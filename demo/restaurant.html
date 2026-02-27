@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMBER — Modern Restaurant</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --red:#FF2D2D;--orange:#FF6B00;--yellow:#FFD500;--teal:#00BFA6;
+  --bg:#FFF8F0;--cream:#FFF3E4;--ink:#1C0A00;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none;}
+#cursor{position:fixed;width:20px;height:20px;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);background:var(--red);mix-blend-mode:multiply;transition:width .3s,height .3s;}
+#cursor.hover{width:60px;height:60px;}
+#threebg{position:fixed;top:0;left:0;z-index:0;pointer-events:none;opacity:.5;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 5rem;background:rgba(255,248,240,.94);backdrop-filter:blur(16px);border-bottom:2px solid var(--ink);}
+.logo{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;letter-spacing:-1px;color:var(--red);}
+nav ul{list-style:none;display:flex;gap:3rem;align-items:center;}
+nav a{color:var(--ink);text-decoration:none;font-weight:500;font-size:.85rem;letter-spacing:.5px;text-transform:uppercase;}
+.reserve-btn{background:var(--red);color:#fff!important;padding:.7rem 2rem;border-radius:8px;border:2px solid var(--ink);}
+
+/* HERO */
+#hero{position:relative;z-index:10;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:8rem 5rem 5rem;gap:6rem;background:linear-gradient(125deg,#FFF3E4 0%,#FFE0C0 40%,#FFD0D0 70%,#FFE8C0 100%);}
+.hero-left{}
+.cuisine-tag{display:inline-flex;align-items:center;gap:.75rem;background:var(--yellow);color:var(--ink);padding:.5rem 1.4rem;border-radius:100px;font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:2rem;border:2px solid var(--ink);}
+h1{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,6.5vw,6rem);font-weight:900;line-height:.95;letter-spacing:-2px;margin-bottom:1.8rem;}
+h1 em{font-style:italic;color:var(--red);}
+.hero-desc{font-size:1.05rem;line-height:1.75;color:rgba(28,10,0,.6);max-width:440px;margin-bottom:2.5rem;}
+.award-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:3rem;}
+.award{display:flex;align-items:center;gap:.5rem;background:#fff;border:1.5px solid var(--ink);border-radius:100px;padding:.4rem 1rem;font-size:.78rem;font-weight:600;}
+.award em{font-size:1rem;font-style:normal;}
+.hero-btns{display:flex;gap:1rem;}
+.btn-red{display:inline-flex;align-items:center;gap:.75rem;background:var(--red);color:#fff;padding:1.05rem 2.5rem;border-radius:8px;font-weight:600;font-size:.95rem;text-decoration:none;border:2px solid var(--ink);transition:transform .3s;}
+.btn-red:hover{transform:translateY(-3px);}
+.btn-line{display:inline-flex;align-items:center;gap:.75rem;background:transparent;color:var(--ink);padding:1.05rem 2.5rem;border-radius:8px;font-weight:600;font-size:.95rem;text-decoration:none;border:2px solid var(--ink);transition:background .25s;}
+.btn-line:hover{background:var(--ink);color:#fff;}
+
+/* Hero right - dish showcase */
+.dish-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.dish-card{border-radius:20px;border:2.5px solid var(--ink);overflow:hidden;transition:transform .4s,box-shadow .4s;}
+.dish-card:hover{transform:translateY(-8px) rotate(1.5deg);box-shadow:5px 8px 0 var(--ink);}
+.dish-card:nth-child(1){grid-column:span 2;background:linear-gradient(135deg,#FF6B00,#FFD500);}
+.dish-card:nth-child(2){background:linear-gradient(135deg,#FF2D2D,#FF8C00);}
+.dish-card:nth-child(3){background:linear-gradient(135deg,#00BFA6,#FFD500);}
+.dish-inner{padding:2rem 2rem 1.5rem;display:flex;align-items:center;gap:1rem;}
+.dish-card:nth-child(1) .dish-inner{flex-direction:row;}
+.dish-em{font-size:3.5rem;}
+.dish-card:nth-child(1) .dish-em{font-size:4.5rem;}
+.dish-info h4{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:.2rem;}
+.dish-info p{font-size:.8rem;color:rgba(28,10,0,.6);}
+.dish-price{font-weight:700;font-size:1rem;color:var(--ink);}
+
+/* TICKER */
+.ticker{position:relative;z-index:10;background:var(--red);color:#fff;padding:.8rem 0;overflow:hidden;}
+.ticker-inner{display:flex;white-space:nowrap;animation:tick 22s linear infinite;}
+.ti{padding:0 3rem;font-size:.78rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+.ti span{opacity:.4;margin-left:3rem;}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* MENU */
+#menu{position:relative;z-index:10;padding:8rem 5rem;background:var(--bg);}
+.menu-intro{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start;margin-bottom:5rem;}
+.mi-left .stag{font-size:.7rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:.75rem;display:block;}
+.mi-left .stitle{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,4vw,3.5rem);font-weight:900;letter-spacing:-1.5px;line-height:1.05;}
+.mi-right{padding-top:1rem;font-size:1rem;line-height:1.75;color:rgba(28,10,0,.6);}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;}
+.menu-item{border-radius:20px;overflow:hidden;border:2px solid var(--ink);transition:transform .4s,box-shadow .4s;cursor:none;}
+.menu-item:hover{transform:translateY(-8px);box-shadow:5px 8px 0 var(--ink);}
+.mi-top{padding:2.5rem 2rem;text-align:center;position:relative;}
+.menu-item:nth-child(1) .mi-top{background:linear-gradient(145deg,#FFE4CC,#FFCCA0);}
+.menu-item:nth-child(2) .mi-top{background:linear-gradient(145deg,#FFD0D0,#FFA0A0);}
+.menu-item:nth-child(3) .mi-top{background:linear-gradient(145deg,#D0FFE8,#A0FFD0);}
+.menu-item:nth-child(4) .mi-top{background:linear-gradient(145deg,#FFE4A0,#FFD060);}
+.menu-item:nth-child(5) .mi-top{background:linear-gradient(145deg,#C0F0FF,#A0DCFF);}
+.menu-item:nth-child(6) .mi-top{background:linear-gradient(145deg,#FFD0F0,#FFA0E0);}
+.mi-em{font-size:4rem;display:block;animation:float 3.5s ease-in-out infinite;}
+.menu-item:nth-child(2) .mi-em{animation-delay:-.6s;}
+.menu-item:nth-child(3) .mi-em{animation-delay:-1.2s;}
+.menu-item:nth-child(4) .mi-em{animation-delay:-1.8s;}
+.menu-item:nth-child(5) .mi-em{animation-delay:-2.4s;}
+.menu-item:nth-child(6) .mi-em{animation-delay:-3s;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.mi-badge{position:absolute;top:1rem;right:1rem;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:.25rem .6rem;border-radius:4px;letter-spacing:1px;text-transform:uppercase;}
+.mi-body{padding:1.5rem 2rem;background:#fff;}
+.mi-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;margin-bottom:.3rem;}
+.mi-desc{font-size:.8rem;color:rgba(28,10,0,.5);line-height:1.5;margin-bottom:1rem;}
+.mi-foot{display:flex;justify-content:space-between;align-items:center;}
+.mi-price{font-weight:700;font-size:1.1rem;}
+.mi-tag{font-size:.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:.3rem .7rem;border-radius:4px;}
+.tag-star{background:#FFF3A0;color:#A06000;}
+.tag-new{background:#D0FFE8;color:#007050;}
+.tag-chef{background:#FFD0D0;color:#A00000;}
+
+/* AMBIANCE */
+#ambiance{position:relative;z-index:10;background:var(--cream);padding:6rem 5rem;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);}
+.amb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:3rem;}
+.amb-card{border-radius:20px;border:2px solid var(--ink);padding:2.5rem 2rem;background:#fff;transition:transform .3s;}
+.amb-card:hover{transform:translateY(-6px);}
+.amb-icon{font-size:2.5rem;margin-bottom:1rem;display:block;}
+.amb-card h4{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;margin-bottom:.5rem;}
+.amb-card p{font-size:.85rem;color:rgba(28,10,0,.55);line-height:1.6;}
+
+/* RESERVATION */
+#reservation{position:relative;z-index:10;background:linear-gradient(135deg,#FFE0A0,#FFB0A0);padding:8rem 5rem;text-align:center;border-top:2px solid var(--ink);}
+#reservation h2{font-family:'Playfair Display',serif;font-size:clamp(3rem,5.5vw,5rem);font-weight:900;letter-spacing:-2px;color:var(--ink);margin-bottom:1.5rem;line-height:1.05;}
+#reservation p{font-size:1rem;color:rgba(28,10,0,.6);margin-bottom:3rem;max-width:420px;margin-left:auto;margin-right:auto;}
+.hours-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-bottom:3rem;}
+.hr{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:1.5rem 2.5rem;text-align:center;}
+.hr-day{font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:.4rem;}
+.hr-time{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;}
+footer{position:relative;z-index:10;background:var(--ink);color:#fff;padding:2.5rem 5rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}
+.fade-up{opacity:0;transform:translateY(35px);transition:opacity .7s,transform .7s;}
+.fade-up.vis{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<canvas id="threebg"></canvas>
+<nav>
+  <div class="logo">EMBER</div>
+  <ul>
+    <li><a href="#">Menu</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Events</a></li>
+    <li><a href="#" class="reserve-btn">Reserve</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-left">
+    <div class="cuisine-tag">🔥 New Menu — Summer 2025</div>
+    <h1>Where food<br>becomes <em>art.</em></h1>
+    <p class="hero-desc">Modern cuisine rooted in bold flavours, local seasons, and the kind of warmth you can only feel around a great meal shared.</p>
+    <div class="award-row">
+      <div class="award"><em>⭐</em> Michelin Recommended</div>
+      <div class="award"><em>🏆</em> Best New Restaurant 2024</div>
+    </div>
+    <div class="hero-btns">
+      <a href="#" class="btn-red">Reserve a Table →</a>
+      <a href="#" class="btn-line">View Menu</a>
+    </div>
+  </div>
+  <div class="dish-grid">
+    <div class="dish-card">
+      <div class="dish-inner">
+        <span class="dish-em">🥩</span>
+        <div class="dish-info">
+          <h4>Ember Wagyu</h4>
+          <p>A5 · Bone Marrow · Black Garlic</p>
+          <div class="dish-price">$98</div>
+        </div>
+      </div>
+    </div>
+    <div class="dish-card">
+      <div class="dish-inner" style="flex-direction:column;text-align:center;">
+        <span class="dish-em">🦞</span>
+        <div class="dish-info">
+          <h4>Lobster Bisque</h4>
+          <p>Tarragon Cream</p>
+          <div class="dish-price">$38</div>
+        </div>
+      </div>
+    </div>
+    <div class="dish-card">
+      <div class="dish-inner" style="flex-direction:column;text-align:center;">
+        <span class="dish-em">🍮</span>
+        <div class="dish-info">
+          <h4>Crème Brûlée</h4>
+          <p>Vanilla Bean · Seasonal</p>
+          <div class="dish-price">$18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker">
+  <div class="ticker-inner" id="tinner"></div>
+</div>
+
+<section id="menu">
+  <div class="menu-intro">
+    <div class="mi-left fade-up">
+      <span class="stag">// Tonight's Menu</span>
+      <h2 class="stitle">Crafted with<br>fire & care.</h2>
+    </div>
+    <div class="mi-right fade-up">Every dish on our menu is composed to surprise, delight, and linger in memory. Our kitchen sources locally, cooks boldly, and presents beautifully. No shortcuts, ever.</div>
+  </div>
+  <div class="menu-grid">
+    <div class="menu-item fade-up"><div class="mi-top"><em class="mi-em">🦪</em><span class="mi-badge">New</span></div><div class="mi-body"><h3 class="mi-name">Oyster Trio</h3><p class="mi-desc">Kumamoto · Champagne Mignonette · Caviar</p><div class="mi-foot"><span class="mi-price">$28</span><span class="mi-tag tag-new">New</span></div></div></div>
+    <div class="menu-item fade-up"><div class="mi-top"><em class="mi-em">🥗</em></div><div class="mi-body"><h3 class="mi-name">Heirloom Caesar</h3><p class="mi-desc">Heirloom Tomatoes · Anchovy · Parmesan Snow</p><div class="mi-foot"><span class="mi-price">$22</span><span class="mi-tag tag-star">⭐ Bestseller</span></div></div></div>
+    <div class="menu-item fade-up"><div class="mi-top"><em class="mi-em">🍝</em></div><div class="mi-body"><h3 class="mi-name">Black Truffle Pasta</h3><p class="mi-desc">Hand-rolled Pappardelle · Winter Truffle · Sage</p><div class="mi-foot"><span class="mi-price">$46</span><span class="mi-tag tag-chef">Chef's Pick</span></div></div></div>
+    <div class="menu-item fade-up"><div class="mi-top"><em class="mi-em">🥩</em></div><div class="mi-body"><h3 class="mi-name">Ember Wagyu</h3><p class="mi-desc">A5 Wagyu · Bone Marrow · Celeriac Puree</p><div class="mi-foot"><span class="mi-price">$98</span><span class="mi-tag tag-chef">Chef's Pick</span></div></div></div>
+    <div class="menu-item fade-up"><div class="mi-top"><em class="mi-em">🐟</em></div><div class="mi-body"><h3 class="mi-name">Halibut en Croûte</h3><p class="mi-desc">Wild Halibut · Herb Crust · Saffron Beurre Blanc</p><div class="mi-foot"><span class="mi-price">$58</span><span class="mi-tag tag-star">⭐ Top Rated</span></div></div></div>
+    <div class="menu-item fade-up"><div class="mi-top"><em class="mi-em">🍫</em></div><div class="mi-body"><h3 class="mi-name">Chocolate Sphere</h3><p class="mi-desc">Valrhona 72% · Salted Caramel · Gold Dust</p><div class="mi-foot"><span class="mi-price">$24</span><span class="mi-tag tag-new">New</span></div></div></div>
+  </div>
+</section>
+
+<section id="ambiance">
+  <div style="text-align:center;">
+    <span class="stag" style="font-size:.7rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:.5rem;display:block;">// The Space</span>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(2.5rem,4vw,3.5rem);font-weight:900;letter-spacing:-1.5px;">More than a meal.</h2>
+  </div>
+  <div class="amb-grid">
+    <div class="amb-card fade-up"><span class="amb-icon">🕯️</span><h4>Intimate Atmosphere</h4><p>Hand-poured candles, low warm lighting, and a room designed to slow time down.</p></div>
+    <div class="amb-card fade-up"><span class="amb-icon">🍷</span><h4>Natural Wine List</h4><p>160 selections curated by our sommelier. Biodynamic, minimal intervention, all extraordinary.</p></div>
+    <div class="amb-card fade-up"><span class="amb-icon">🎵</span><h4>Live Music Fridays</h4><p>Acoustic jazz sets every Friday from 7PM. The perfect backdrop for any occasion.</p></div>
+  </div>
+</section>
+
+<section id="reservation">
+  <h2 class="fade-up">Come dine<br>with us.</h2>
+  <div class="hours-row">
+    <div class="hr fade-up"><div class="hr-day">Tue – Thu</div><div class="hr-time">6:00 – 10:00 PM</div></div>
+    <div class="hr fade-up"><div class="hr-day">Fri – Sat</div><div class="hr-time">5:30 – 11:00 PM</div></div>
+    <div class="hr fade-up"><div class="hr-day">Sunday</div><div class="hr-time">5:00 – 9:30 PM</div></div>
+  </div>
+  <a href="#" class="btn-red fade-up" style="font-size:1rem;padding:1.2rem 3rem;display:inline-flex;margin:0 auto;">Reserve Your Table →</a>
+</section>
+
+<footer>
+  <span><b>EMBER</b> — Modern Restaurant</span>
+  <span>123 Fifth Avenue, New York · (212) 555-0194</span>
+  <span>© 2025</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// Ticker
+const items2=['🔥 Open Nightly','🍷 Natural Wine List','⭐ Michelin Recommended','🥩 Locally Sourced','🎵 Live Jazz Fridays','👨‍🍳 Chef\'s Table Available'];
+const ti=document.getElementById('tinner');
+ti.innerHTML=[...items2,...items2].map(t=>`<span class="ti">${t}<span>·</span></span>`).join('');
+
+// Cursor
+const cur2=document.getElementById('cursor');
+let cx=0,cy=0,tx2=0,ty2=0;
+document.addEventListener('mousemove',e=>{tx2=e.clientX;ty2=e.clientY;});
+(function ac(){cx+=(tx2-cx)*.18;cy+=(ty2-cy)*.18;cur2.style.left=cx+'px';cur2.style.top=cy+'px';requestAnimationFrame(ac);})();
+document.querySelectorAll('a,.menu-item,.dish-card,.amb-card').forEach(el=>{el.addEventListener('mouseenter',()=>cur2.classList.add('hover'));el.addEventListener('mouseleave',()=>cur2.classList.remove('hover'));});
+
+// Three.js - warm floating shapes
+const c2=document.getElementById('threebg');
+const r2=new THREE.WebGLRenderer({canvas:c2,antialias:true,alpha:true});
+r2.setSize(innerWidth,innerHeight);r2.setPixelRatio(Math.min(devicePixelRatio,2));
+const sc2=new THREE.Scene(),cam2=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,100);
+cam2.position.z=6;
+const shapes2=[];
+const warmColors=[0xFF6B00,0xFF2D2D,0xFFD500,0xFF8C00,0x00BFA6,0xFFB347];
+const geos2=[
+  new THREE.IcosahedronGeometry(.15,0),
+  new THREE.OctahedronGeometry(.15),
+  new THREE.TetrahedronGeometry(.18),
+  new THREE.BoxGeometry(.2,.2,.2),
+];
+for(let i=0;i<35;i++){
+  const g=geos2[i%geos2.length];
+  const m=new THREE.MeshBasicMaterial({color:warmColors[i%warmColors.length],transparent:true,opacity:Math.random()*.2+.06,wireframe:i%3===0});
+  const mesh=new THREE.Mesh(g,m);
+  mesh.position.set((Math.random()-.5)*22,(Math.random()-.5)*16,(Math.random()-.5)*8-4);
+  mesh.userData={rx:(Math.random()-.5)*.015,ry:(Math.random()-.5)*.012,vy:(Math.random()-.5)*.006};
+  sc2.add(mesh);shapes2.push(mesh);
+}
+let mx2=0,my2=0;
+document.addEventListener('mousemove',e=>{mx2=(e.clientX/innerWidth-.5)*2;my2=-(e.clientY/innerHeight-.5)*2;});
+function anim2(){
+  requestAnimationFrame(anim2);
+  shapes2.forEach(sh=>{sh.rotation.x+=sh.userData.rx;sh.rotation.y+=sh.userData.ry;sh.position.y+=sh.userData.vy;if(sh.position.y>10||sh.position.y<-10)sh.userData.vy*=-1;});
+  cam2.position.x+=(mx2*.35-cam2.position.x)*.04;
+  cam2.position.y+=(my2*.35-cam2.position.y)*.04;
+  r2.render(sc2,cam2);
+}
+anim2();
+window.addEventListener('resize',()=>{cam2.aspect=innerWidth/innerHeight;cam2.updateProjectionMatrix();r2.setSize(innerWidth,innerHeight);});
+
+// Scroll reveals
+const obs2=new IntersectionObserver(entries=>entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('vis'),i*80);}),{threshold:.1});
+document.querySelectorAll('.fade-up').forEach(el=>obs2.observe(el));
+</script>
+</body>
+</html>
