@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULSE — Data News</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#F2F0EB;--ink:#12100E;--red:#E8003D;--blue:#0047FF;--green:#00C853;
+  --yellow:#FFD600;--orange:#FF5500;--purple:#7C00FF;
+  --white:#FFFFFF;--muted:#888;--border:#D0CCBE;
+  --surface:#FFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;overflow-x:hidden;cursor:none;}
+#cursor{position:fixed;width:16px;height:16px;border-radius:50%;background:var(--red);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s;mix-blend-mode:multiply;}
+#cursor.hover{width:48px;height:48px;background:var(--blue);}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:var(--ink);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:.9rem 3rem;border-bottom:3px solid var(--red);}
+.nav-logo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:2px;color:var(--red);}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.8rem;font-weight:500;letter-spacing:1px;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:#fff;}
+.live-pill{display:flex;align-items:center;gap:.5rem;background:var(--red);padding:.35rem 1rem;border-radius:4px;font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+.live-dot{width:7px;height:7px;background:#fff;border-radius:50%;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* BREAKING BANNER */
+.breaking{background:var(--red);color:#fff;padding:.6rem 3rem;display:flex;align-items:center;gap:1.5rem;overflow:hidden;}
+.brk-label{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;white-space:nowrap;background:rgba(255,255,255,.2);padding:.2rem .7rem;border-radius:2px;}
+.brk-scroll{display:flex;gap:4rem;white-space:nowrap;animation:brkscroll 30s linear infinite;font-size:.82rem;font-weight:500;}
+@keyframes brkscroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* LAYOUT */
+.page-wrap{max-width:1440px;margin:0 auto;padding:2rem 3rem;}
+
+/* HEADLINE GRID */
+.headline-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:auto auto;gap:1.5rem;margin-bottom:2.5rem;}
+.hl-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;cursor:none;transition:transform .3s,box-shadow .3s;}
+.hl-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.1);}
+.hl-main{grid-row:span 2;display:flex;flex-direction:column;}
+.hl-vis{height:220px;display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative;overflow:hidden;}
+.hl-card:nth-child(1) .hl-vis{background:linear-gradient(135deg,#FFE040,#FF5500);}
+.hl-card:nth-child(2) .hl-vis{height:160px;background:linear-gradient(135deg,#E0F0FF,#0047FF20);font-size:3rem;}
+.hl-card:nth-child(3) .hl-vis{height:160px;background:linear-gradient(135deg,#F0FFE8,#00C85330);font-size:3rem;}
+.hl-card:nth-child(4) .hl-vis{height:160px;background:linear-gradient(135deg,#FFE8F8,#7C00FF20);font-size:3rem;}
+.hl-card:nth-child(5) .hl-vis{height:160px;background:linear-gradient(135deg,#FFF4E0,#E8003D20);font-size:3rem;}
+.hl-body{padding:1.25rem 1.5rem;flex:1;}
+.hl-cat{font-size:.65rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:.5rem;}
+.cat-tech{color:var(--blue);}
+.cat-economy{color:var(--green);}
+.cat-science{color:var(--purple);}
+.cat-world{color:var(--orange);}
+.cat-climate{color:var(--green);}
+.hl-title{font-size:1.15rem;font-weight:700;line-height:1.3;margin-bottom:.5rem;}
+.hl-main .hl-title{font-size:1.6rem;}
+.hl-time{font-size:.72rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+
+/* LIVE STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:2.5rem;}
+.stat-pill{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.4rem;cursor:none;transition:border-color .3s,transform .3s;}
+.stat-pill:hover{border-color:var(--ink);transform:translateY(-3px);}
+.sp-label{font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.sp-val{font-family:'Bebas Neue',cursive;font-size:2.2rem;letter-spacing:1px;line-height:1;}
+.sp-change{font-size:.75rem;font-weight:600;font-family:'IBM Plex Mono',monospace;}
+.up{color:var(--green);}
+.down{color:var(--red);}
+.sp-bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-top:.25rem;}
+.sp-fill{height:100%;border-radius:2px;transition:width 1s ease;}
+
+/* MAIN CONTENT COLUMNS */
+.content-cols{display:grid;grid-template-columns:1fr 380px;gap:2.5rem;margin-bottom:2.5rem;}
+
+/* CHARTS SECTION */
+.charts-section{}
+.section-label{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem;display:flex;align-items:center;gap:.75rem;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.chart-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:1.5rem;}
+.chart-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;}
+.chart-title{font-size:1rem;font-weight:700;}
+.chart-sub{font-size:.78rem;color:var(--muted);margin-top:.2rem;}
+.chart-meta{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--muted);text-align:right;}
+.chart-big{font-family:'Bebas Neue',cursive;font-size:2.5rem;color:var(--ink);}
+
+canvas.chart{width:100%!important;height:220px!important;}
+
+/* INTERACTIVE INPUTS */
+.input-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:1.5rem;}
+.input-card h3{font-size:1rem;font-weight:700;margin-bottom:.3rem;}
+.input-card .ic-sub{font-size:.8rem;color:var(--muted);margin-bottom:1.5rem;}
+.inp-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.inp-group{display:flex;flex-direction:column;gap:.4rem;}
+.inp-group label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.inp-group input[type=range]{-webkit-appearance:none;width:100%;height:5px;background:var(--bg);border-radius:3px;outline:none;cursor:pointer;}
+.inp-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid var(--ink);}
+.inp-group input[type=number]{width:100%;padding:.6rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:.9rem;background:var(--bg);color:var(--ink);outline:none;transition:border-color .2s;}
+.inp-group input[type=number]:focus{border-color:var(--blue);}
+.inp-val{font-family:'Bebas Neue',cursive;font-size:1.5rem;color:var(--blue);line-height:1;}
+.update-btn{width:100%;padding:.85rem;background:var(--blue);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.9rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .2s;font-family:'IBM Plex Sans',sans-serif;}
+.update-btn:hover{background:var(--ink);transform:translateY(-2px);}
+
+/* SIDEBAR */
+.sidebar{}
+.trending-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;}
+.trending-card h3{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
+.trend-item{display:flex;align-items:flex-start;gap:1rem;padding:.85rem 0;border-bottom:1px solid var(--bg);}
+.trend-item:last-child{border-bottom:none;}
+.trend-num{font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--border);line-height:1;min-width:28px;}
+.trend-text{}
+.trend-cat{font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.trend-title{font-size:.85rem;font-weight:600;line-height:1.4;margin-top:.2rem;}
+.trend-reads{font-size:.7rem;color:var(--muted);margin-top:.3rem;font-family:'IBM Plex Mono',monospace;}
+
+/* WORLD MAP PLACEHOLDER */
+.map-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.5rem;}
+.map-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);}
+.map-header h3{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.map-canvas-wrap{padding:1.25rem;}
+canvas#worldmap{width:100%!important;}
+
+/* DONUT CHARTS ROW */
+.donut-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2.5rem;}
+.donut-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center;}
+.donut-title{font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;}
+.donut-wrap{position:relative;display:inline-block;}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.donut-big{font-family:'Bebas Neue',cursive;font-size:2rem;line-height:1;}
+.donut-sm{font-size:.65rem;color:var(--muted);font-weight:500;}
+.donut-legend{margin-top:1rem;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;}
+.legend-item{display:flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:600;}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* HEATMAP */
+.heatmap-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:2.5rem;}
+.hm-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:1.25rem;}
+.hm-cell{aspect-ratio:1;border-radius:3px;transition:opacity .3s;}
+
+/* TICKER BOTTOM */
+.bottom-ticker{background:var(--ink);color:var(--yellow);padding:.65rem 0;overflow:hidden;margin-top:2rem;}
+.bt-inner{display:flex;white-space:nowrap;animation:tick2 25s linear infinite;}
+.bt-item{padding:0 2.5rem;font-size:.75rem;font-weight:500;font-family:'IBM Plex Mono',monospace;}
+@keyframes tick2{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+footer{background:var(--ink);color:rgba(255,255,255,.5);padding:2rem 3rem;display:flex;justify-content:space-between;font-size:.78rem;font-family:'IBM Plex Mono',monospace;}
+.footer-logo{color:var(--red);font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:2px;}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<nav>
+  <div class="nav-logo">PULSE</div>
+  <ul class="nav-links">
+    <li><a href="#">World</a></li>
+    <li><a href="#">Economy</a></li>
+    <li><a href="#">Tech</a></li>
+    <li><a href="#">Climate</a></li>
+    <li><a href="#">Science</a></li>
+  </ul>
+  <div class="live-pill"><div class="live-dot"></div>Live</div>
+</nav>
+
+<div class="breaking">
+  <div class="brk-label">Breaking</div>
+  <div class="brk-scroll" id="brkscroll"></div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- HEADLINES -->
+  <div class="headline-grid">
+    <div class="hl-card hl-main">
+      <div class="hl-vis">📊</div>
+      <div class="hl-body">
+        <div class="hl-cat cat-economy">Economy</div>
+        <h2 class="hl-title">Global markets rally as inflation data shows unexpected cooling — S&P 500 hits record high</h2>
+        <div class="hl-time">2 min ago · 12,482 reads</div>
+      </div>
+    </div>
+    <div class="hl-card"><div class="hl-vis">🤖</div><div class="hl-body"><div class="hl-cat cat-tech">Technology</div><h3 class="hl-title">AI chip demand surges 340% as new model wave hits production</h3><div class="hl-time">8 min ago</div></div></div>
+    <div class="hl-card"><div class="hl-vis">🌿</div><div class="hl-body"><div class="hl-cat cat-climate">Climate</div><h3 class="hl-title">Renewable energy now covers 41% of global electricity production</h3><div class="hl-time">15 min ago</div></div></div>
+    <div class="hl-card"><div class="hl-vis">🔭</div><div class="hl-body"><div class="hl-cat cat-science">Science</div><h3 class="hl-title">NASA confirms water ice discovery on lunar south pole</h3><div class="hl-time">31 min ago</div></div></div>
+    <div class="hl-card"><div class="hl-vis">🌍</div><div class="hl-body"><div class="hl-cat cat-world">World</div><h3 class="hl-title">G20 nations agree on landmark digital tax framework</h3><div class="hl-time">47 min ago</div></div></div>
+  </div>
+
+  <!-- LIVE STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-pill"><div class="sp-label">S&P 500</div><div class="sp-val" id="sp500">5,842</div><div class="sp-change up">▲ +1.24%</div><div class="sp-bar"><div class="sp-fill" style="width:72%;background:var(--green);"></div></div></div>
+    <div class="stat-pill"><div class="sp-label">Bitcoin</div><div class="sp-val" id="btc">$91,240</div><div class="sp-change up">▲ +3.8%</div><div class="sp-bar"><div class="sp-fill" style="width:85%;background:var(--orange);"></div></div></div>
+    <div class="stat-pill"><div class="sp-label">Inflation</div><div class="sp-val" id="cpi">2.7%</div><div class="sp-change down">▼ -0.3%</div><div class="sp-bar"><div class="sp-fill" style="width:27%;background:var(--red);"></div></div></div>
+    <div class="stat-pill"><div class="sp-label">Unemployment</div><div class="sp-val" id="unemp">3.9%</div><div class="sp-change up">▲ stable</div><div class="sp-bar"><div class="sp-fill" style="width:39%;background:var(--blue);"></div></div></div>
+    <div class="stat-pill"><div class="sp-label">CO₂ ppm</div><div class="sp-val" id="co2">424</div><div class="sp-change down">▼ trend</div><div class="sp-bar"><div class="sp-fill" style="width:84%;background:var(--purple);"></div></div></div>
+  </div>
+
+  <div class="content-cols">
+    <div class="charts-section">
+      <div class="section-label">Interactive Charts</div>
+
+      <!-- LINE CHART CARD -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Global Economic Indicators</div>
+            <div class="chart-sub">GDP growth · Inflation · Interest rates (last 12 months)</div>
+          </div>
+          <div class="chart-meta">
+            <div>Updated: <span id="updatetime">live</span></div>
+            <div class="chart-big" id="main-metric">+3.2%</div>
+          </div>
+        </div>
+        <canvas class="chart" id="lineChart"></canvas>
+      </div>
+
+      <!-- BAR CHART CARD -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Technology Sector Revenue ($B)</div>
+            <div class="chart-sub">Top 6 companies — Q1–Q4 2024</div>
+          </div>
+        </div>
+        <canvas class="chart" id="barChart"></canvas>
+      </div>
+
+      <!-- INTERACTIVE INPUTS -->
+      <div class="input-card">
+        <h3>🎛️ Adjust the Data</h3>
+        <p class="ic-sub">Move the sliders or type values — the charts update in real time.</p>
+        <div class="inp-row">
+          <div class="inp-group">
+            <label>GDP Growth Rate (%)</label>
+            <input type="range" id="gdpSlider" min="-5" max="10" step="0.1" value="3.2">
+            <div class="inp-val" id="gdpVal">3.2%</div>
+          </div>
+          <div class="inp-group">
+            <label>Inflation Rate (%)</label>
+            <input type="range" id="inflSlider" min="0" max="15" step="0.1" value="2.7">
+            <div class="inp-val" id="inflVal">2.7%</div>
+          </div>
+          <div class="inp-group">
+            <label>Interest Rate (%)</label>
+            <input type="range" id="rateSlider" min="0" max="8" step="0.25" value="4.5">
+            <div class="inp-val" id="rateVal">4.50%</div>
+          </div>
+          <div class="inp-group">
+            <label>Unemployment (%)</label>
+            <input type="range" id="unempSlider" min="1" max="15" step="0.1" value="3.9">
+            <div class="inp-val" id="unempVal">3.9%</div>
+          </div>
+        </div>
+        <div class="inp-row">
+          <div class="inp-group">
+            <label>S&P 500 Level</label>
+            <input type="number" id="spInput" value="5842" min="1000" max="10000">
+          </div>
+          <div class="inp-group">
+            <label>Bitcoin Price ($)</label>
+            <input type="number" id="btcInput" value="91240" min="1000" max="500000">
+          </div>
+        </div>
+        <button class="update-btn" id="updateBtn">⚡ Update All Charts</button>
+      </div>
+
+      <!-- DONUT CHARTS ROW -->
+      <div class="donut-row">
+        <div class="donut-card">
+          <div class="donut-title">Energy Mix 2025</div>
+          <div class="donut-wrap">
+            <canvas id="donut1" width="160" height="160"></canvas>
+            <div class="donut-center"><div class="donut-big" id="d1pct">41%</div><div class="donut-sm">Renewable</div></div>
+          </div>
+          <div class="donut-legend" id="d1legend"></div>
+        </div>
+        <div class="donut-card">
+          <div class="donut-title">Tech Sector Breakdown</div>
+          <div class="donut-wrap">
+            <canvas id="donut2" width="160" height="160"></canvas>
+            <div class="donut-center"><div class="donut-big">$3.8T</div><div class="donut-sm">Total Cap</div></div>
+          </div>
+          <div class="donut-legend" id="d2legend"></div>
+        </div>
+      </div>
+
+      <!-- HEATMAP -->
+      <div class="heatmap-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Market Activity Heatmap</div>
+            <div class="chart-sub">Trading intensity by month and sector (Jan–Dec)</div>
+          </div>
+        </div>
+        <div id="hmLabels" style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:.5rem;"></div>
+        <div class="hm-grid" id="hmGrid"></div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.75rem;font-size:.7rem;color:var(--muted);">
+          <span>Low</span>
+          <div style="display:flex;gap:2px;">
+            <div style="width:14px;height:14px;border-radius:2px;background:#E0F0FF;"></div>
+            <div style="width:14px;height:14px;border-radius:2px;background:#9ECFFF;"></div>
+            <div style="width:14px;height:14px;border-radius:2px;background:#4FA0FF;"></div>
+            <div style="width:14px;height:14px;border-radius:2px;background:#0047FF;"></div>
+            <div style="width:14px;height:14px;border-radius:2px;background:#002AAA;"></div>
+          </div>
+          <span>High</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="section-label">Trending</div>
+      <div class="trending-card">
+        <h3>Most Read Today</h3>
+        <div class="trend-item"><div class="trend-num">01</div><div class="trend-text"><div class="trend-cat cat-economy">Economy</div><div class="trend-title">Fed signals rate cuts may come sooner than expected</div><div class="trend-reads">42.1K reads</div></div></div>
+        <div class="trend-item"><div class="trend-num">02</div><div class="trend-text"><div class="trend-cat cat-tech">Tech</div><div class="trend-title">OpenAI announces breakthrough in reasoning models</div><div class="trend-reads">38.6K reads</div></div></div>
+        <div class="trend-item"><div class="trend-num">03</div><div class="trend-text"><div class="trend-cat cat-climate">Climate</div><div class="trend-title">Arctic sea ice reaches 40-year record high</div><div class="trend-reads">29.4K reads</div></div></div>
+        <div class="trend-item"><div class="trend-num">04</div><div class="trend-text"><div class="trend-cat cat-science">Science</div><div class="trend-title">CRISPR gene therapy approved for rare blood disorder</div><div class="trend-reads">24.8K reads</div></div></div>
+        <div class="trend-item"><div class="trend-num">05</div><div class="trend-text"><div class="trend-cat cat-world">World</div><div class="trend-title">Global population reaches 8.2 billion milestone</div><div class="trend-reads">21.0K reads</div></div></div>
+      </div>
+
+      <!-- AREA CHART SIDEBAR -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-title">Readership Today</div><div class="chart-sub">Unique visitors (hourly)</div></div>
+        </div>
+        <canvas class="chart" id="areaChart" style="height:140px!important;"></canvas>
+      </div>
+
+      <!-- CO2 GAUGE -->
+      <div class="chart-card">
+        <div style="text-align:center;">
+          <div class="chart-title" style="margin-bottom:1rem;">CO₂ Concentration</div>
+          <canvas id="gaugeChart" width="200" height="120" style="max-width:200px;"></canvas>
+          <div style="font-family:'Bebas Neue',cursive;font-size:2.5rem;color:var(--red);margin-top:.5rem;" id="gaugeVal">424 ppm</div>
+          <div style="font-size:.75rem;color:var(--muted);">Pre-industrial: 280 ppm</div>
+          <div style="margin-top:1rem;">
+            <input type="range" id="co2Slider" min="280" max="500" value="424" style="width:100%;">
+          </div>
+        </div>
+      </div>
+
+      <!-- MINI BAR CHART - TOP COUNTRIES -->
+      <div class="chart-card">
+        <div class="chart-header"><div><div class="chart-title">GDP Growth by Region</div><div class="chart-sub">2024 estimates (%)</div></div></div>
+        <canvas class="chart" id="hbarChart" style="height:200px!important;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-ticker">
+  <div class="bt-inner" id="btinner"></div>
+</div>
+
+<footer>
+  <div class="footer-logo">PULSE</div>
+  <span>© 2025 Pulse Data News — Real-time financial & world data</span>
+  <span>Updated live · All data illustrative</span>
+</footer>
+
+<script>
+// ── CURSOR ──────────────────────────────────────────────────
+const cur=document.getElementById('cursor');
+let cx=0,cy=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;});
+(function ac(){cx+=(tx-cx)*.18;cy+=(ty-cy)*.18;cur.style.left=cx+'px';cur.style.top=cy+'px';requestAnimationFrame(ac);})();
+document.querySelectorAll('a,button,input,.hl-card,.stat-pill,.trend-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cur.classList.add('hover'));
+  el.addEventListener('mouseleave',()=>cur.classList.remove('hover'));
+});
+
+// ── BREAKING TICKER ─────────────────────────────────────────
+const brkItems=['🔴 Markets rally as inflation cools to 2.7%','🤖 AI chip orders surge 340% year-on-year','🌿 Renewable energy hits 41% of global power','🚀 SpaceX completes 200th successful launch','💰 Bitcoin reaches $91K for first time in 2025','🌡️ February 2026 recorded as warmest on record'];
+const bs=document.getElementById('brkscroll');
+bs.innerHTML=[...brkItems,...brkItems].map(t=>`<span style="padding:0 3rem;">${t}</span>`).join('');
+const bt=document.getElementById('btinner');
+const btItems=['DOW: 44,821 ▲ +0.8%','NASDAQ: 19,450 ▲ +1.4%','FTSE: 8,920 ▲ +0.5%','EUR/USD: 1.0842','OIL (WTI): $71.20 ▼ -0.3%','GOLD: $2,640 ▲ +0.2%','10Y TREASURY: 4.22%','BTC: $91,240 ▲ +3.8%'];
+bt.innerHTML=[...btItems,...btItems].map(t=>`<span class="bt-item">${t}</span>`).join('');
+
+// ── DATA STATE ───────────────────────────────────────────────
+const state={gdp:3.2,infl:2.7,rate:4.5,unemp:3.9,sp500:5842,btc:91240,co2:424};
+
+// ── LINE CHART ───────────────────────────────────────────────
+const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const lineCanvas=document.getElementById('lineChart');
+const lineCtx=lineCanvas.getContext('2d');
+
+function genGDPData(base){return months.map((_,i)=>+(base+Math.sin(i*.6)*.8+Math.random()*.4-.2).toFixed(2));}
+function genInflData(base){return months.map((_,i)=>+(base-i*.04+Math.sin(i*.9)*.3+Math.random()*.2).toFixed(2));}
+function genRateData(base){return months.map((_,i)=>+(base-i*.02+Math.random()*.1).toFixed(2));}
+
+let lineData={gdp:genGDPData(state.gdp),infl:genInflData(state.infl),rate:genRateData(state.rate)};
+
+function drawLine(){
+  const w=lineCanvas.offsetWidth,h=220;
+  lineCanvas.width=w*devicePixelRatio;lineCanvas.height=h*devicePixelRatio;
+  lineCanvas.style.width=w+'px';lineCanvas.style.height=h+'px';
+  const ctx=lineCtx;ctx.scale(devicePixelRatio,devicePixelRatio);
+  const pad={top:15,right:20,bottom:35,left:45};
+  const cw=w-pad.left-pad.right,ch=h-pad.top-pad.bottom;
+
+  const allVals=[...lineData.gdp,...lineData.infl,...lineData.rate];
+  const minV=Math.min(...allVals)-0.5,maxV=Math.max(...allVals)+0.5;
+
+  const toX=(i)=>pad.left+i*(cw/(months.length-1));
+  const toY=(v)=>pad.top+ch-(v-minV)/(maxV-minV)*ch;
+
+  // Grid
+  ctx.strokeStyle='#E8E4DC';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.top+i*(ch/4);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
+    const val=(maxV-(i/4)*(maxV-minV)).toFixed(1);
+    ctx.fillStyle='#999';ctx.font='11px IBM Plex Mono';ctx.textAlign='right';
+    ctx.fillText(val+'%',pad.left-6,y+4);
+  }
+  months.forEach((m,i)=>{
+    ctx.fillStyle='#999';ctx.font='11px IBM Plex Sans';ctx.textAlign='center';
+    ctx.fillText(m,toX(i),h-pad.bottom+18);
+  });
+
+  function drawDataLine(data,color,label,dashed=false){
+    ctx.save();
+    if(dashed){ctx.setLineDash([6,4]);}
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';
+    // Gradient fill
+    const grad=ctx.createLinearGradient(0,pad.top,0,pad.top+ch);
+    grad.addColorStop(0,color+'40');grad.addColorStop(1,color+'00');
+    ctx.beginPath();
+    data.forEach((v,i)=>{i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v));});
+    ctx.stroke();
+    // Fill
+    ctx.lineTo(toX(data.length-1),pad.top+ch);ctx.lineTo(toX(0),pad.top+ch);
+    ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+    ctx.setLineDash([]);
+    // Dots on last point
+    ctx.beginPath();ctx.arc(toX(data.length-1),toY(data[data.length-1]),5,0,Math.PI*2);
+    ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    ctx.restore();
+  }
+
+  drawDataLine(lineData.gdp,'#0047FF','GDP');
+  drawDataLine(lineData.infl,'#E8003D','Inflation',true);
+  drawDataLine(lineData.rate,'#00C853','Rate',true);
+
+  // Legend
+  const legend=[['GDP Growth','#0047FF'],['Inflation','#E8003D'],['Interest Rate','#00C853']];
+  let lx=pad.left;
+  legend.forEach(([name,color])=>{
+    ctx.fillStyle=color;ctx.fillRect(lx,h-10,20,3);
+    ctx.fillStyle='#666';ctx.font='11px IBM Plex Sans';ctx.textAlign='left';
+    ctx.fillText(name,lx+26,h-4);lx+=90;
+  });
+}
+
+// ── BAR CHART ────────────────────────────────────────────────
+const barCanvas=document.getElementById('barChart');
+const barCtx=barCanvas.getContext('2d');
+const companies=['Apple','Microsoft','Nvidia','Google','Amazon','Meta'];
+const compColors=['#0047FF','#00C853','#E8003D','#FF5500','#FFD600','#7C00FF'];
+let barData=[394,245,285,307,411,135];
+
+function drawBar(){
+  const w=barCanvas.offsetWidth,h=220;
+  barCanvas.width=w*devicePixelRatio;barCanvas.height=h*devicePixelRatio;
+  barCanvas.style.width=w+'px';barCanvas.style.height=h+'px';
+  const ctx=barCtx;ctx.scale(devicePixelRatio,devicePixelRatio);
+  const pad={top:15,right:20,bottom:45,left:45};
+  const cw=w-pad.left-pad.right,ch=h-pad.top-pad.bottom;
+  const maxV=Math.max(...barData)*1.15;
+  const bw=cw/companies.length*.55,gap=cw/companies.length;
+
+  ctx.strokeStyle='#E8E4DC';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.top+i*(ch/4);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
+    ctx.fillStyle='#999';ctx.font='11px IBM Plex Mono';ctx.textAlign='right';
+    ctx.fillText('$'+(maxV-(i/4)*maxV).toFixed(0)+'B',pad.left-6,y+4);
+  }
+
+  companies.forEach((c,i)=>{
+    const x=pad.left+i*gap+gap*.5-bw/2;
+    const bh=(barData[i]/maxV)*ch;
+    const y=pad.top+ch-bh;
+    const grad=ctx.createLinearGradient(0,y,0,pad.top+ch);
+    grad.addColorStop(0,compColors[i]);grad.addColorStop(1,compColors[i]+'60');
+    ctx.fillStyle=grad;
+    // Rounded top bar
+    const r=6;
+    ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+bw-r,y);
+    ctx.quadraticCurveTo(x+bw,y,x+bw,y+r);
+    ctx.lineTo(x+bw,pad.top+ch);ctx.lineTo(x,pad.top+ch);ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();ctx.fill();
+    // Value label
+    ctx.fillStyle=compColors[i];ctx.font='bold 11px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillText('$'+barData[i]+'B',x+bw/2,y-5);
+    // Name
+    ctx.fillStyle='#555';ctx.font='11px IBM Plex Sans';
+    ctx.fillText(c,x+bw/2,h-pad.bottom+16);
+  });
+}
+
+// ── AREA CHART (SIDEBAR) ─────────────────────────────────────
+const areaCanvas=document.getElementById('areaChart');
+const areaCtx=areaCanvas.getContext('2d');
+let areaData=Array.from({length:24},(_,i)=>Math.floor(3000+Math.sin(i*.4)*1200+Math.random()*600));
+
+function drawArea(){
+  const w=areaCanvas.offsetWidth,h=140;
+  areaCanvas.width=w*devicePixelRatio;areaCanvas.height=h*devicePixelRatio;
+  areaCanvas.style.width=w+'px';areaCanvas.style.height=h+'px';
+  const ctx=areaCtx;ctx.scale(devicePixelRatio,devicePixelRatio);
+  const pad={top:10,right:10,bottom:20,left:35};
+  const cw=w-pad.left-pad.right,ch=h-pad.top-pad.bottom;
+  const minV=0,maxV=Math.max(...areaData)*1.1;
+  const toX=i=>pad.left+i*(cw/(areaData.length-1));
+  const toY=v=>pad.top+ch-(v/maxV)*ch;
+  ctx.strokeStyle='#E8E4DC';ctx.lineWidth=1;
+  for(let i=0;i<=3;i++){const y=pad.top+i*(ch/3);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();}
+  const grad=ctx.createLinearGradient(0,pad.top,0,pad.top+ch);
+  grad.addColorStop(0,'#0047FF60');grad.addColorStop(1,'#0047FF00');
+  ctx.strokeStyle='#0047FF';ctx.lineWidth=2;ctx.lineJoin='round';
+  ctx.beginPath();
+  areaData.forEach((v,i)=>{i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v));});
+  ctx.stroke();
+  areaData.forEach((v,i)=>{if(i===areaData.length-1||i===0)return;});
+  ctx.lineTo(toX(areaData.length-1),pad.top+ch);ctx.lineTo(toX(0),pad.top+ch);
+  ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  // Hour labels
+  [0,6,12,18,23].forEach(i=>{
+    ctx.fillStyle='#999';ctx.font='9px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillText(i+'h',toX(i),h-pad.bottom+14);
+  });
+}
+
+// ── GAUGE CHART ──────────────────────────────────────────────
+const gaugeCanvas=document.getElementById('gaugeChart');
+const gaugeCtx=gaugeCanvas.getContext('2d');
+
+function drawGauge(val){
+  const ctx=gaugeCtx;
+  ctx.clearRect(0,0,200,120);
+  const cx=100,cy=100,r=80;
+  const startAngle=Math.PI,endAngle=2*Math.PI;
+  const pct=(val-280)/(500-280);
+  const angle=startAngle+pct*Math.PI;
+  // Track
+  ctx.strokeStyle='#E8E4DC';ctx.lineWidth=18;ctx.lineCap='round';
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,2*Math.PI);ctx.stroke();
+  // Fill
+  const grad=ctx.createLinearGradient(cx-r,cy,cx+r,cy);
+  grad.addColorStop(0,'#00C853');grad.addColorStop(.5,'#FFD600');grad.addColorStop(1,'#E8003D');
+  ctx.strokeStyle=grad;ctx.lineWidth=18;
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,angle);ctx.stroke();
+  // Needle
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(Math.PI+pct*Math.PI);
+  ctx.strokeStyle='#1C0A00';ctx.lineWidth=2.5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(r-22,0);ctx.stroke();
+  ctx.restore();
+  // Center dot
+  ctx.fillStyle='#1C0A00';ctx.beginPath();ctx.arc(cx,cy,7,0,2*Math.PI);ctx.fill();
+  // Labels
+  ctx.fillStyle='#999';ctx.font='bold 11px IBM Plex Mono';ctx.textAlign='left';ctx.fillText('280',20,cy+20);
+  ctx.textAlign='right';ctx.fillText('500',180,cy+20);
+  document.getElementById('gaugeVal').textContent=val+' ppm';
+}
+
+// ── DONUT CHARTS ─────────────────────────────────────────────
+function drawDonut(canvasId,data,colors,legendId){
+  const canvas=document.getElementById(canvasId);
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,160,160);
+  const total=data.reduce((a,b)=>a.val+b,0) || data.reduce((a,b)=>a+b.val,0);
+  // normalize
+  const items=Array.isArray(data[0])?data:data;
+  let startAngle=-Math.PI/2;
+  items.forEach((item,i)=>{
+    const slice=item.val/item.total*Math.PI*2;
+    ctx.strokeStyle='#fff';ctx.lineWidth=3;
+    ctx.fillStyle=colors[i];
+    ctx.beginPath();ctx.moveTo(80,80);
+    ctx.arc(80,80,70,startAngle,startAngle+slice);
+    ctx.closePath();ctx.fill();ctx.stroke();
+    startAngle+=slice;
+  });
+  // Inner hole
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(80,80,44,0,Math.PI*2);ctx.fill();
+
+  // Legend
+  const leg=document.getElementById(legendId);
+  leg.innerHTML=items.map((it,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${colors[i]}"></div>${it.label} ${Math.round(it.val/it.total*100)}%</div>`).join('');
+}
+
+const energyData=[
+  {label:'Solar',val:18,total:100},{label:'Wind',val:14,total:100},
+  {label:'Hydro',val:9,total:100},{label:'Nuclear',val:10,total:100},{label:'Fossil',val:49,total:100}
+];
+const energyColors=['#FFD600','#00C2FF','#0047FF','#7C00FF','#E8E4DC'];
+drawDonut('donut1',energyData,energyColors,'d1legend');
+
+const techData=[
+  {label:'AI',val:32,total:100},{label:'Cloud',val:28,total:100},
+  {label:'Consumer',val:22,total:100},{label:'Other',val:18,total:100}
+];
+const techColors=['#E8003D','#0047FF','#00C853','#FFD600'];
+drawDonut('donut2',techData,techColors,'d2legend');
+
+// ── HEATMAP ──────────────────────────────────────────────────
+const hmGrid=document.getElementById('hmGrid');
+const hmLabels=document.getElementById('hmLabels');
+const sectors=['Tech','Finance','Energy','Health','Consumer','Retail','Mfg','Media'];
+months.forEach(m=>{
+  const d=document.createElement('div');
+  d.style.cssText='font-size:.6rem;color:#999;text-align:center;font-family:IBM Plex Mono,monospace;';
+  d.textContent=m;hmLabels.appendChild(d);
+});
+function buildHeatmap(gdp){
+  hmGrid.innerHTML='';
+  sectors.forEach((sec,si)=>{
+    months.forEach((_,mi)=>{
+      const intensity=Math.max(0,Math.min(1,(.3+Math.sin((si+mi)*.7)*.3+mi*.04+gdp*.02+Math.random()*.2)));
+      const cell=document.createElement('div');
+      cell.className='hm-cell';
+      cell.style.background=`hsl(220,100%,${100-intensity*60}%)`;
+      cell.title=`${sec} — ${months[mi]}: ${(intensity*100).toFixed(0)}%`;
+      hmGrid.appendChild(cell);
+    });
+  });
+}
+
+// ── HORIZONTAL BAR (SIDEBAR) ─────────────────────────────────
+const hbarCanvas=document.getElementById('hbarChart');
+const hbarCtx=hbarCanvas.getContext('2d');
+const regions=['SE Asia','S. Asia','US','EU','China','Africa'];
+const regionColors=['#E8003D','#0047FF','#00C853','#FF5500','#FFD600','#7C00FF'];
+let hbarData=[5.8,6.2,2.8,1.4,4.6,4.1];
+
+function drawHBar(){
+  const w=hbarCanvas.offsetWidth,h=200;
+  hbarCanvas.width=w*devicePixelRatio;hbarCanvas.height=h*devicePixelRatio;
+  hbarCanvas.style.width=w+'px';hbarCanvas.style.height=h+'px';
+  const ctx=hbarCtx;ctx.scale(devicePixelRatio,devicePixelRatio);
+  const pad={top:10,right:50,bottom:10,left:65};
+  const cw=w-pad.left-pad.right,ch=h-pad.top-pad.bottom;
+  const maxV=Math.max(...hbarData)*1.15;
+  const bh=(ch/regions.length)*.55,gap=ch/regions.length;
+
+  regions.forEach((r,i)=>{
+    const y=pad.top+i*gap+gap*.5-bh/2;
+    const bw=(hbarData[i]/maxV)*cw;
+    const grad=ctx.createLinearGradient(pad.left,0,pad.left+cw,0);
+    grad.addColorStop(0,regionColors[i]);grad.addColorStop(1,regionColors[i]+'60');
+    ctx.fillStyle=grad;
+    const rr=4;
+    ctx.beginPath();ctx.moveTo(pad.left,y+rr);ctx.lineTo(pad.left,y+bh-rr);
+    ctx.quadraticCurveTo(pad.left,y+bh,pad.left+rr,y+bh);
+    ctx.lineTo(pad.left+bw-rr,y+bh);ctx.quadraticCurveTo(pad.left+bw,y+bh,pad.left+bw,y+bh-rr);
+    ctx.lineTo(pad.left+bw,y+rr);ctx.quadraticCurveTo(pad.left+bw,y,pad.left+bw-rr,y);
+    ctx.lineTo(pad.left+rr,y);ctx.quadraticCurveTo(pad.left,y,pad.left,y+rr);
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle='#444';ctx.font='11px IBM Plex Sans';ctx.textAlign='right';
+    ctx.fillText(r,pad.left-6,y+bh/2+4);
+    ctx.fillStyle=regionColors[i];ctx.font='bold 11px IBM Plex Mono';ctx.textAlign='left';
+    ctx.fillText(hbarData[i]+'%',pad.left+bw+6,y+bh/2+4);
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+function initCharts(){
+  drawLine();drawBar();drawArea();drawGauge(state.co2);drawHBar();buildHeatmap(state.gdp);
+}
+setTimeout(initCharts,50);
+window.addEventListener('resize',()=>setTimeout(initCharts,50));
+
+// ── SLIDER BINDINGS ──────────────────────────────────────────
+function bindSlider(id,valId,suffix,callback,decimals=1){
+  const slider=document.getElementById(id);
+  const valEl=document.getElementById(valId);
+  slider.addEventListener('input',()=>{
+    const v=parseFloat(slider.value);
+    valEl.textContent=v.toFixed(decimals)+suffix;
+    callback(v);
+  });
+}
+bindSlider('gdpSlider','gdpVal','%',v=>{
+  state.gdp=v;
+  document.getElementById('main-metric').textContent=(v>0?'+':'')+v.toFixed(1)+'%';
+  document.getElementById('main-metric').style.color=v>0?'var(--green)':'var(--red)';
+});
+bindSlider('inflSlider','inflVal','%',v=>{
+  state.infl=v;
+  document.getElementById('cpi').textContent=v.toFixed(1)+'%';
+});
+bindSlider('rateSlider','rateVal','%',v=>{state.rate=v;},2);
+bindSlider('unempSlider','unempVal','%',v=>{
+  state.unemp=v;
+  document.getElementById('unemp').textContent=v.toFixed(1)+'%';
+});
+document.getElementById('co2Slider').addEventListener('input',function(){
+  state.co2=+this.value;
+  document.getElementById('co2').textContent=this.value;
+  drawGauge(+this.value);
+});
+
+// ── UPDATE BUTTON ────────────────────────────────────────────
+document.getElementById('updateBtn').addEventListener('click',()=>{
+  // Read number inputs
+  const spv=+document.getElementById('spInput').value;
+  const btcv=+document.getElementById('btcInput').value;
+  if(spv>0){state.sp500=spv;document.getElementById('sp500').textContent=spv.toLocaleString();}
+  if(btcv>0){state.btc=btcv;document.getElementById('btc').textContent='$'+btcv.toLocaleString();}
+
+  // Regenerate line chart data
+  lineData={
+    gdp:genGDPData(state.gdp),
+    infl:genInflData(state.infl),
+    rate:genRateData(state.rate)
+  };
+
+  // Update bar data slightly influenced by gdp
+  barData=barData.map((v,i)=>Math.max(50,Math.round(v*(1+(state.gdp/100)+((Math.random()-.5)*.08)))));
+  hbarData=hbarData.map(v=>Math.max(.5,+(v+(state.gdp*.03)+(Math.random()-.5)*.2).toFixed(1)));
+
+  // Animate update button
+  const btn=document.getElementById('updateBtn');
+  btn.textContent='✅ Charts Updated!';
+  btn.style.background='var(--green)';
+  setTimeout(()=>{btn.textContent='⚡ Update All Charts';btn.style.background='';},1500);
+
+  // Redraw
+  drawLine();drawBar();drawHBar();buildHeatmap(state.gdp);
+  document.getElementById('updatetime').textContent=new Date().toLocaleTimeString();
+});
+
+// ── LIVE TICKER SIMULATION ───────────────────────────────────
+setInterval(()=>{
+  const sp=state.sp500+(Math.random()-.48)*8;
+  state.sp500=Math.round(sp);
+  document.getElementById('sp500').textContent=state.sp500.toLocaleString();
+  // Subtle area chart update
+  areaData.shift();
+  areaData.push(Math.floor(3000+Math.random()*3000));
+  drawArea();
+},3000);
+</script>
+</body>
+</html>
