@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZEST — Cold Pressed Juice</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+:root{--sun:#FFD600;--orange:#FF5C00;--pink:#FF3CAC;--lime:#7BFF00;--sky:#00C2FF;--mint:#00FFB2;--white:#FFFEF7;--ink:#1A0A00;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--white);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden;cursor:none;}
+#cursor{position:fixed;width:18px;height:18px;background:var(--orange);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s;mix-blend-mode:multiply;}
+#cursor.big{width:50px;height:50px;}
+#threebg{position:fixed;top:0;left:0;z-index:0;pointer-events:none;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.4rem 4rem;background:rgba(255,254,247,.92);backdrop-filter:blur(12px);border-bottom:2.5px solid var(--ink);}
+.logo{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;color:var(--orange);letter-spacing:-2px;}
+nav ul{list-style:none;display:flex;gap:2.5rem;}
+nav a{color:var(--ink);text-decoration:none;font-weight:600;font-size:.85rem;letter-spacing:.5px;text-transform:uppercase;}
+.nav-cta{background:var(--orange);color:var(--white)!important;padding:.65rem 1.8rem;border-radius:100px;border:2px solid var(--ink);}
+#hero{position:relative;z-index:10;min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;padding:8rem 4rem 5rem;gap:5rem;background:linear-gradient(125deg,#FFF5A0 0%,#FFE5C0 35%,#FFD0E8 65%,#C0F0FF 100%);}
+.pill{display:inline-flex;align-items:center;gap:.5rem;background:var(--orange);color:var(--white);padding:.45rem 1.3rem;border-radius:100px;font-size:.75rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2rem;border:2px solid var(--ink);}
+.dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+h1{font-family:'Fraunces',serif;font-size:clamp(4rem,7vw,6.5rem);font-weight:900;line-height:.92;letter-spacing:-3px;margin-bottom:1.5rem;}
+h1 .splash{color:var(--orange);font-style:italic;}
+.sub{font-size:1.1rem;line-height:1.75;color:rgba(26,10,0,.65);max-width:420px;margin-bottom:3rem;}
+.hero-btns{display:flex;gap:1rem;}
+.btn-dark{display:inline-flex;align-items:center;gap:.75rem;background:var(--ink);color:var(--white);padding:1rem 2.5rem;border-radius:100px;font-weight:700;font-size:.95rem;text-decoration:none;transition:transform .3s,box-shadow .3s;border:2px solid var(--ink);}
+.btn-dark:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(26,10,0,.25);}
+.btn-outline{display:inline-flex;align-items:center;gap:.75rem;background:transparent;color:var(--ink);padding:1rem 2.5rem;border-radius:100px;font-weight:700;font-size:.95rem;border:2px solid var(--ink);text-decoration:none;transition:background .25s;}
+.btn-outline:hover{background:var(--ink);color:var(--white);}
+.hero-bottles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem;}
+.hbottle{border-radius:28px;padding:2.5rem 1.5rem 2rem;text-align:center;border:2.5px solid var(--ink);position:relative;transition:transform .4s,box-shadow .4s;}
+.hbottle:hover{transform:rotate(-4deg) scale(1.06);box-shadow:6px 8px 0 var(--ink);}
+.hbottle:nth-child(1){background:linear-gradient(150deg,#FFD600,#FF8C00);transform:rotate(-3deg);}
+.hbottle:nth-child(2){background:linear-gradient(150deg,#00FFB2,#00C2FF);transform:rotate(2.5deg);margin-top:-1.5rem;}
+.hbottle:nth-child(3){background:linear-gradient(150deg,#FF3CAC,#FF5C00);transform:rotate(-1.5deg);}
+.hbottle .bi{font-size:3.8rem;display:block;margin-bottom:.6rem;animation:float 3s ease-in-out infinite;}
+.hbottle:nth-child(2) .bi{animation-delay:-.8s;}
+.hbottle:nth-child(3) .bi{animation-delay:-1.6s;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.hbottle h4{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900;}
+.hbottle .hp{font-size:.85rem;font-weight:600;opacity:.7;margin-top:.2rem;}
+
+/* TICKER */
+.ticker{position:relative;z-index:10;background:var(--ink);padding:.85rem 0;overflow:hidden;}
+.ticker-track{display:flex;gap:0;white-space:nowrap;animation:tick 18s linear infinite;}
+.ticker-item{padding:0 2.5rem;font-size:.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sun);}
+.ticker-item span{color:rgba(255,255,255,.3);margin-left:2.5rem;}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* FLAVORS */
+#flavors{position:relative;z-index:10;padding:8rem 4rem;background:var(--white);}
+.sh{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;}
+.stag{font-size:.7rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--orange);margin-bottom:.5rem;}
+.stitle{font-family:'Fraunces',serif;font-size:clamp(2.5rem,4vw,3.8rem);font-weight:900;letter-spacing:-2px;line-height:1.05;}
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;}
+.fc{border-radius:28px;overflow:hidden;border:2.5px solid var(--ink);transition:transform .4s,box-shadow .4s;cursor:none;}
+.fc:hover{transform:translateY(-10px);box-shadow:6px 10px 0 var(--ink);}
+.ft{padding:3rem 2rem 2rem;text-align:center;}
+.fc:nth-child(1) .ft{background:linear-gradient(145deg,#FFD600 0%,#FF8C00 100%);}
+.fc:nth-child(2) .ft{background:linear-gradient(145deg,#00FFB2 0%,#00C2FF 100%);}
+.fc:nth-child(3) .ft{background:linear-gradient(145deg,#FF3CAC 0%,#FF8C00 100%);}
+.fc:nth-child(4) .ft{background:linear-gradient(145deg,#7BFF00 0%,#FFD600 100%);}
+.fc:nth-child(5) .ft{background:linear-gradient(145deg,#00C2FF 0%,#7BFF00 100%);}
+.fc:nth-child(6) .ft{background:linear-gradient(145deg,#FF5C00 0%,#FF3CAC 100%);}
+.fi2{font-size:4rem;display:block;margin-bottom:.5rem;animation:float 3s ease-in-out infinite;}
+.fc:nth-child(2) .fi2{animation-delay:-.5s;}
+.fc:nth-child(3) .fi2{animation-delay:-1s;}
+.fc:nth-child(4) .fi2{animation-delay:-1.5s;}
+.fc:nth-child(5) .fi2{animation-delay:-2s;}
+.fc:nth-child(6) .fi2{animation-delay:-2.5s;}
+.fb{padding:1.5rem 2rem;background:#fff;}
+.fn{font-family:'Fraunces',serif;font-size:1.25rem;font-weight:900;margin-bottom:.3rem;}
+.fd{font-size:.8rem;color:rgba(26,10,0,.5);line-height:1.5;margin-bottom:1rem;}
+.ff{display:flex;justify-content:space-between;align-items:center;}
+.fp{font-weight:700;font-size:1.1rem;}
+.ab{background:var(--ink);color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:1.4rem;cursor:none;display:flex;align-items:center;justify-content:center;transition:background .2s;line-height:1;}
+.ab:hover{background:var(--orange);}
+
+/* PROCESS */
+#process{position:relative;z-index:10;background:linear-gradient(135deg,#FFF5A0,#C0FFF0);padding:7rem 4rem;border-top:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);}
+.proc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-top:4rem;}
+.proc-step{background:#fff;border-radius:24px;padding:2.5rem 2rem;border:2px solid var(--ink);text-align:center;transition:transform .3s;}
+.proc-step:hover{transform:translateY(-6px);}
+.step-icon{font-size:2.5rem;margin-bottom:1rem;display:block;}
+.step-n{font-size:.65rem;font-weight:700;letter-spacing:3px;color:var(--orange);margin-bottom:.5rem;text-transform:uppercase;}
+.proc-step h4{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:900;margin-bottom:.5rem;}
+.proc-step p{font-size:.85rem;color:rgba(26,10,0,.55);line-height:1.6;}
+
+/* STATS BAR */
+#sstats{position:relative;z-index:10;background:var(--orange);padding:5rem 4rem;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;border-top:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);}
+.sbox{text-align:center;padding:2rem;background:rgba(255,255,255,.15);border-radius:20px;border:2px solid rgba(255,255,255,.25);}
+.snum{font-family:'Fraunces',serif;font-size:3.5rem;font-weight:900;color:#fff;line-height:1;}
+.slbl{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-top:.5rem;}
+
+/* CTA */
+#cta{position:relative;z-index:10;background:linear-gradient(135deg,var(--lime),var(--sky));padding:8rem 4rem;text-align:center;border-top:2.5px solid var(--ink);}
+#cta h2{font-family:'Fraunces',serif;font-size:clamp(3rem,6vw,5.5rem);font-weight:900;letter-spacing:-3px;color:var(--ink);margin-bottom:1.5rem;line-height:1.05;}
+#cta p{font-size:1.1rem;color:rgba(26,10,0,.6);margin-bottom:3rem;max-width:420px;margin-left:auto;margin-right:auto;}
+footer{position:relative;z-index:10;background:var(--ink);color:#fff;padding:2.5rem 4rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;opacity:.9;}
+.fade-up{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease;}
+.fade-up.vis{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<canvas id="threebg"></canvas>
+<nav>
+  <div class="logo">ZEST</div>
+  <ul>
+    <li><a href="#">Flavors</a></li>
+    <li><a href="#">Cleanses</a></li>
+    <li><a href="#">Story</a></li>
+    <li><a href="#" class="nav-cta">Order Now</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div>
+    <div class="pill"><div class="dot"></div>100% Organic</div>
+    <h1>Life is<br><span class="splash">Sweeter</span><br>juiced.</h1>
+    <p class="sub">Cold-pressed juices bursting with colour, flavour, and nutrients. No added sugar. No nonsense. Pure fruit magic, bottled daily.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn-dark">Shop All Juices →</a>
+      <a href="#" class="btn-outline">Start a Cleanse</a>
+    </div>
+  </div>
+  <div class="hero-bottles">
+    <div class="hbottle"><em class="bi">🍊</em><h4>Solar</h4><p class="hp">$9.50</p></div>
+    <div class="hbottle"><em class="bi">🥬</em><h4>Greens</h4><p class="hp">$10</p></div>
+    <div class="hbottle"><em class="bi">🍇</em><h4>Berry</h4><p class="hp">$9.50</p></div>
+  </div>
+</section>
+
+<div class="ticker">
+  <div class="ticker-track" id="tt"></div>
+</div>
+
+<section id="flavors">
+  <div class="sh">
+    <div>
+      <p class="stag">// Our Collection</p>
+      <h2 class="stitle">Pick Your<br>Colour.</h2>
+    </div>
+  </div>
+  <div class="fg">
+    <div class="fc fade-up"><div class="ft"><em class="fi2">🍊</em></div><div class="fb"><h3 class="fn">Solar Burst</h3><p class="fd">Orange · Carrot · Ginger · Turmeric</p><div class="ff"><span class="fp">$9.50</span><button class="ab">+</button></div></div></div>
+    <div class="fc fade-up"><div class="ft"><em class="fi2">🥬</em></div><div class="fb"><h3 class="fn">Deep Green</h3><p class="fd">Cucumber · Spinach · Apple · Mint</p><div class="ff"><span class="fp">$10.00</span><button class="ab">+</button></div></div></div>
+    <div class="fc fade-up"><div class="ft"><em class="fi2">🍇</em></div><div class="fb"><h3 class="fn">Berry Bomb</h3><p class="fd">Blueberry · Raspberry · Acai · Lemon</p><div class="ff"><span class="fp">$10.50</span><button class="ab">+</button></div></div></div>
+    <div class="fc fade-up"><div class="ft"><em class="fi2">🍍</em></div><div class="fb"><h3 class="fn">Tropic High</h3><p class="fd">Pineapple · Mango · Coconut · Lime</p><div class="ff"><span class="fp">$9.50</span><button class="ab">+</button></div></div></div>
+    <div class="fc fade-up"><div class="ft"><em class="fi2">🍏</em></div><div class="fb"><h3 class="fn">Apple Clarity</h3><p class="fd">Green Apple · Celery · Ginger · Parsley</p><div class="ff"><span class="fp">$9.00</span><button class="ab">+</button></div></div></div>
+    <div class="fc fade-up"><div class="ft"><em class="fi2">🍓</em></div><div class="fb"><h3 class="fn">Pink Glow</h3><p class="fd">Strawberry · Watermelon · Rose · Hibiscus</p><div class="ff"><span class="fp">$10.50</span><button class="ab">+</button></div></div></div>
+  </div>
+</section>
+
+<section id="process">
+  <div style="text-align:center;">
+    <p class="stag" style="display:block;margin-bottom:.5rem;">// How We Do It</p>
+    <h2 class="stitle">Farm to<br>Your Door.</h2>
+  </div>
+  <div class="proc-grid">
+    <div class="proc-step fade-up"><span class="step-icon">🌾</span><p class="step-n">Step 01</p><h4>Source</h4><p>Organic farms within 200 miles. Seasonal, traceable, real.</p></div>
+    <div class="proc-step fade-up"><span class="step-icon">⚡</span><p class="step-n">Step 02</p><h4>Cold Press</h4><p>10,000 PSI extracts maximum nutrition with zero heat damage.</p></div>
+    <div class="proc-step fade-up"><span class="step-icon">🍾</span><p class="step-n">Step 03</p><h4>Bottle</h4><p>Glass bottles, sealed within 30 minutes. No air, no additives.</p></div>
+    <div class="proc-step fade-up"><span class="step-icon">🚚</span><p class="step-n">Step 04</p><h4>Deliver</h4><p>On ice to your door within 24 hours of pressing. Peak freshness.</p></div>
+  </div>
+</section>
+
+<section id="sstats">
+  <div class="sbox"><div class="snum" data-target="50000">0</div><div class="slbl">Happy Customers</div></div>
+  <div class="sbox"><div class="snum">12</div><div class="slbl">Fresh Flavors</div></div>
+  <div class="sbox"><div class="snum">24h</div><div class="slbl">Farm to Bottle</div></div>
+  <div class="sbox"><div class="snum">0%</div><div class="slbl">Added Sugar</div></div>
+</section>
+
+<section id="cta">
+  <h2 class="fade-up">Ready to glow<br>from the inside?</h2>
+  <p class="fade-up">First subscription box ships free. Cancel anytime. Your cells will thank you.</p>
+  <a href="#" class="btn-dark fade-up" style="font-size:1rem;padding:1.2rem 3rem;margin:0 auto;display:inline-flex;">Get My First Box Free 🎁</a>
+</section>
+
+<footer>
+  <span><b>ZEST</b> — Cold Pressed Juice Co.</span>
+  <span>© 2025 · hello@zestjuice.com</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// Ticker
+const items=['🍋 Cold Pressed','🌿 100% Organic','🚚 Free Delivery Over $40','❄️ Pressed Daily','💚 Zero Additives','🍊 12 Flavors','🧃 Glass Bottled'];
+const tt=document.getElementById('tt');
+const full=[...items,...items].map(t=>`<span class="ticker-item">${t}<span>·</span></span>`).join('');
+tt.innerHTML=full;
+
+// Cursor
+const cur=document.getElementById('cursor');
+let curX=0,curY=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;});
+(function animC(){curX+=(tx-curX)*.2;curY+=(ty-curY)*.2;cur.style.left=curX+'px';cur.style.top=curY+'px';requestAnimationFrame(animC);})();
+document.querySelectorAll('a,button,.fc,.hbottle').forEach(el=>{el.addEventListener('mouseenter',()=>cur.classList.add('big'));el.addEventListener('mouseleave',()=>cur.classList.remove('big'));});
+
+// Three.js bg - colorful bouncing orbs
+const canvas=document.getElementById('threebg');
+const ren=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+ren.setSize(innerWidth,innerHeight);ren.setPixelRatio(Math.min(devicePixelRatio,2));
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,100);
+cam.position.z=6;
+const colors=[0xFFD600,0xFF5C00,0xFF3CAC,0x7BFF00,0x00C2FF,0x00FFB2,0xFF8C00,0xFF9FE1];
+const orbs=[];
+for(let i=0;i<45;i++){
+  const g=new THREE.SphereGeometry(Math.random()*.22+.05,8,8);
+  const m=new THREE.MeshBasicMaterial({color:colors[i%colors.length],transparent:true,opacity:Math.random()*.25+.08});
+  const mesh=new THREE.Mesh(g,m);
+  mesh.position.set((Math.random()-.5)*22,(Math.random()-.5)*16,(Math.random()-.5)*8-3);
+  mesh.userData={vx:(Math.random()-.5)*.018+.003,vy:(Math.random()-.5)*.015};
+  sc.add(mesh);orbs.push(mesh);
+}
+let mx=0,my=0;
+document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=-(e.clientY/innerHeight-.5)*2;});
+function anim(){
+  requestAnimationFrame(anim);
+  orbs.forEach(o=>{
+    o.position.x+=o.userData.vx;o.position.y+=o.userData.vy;
+    if(o.position.x>13||o.position.x<-13)o.userData.vx*=-1;
+    if(o.position.y>10||o.position.y<-10)o.userData.vy*=-1;
+    o.rotation.x+=.012;o.rotation.y+=.008;
+  });
+  cam.position.x+=(mx*.4-cam.position.x)*.04;
+  cam.position.y+=(my*.4-cam.position.y)*.04;
+  ren.render(sc,cam);
+}
+anim();
+window.addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();ren.setSize(innerWidth,innerHeight);});
+
+// Scroll reveals
+const obs=new IntersectionObserver(entries=>entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('vis'),i*80);}),{threshold:.1});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+
+// Counter animation
+const counterObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting&&e.target.dataset.target){
+      const target=+e.target.dataset.target;
+      let current=0;
+      const step=target/60;
+      const int=setInterval(()=>{current=Math.min(current+step,target);e.target.textContent=current>=1000?(current/1000).toFixed(0)+'K+':Math.floor(current);if(current>=target)clearInterval(int);},16);
+      counterObs.unobserve(e.target);
+    }
+  });
+},{threshold:.5});
+document.querySelectorAll('[data-target]').forEach(el=>counterObs.observe(el));
+</script>
+</body>
+</html>
