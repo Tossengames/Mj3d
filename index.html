@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MJ3d — Web Experiences</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Syne+Mono&display=swap');
+
+  :root {
+    --bg: #070710;
+    --surface: #0E0E1F;
+    --accent: #6C63FF;
+    --accent2: #FF6584;
+    --accent3: #43E8D8;
+    --white: #F0F0FF;
+    --muted: rgba(240,240,255,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  #cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+  }
+
+  #cursor-outer {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+  }
+
+  #cursor-inner {
+    width: 6px; height: 6px;
+    background: var(--accent3);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  #cursor.active #cursor-outer {
+    width: 64px; height: 64px;
+    background: rgba(108,99,255,0.1);
+    border-color: var(--accent3);
+  }
+
+  /* THREE.JS CANVAS */
+  #hero-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    padding: 2rem 5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-badge {
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s;
+    letter-spacing: 0.5px;
+  }
+
+  nav a:hover { color: var(--white); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: var(--white) !important;
+    padding: 0.7rem 1.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: transform 0.3s, box-shadow 0.3s !important;
+  }
+
+  .nav-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(108,99,255,0.4);
+    color: var(--white) !important;
+  }
+
+  /* HERO */
+  #hero {
+    position: relative;
+    z-index: 10;
+    height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 5rem 8rem;
+  }
+
+  .hero-content { max-width: 750px; }
+
+  .hero-tag {
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent3);
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: rise 1s 0.3s forwards;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: 1;
+    letter-spacing: -3px;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: rise 1s 0.5s forwards;
+  }
+
+  h1 .grad {
+    background: linear-gradient(135deg, var(--accent), var(--accent3), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 480px;
+    margin-bottom: 3rem;
+    font-weight: 300;
+    opacity: 0;
+    animation: rise 1s 0.7s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    opacity: 0;
+    animation: rise 1s 0.9s forwards;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--accent);
+    color: var(--white);
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 40px rgba(108,99,255,0.4);
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid rgba(240,240,255,0.2);
+    color: var(--white);
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent3);
+    background: rgba(67,232,216,0.07);
+  }
+
+  .hero-stats {
+    position: absolute;
+    right: 5rem;
+    bottom: 8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    opacity: 0;
+    animation: rise 1s 1.2s forwards;
+  }
+
+  .stat { text-align: right; }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* WORK SECTION */
+  #work {
+    position: relative;
+    z-index: 10;
+    padding: 8rem 5rem;
+    background: linear-gradient(to bottom, transparent, var(--surface) 20%, var(--surface) 80%, transparent);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+  }
+
+  .section-tag {
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    letter-spacing: -2px;
+    line-height: 1.1;
+  }
+
+  .section-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s;
+  }
+
+  .section-link:hover { color: var(--accent3); }
+
+  /* Project Cards */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .project-card {
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(14,14,31,0.8);
+    border: 1px solid rgba(240,240,255,0.07);
+    transition: transform 0.5s cubic-bezier(0.23,1,0.32,1), border-color 0.3s, box-shadow 0.5s;
+    cursor: none;
+    text-decoration: none;
+    color: var(--white);
+    display: block;
+  }
+
+  .project-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(108,99,255,0.3);
+    box-shadow: 0 30px 80px rgba(108,99,255,0.15);
+  }
+
+  
+
+  .card-visual {
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-visual canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  .card-juice {
+    background: linear-gradient(135deg, #1A0A00, #2D1500);
+  }
+
+  .card-restaurant {
+    background: linear-gradient(135deg, #080808, #1C1008);
+  }
+
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    z-index: 2;
+    transition: transform 0.5s;
+  }
+
+  .project-card:hover .card-overlay { transform: scale(1.1) rotate(5deg); }
+
+  .card-tag {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    z-index: 3;
+  }
+
+  .tag-orange { background: rgba(255,107,53,0.2); color: #FF6B35; border: 1px solid rgba(255,107,53,0.3); }
+  .tag-gold { background: rgba(201,168,76,0.2); color: #C9A84C; border: 1px solid rgba(201,168,76,0.3); }
+
+  .card-visit {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 44px; height: 44px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    z-index: 3;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  .project-card:hover .card-visit { opacity: 1; transform: scale(1); }
+
+  .card-body { padding: 2rem; }
+
+  .card-category {
+    font-size: 0.72rem;
+    color: var(--accent3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tech-chip {
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(108,99,255,0.1);
+    border: 1px solid rgba(108,99,255,0.2);
+    border-radius: 4px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  /* SKILLS */
+  #skills {
+    position: relative;
+    z-index: 10;
+    padding: 8rem 5rem;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .skill-card {
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(240,240,255,0.07);
+    background: rgba(14,14,31,0.5);
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: none;
+  }
+
+  .skill-card:hover { border-color: var(--accent); transform: translateY(-6px); }
+
+  .skill-icon { font-size: 2rem; margin-bottom: 1rem; }
+
+  .skill-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .skill-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* CONTACT */
+  #contact {
+    position: relative;
+    z-index: 10;
+    padding: 8rem 5rem;
+    text-align: center;
+  }
+
+  .contact-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,99,255,0.12), transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .contact-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-sub {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 3rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+  }
+
+  .contact-email {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    color: var(--accent3);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(67,232,216,0.3);
+    padding-bottom: 4px;
+    transition: border-color 0.3s;
+  }
+
+  .contact-email:hover { border-color: var(--accent3); }
+
+  footer {
+    position: relative;
+    z-index: 10;
+    padding: 2.5rem 5rem;
+    border-top: 1px solid rgba(240,240,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div id="cursor">
+  <div id="cursor-outer"></div>
+  <div id="cursor-inner"></div>
+</div>
+
+<canvas id="hero-canvas"></canvas>
+
+<nav>
+  <div class="logo-wrap">
+    <div class="logo">MJ3d</div>
+    <div class="logo-badge">v2.0</div>
+  </div>
+  <ul>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contact" class="nav-cta">Hire Me</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-content">
+    <p class="hero-tag">// 3D Web Experience Designer</p>
+    <h1>Building<br><span class="grad">immersive</span><br>digital worlds.</h1>
+    <p class="hero-sub">I craft stunning, interactive 3D web experiences that make brands unforgettable. Three.js, WebGL, and obsessive attention to detail.</p>
+    <div class="hero-actions">
+      <a href="#work" class="btn-primary">View My Work ↓</a>
+      <a href="#contact" class="btn-outline">Let's Talk →</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">3D</div>
+      <div class="stat-label">Interactive</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Creative</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">01</div>
+      <div class="stat-label">You.</div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="section-header fade-in">
+    <div>
+      <p class="section-tag">// Selected Work</p>
+      <h2 class="section-title">Live Demos</h2>
+    </div>
+    <a href="#" class="section-link">All Projects →</a>
+  </div>
+  <div class="projects-grid">
+    <a href="demo/juice.html" target="_blank" class="project-card fade-in">
+      <div class="card-visual card-juice">
+        <canvas class="card-preview" data-type="juice"></canvas>
+        <div class="card-tag tag-orange">Landing Page</div>
+        <div class="card-overlay">🍊</div>
+        <div class="card-visit">↗</div>
+      </div>
+      <div class="card-body">
+        <p class="card-category">Food & Beverage</p>
+        <h3 class="card-title">ZEST — Juice Co.</h3>
+        <p class="card-desc">Premium cold-pressed juice brand with animated 3D particle background, floating product cards, and smooth scroll reveals.</p>
+        <div class="card-tech">
+          <span class="tech-chip">Three.js</span>
+          <span class="tech-chip">CSS Animations</span>
+          <span class="tech-chip">Particles</span>
+          <span class="tech-chip">GSAP-style</span>
+        </div>
+      </div>
+    </a>
+    <a href="demo/restaurant.html" target="_blank" class="project-card fade-in">
+      <div class="card-visual card-restaurant">
+        <canvas class="card-preview" data-type="restaurant"></canvas>
+        <div class="card-tag tag-gold">Landing Page</div>
+        <div class="card-overlay">🍽️</div>
+        <div class="card-visit">↗</div>
+      </div>
+      <div class="card-body">
+        <p class="card-category">Hospitality</p>
+        <h3 class="card-title">EMBER — Fine Dining</h3>
+        <p class="card-desc">Vibrant restaurant landing page with warm colour gradients, 3D floating shapes, animated menu grid, and scroll reveals.</p>
+        <div class="card-tech">
+          <span class="tech-chip">Three.js</span>
+          <span class="tech-chip">Warm Palette</span>
+          <span class="tech-chip">Custom Cursor</span>
+          <span class="tech-chip">Scroll Reveal</span>
+        </div>
+      </div>
+    </a>
+    <a href="demo/stats.html" target="_blank" class="project-card fade-in" style="transform:none!important;">
+      <div class="card-visual" style="background:linear-gradient(135deg,#0a0a20,#001040);">
+        <canvas class="card-preview" data-type="stats"></canvas>
+        <div class="card-tag" style="background:rgba(0,71,255,.2);color:#0047FF;border:1px solid rgba(0,71,255,.3);">Interactive</div>
+        <div class="card-overlay">📊</div>
+        <div class="card-visit">↗</div>
+      </div>
+      <div class="card-body">
+        <p class="card-category" style="color:var(--accent2);">Data & News</p>
+        <h3 class="card-title">PULSE — Data News</h3>
+        <p class="card-desc">Live news dashboard with interactive charts — line, bar, donut, heatmap — all responding to user sliders and inputs in real time.</p>
+        <div class="card-tech">
+          <span class="tech-chip">Live Charts</span>
+          <span class="tech-chip">Interactive</span>
+          <span class="tech-chip">Canvas API</span>
+          <span class="tech-chip">Data Viz</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="section-header fade-in">
+    <div>
+      <p class="section-tag">// My Stack</p>
+      <h2 class="section-title">What I Bring</h2>
+    </div>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-card fade-in">
+      <div class="skill-icon">🌐</div>
+      <h4 class="skill-name">Three.js & WebGL</h4>
+      <p class="skill-desc">Custom 3D scenes, shaders, particle systems, and real-time interactive environments.</p>
+    </div>
+    <div class="skill-card fade-in">
+      <div class="skill-icon">✨</div>
+      <h4 class="skill-name">Motion Design</h4>
+      <p class="skill-desc">Fluid animations, scroll-triggered reveals, micro-interactions, and smooth transitions.</p>
+    </div>
+    <div class="skill-card fade-in">
+      <div class="skill-icon">🎨</div>
+      <h4 class="skill-name">UI/UX Design</h4>
+      <p class="skill-desc">Premium typography, editorial layouts, and cohesive visual systems that convert.</p>
+    </div>
+    <div class="skill-card fade-in">
+      <div class="skill-icon">⚡</div>
+      <h4 class="skill-name">Performance</h4>
+      <p class="skill-desc">Optimised WebGL pipelines, lazy loading, and silky 60fps experiences on any device.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-glow"></div>
+  <p class="section-tag fade-in">// Get In Touch</p>
+  <h2 class="contact-title fade-in">Let's build<br>something<br><span class="grad">incredible.</span></h2>
+  <p class="contact-sub fade-in">Have a project that needs a 3D interactive edge? I'd love to hear about it.</p>
+  <a href="/cdn-cgi/l/email-protection#771f121b1b18371a1d441359131201" class="contact-email fade-in"><span class="__cf_email__" data-cfemail="e58d8089898aa5888fd681cb818093">[email&#160;protected]</span></a>
+</section>
+
+<footer>
+  <span class="footer-logo">MJ3d</span>
+  <span>© 2025 — All rights reserved</span>
+  <span>Built with Three.js & passion</span>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ==========================================
+// CURSOR
+// ==========================================
+const cursor = document.getElementById('cursor');
+let cx = 0, cy = 0, tx = 0, ty = 0;
+
+document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+
+(function animateCursor() {
+  cx += (tx - cx) * 0.15;
+  cy += (ty - cy) * 0.15;
+  cursor.style.left = cx + 'px';
+  cursor.style.top = cy + 'px';
+  requestAnimationFrame(animateCursor);
+})();
+
+document.querySelectorAll('a, .skill-card, .project-card').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('active'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('active'));
+});
+
+// ==========================================
+// HERO THREE.JS SCENE
+// ==========================================
+const heroCanvas = document.getElementById('hero-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas: heroCanvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.z = 7;
+
+// Lights
+const ambientLight = new THREE.AmbientLight(0x6C63FF, 0.3);
+scene.add(ambientLight);
+
+const pointLight = new THREE.PointLight(0x43E8D8, 2, 20);
+pointLight.position.set(5, 5, 5);
+scene.add(pointLight);
+
+const pointLight2 = new THREE.PointLight(0xFF6584, 1.5, 20);
+pointLight2.position.set(-5, -3, 3);
+scene.add(pointLight2);
+
+// Central rotating icosahedron
+const icoGeo = new THREE.IcosahedronGeometry(1.2, 1);
+const icoMat = new THREE.MeshPhongMaterial({
+  color: 0x6C63FF,
+  emissive: 0x1A1550,
+  shininess: 80,
+  wireframe: false,
+  transparent: true,
+  opacity: 0.7
+});
+const ico = new THREE.Mesh(icoGeo, icoMat);
+ico.position.set(3.5, 0.5, -2);
+scene.add(ico);
+
+// Wireframe overlay
+const icoWireGeo = new THREE.IcosahedronGeometry(1.22, 1);
+const icoWireMat = new THREE.MeshBasicMaterial({
+  color: 0x43E8D8,
+  wireframe: true,
+  transparent: true,
+  opacity: 0.25
+});
+const icoWire = new THREE.Mesh(icoWireGeo, icoWireMat);
+icoWire.position.copy(ico.position);
+scene.add(icoWire);
+
+// Orbiting rings around icosahedron
+const rings = [];
+for (let i = 0; i < 3; i++) {
+  const rGeo = new THREE.TorusGeometry(1.8 + i * 0.4, 0.008, 8, 100);
+  const rMat = new THREE.MeshBasicMaterial({
+    color: [0x6C63FF, 0x43E8D8, 0xFF6584][i],
+    transparent: true,
+    opacity: 0.4 - i * 0.1
+  });
+  const ring = new THREE.Mesh(rGeo, rMat);
+  ring.position.copy(ico.position);
+  ring.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+  scene.add(ring);
+  rings.push(ring);
+}
+
+// Floating geometry cluster
+const geoShapes = [];
+const shapeDefs = [
+  { geo: new THREE.OctahedronGeometry(0.3), color: 0x43E8D8 },
+  { geo: new THREE.TetrahedronGeometry(0.25), color: 0xFF6584 },
+  { geo: new THREE.BoxGeometry(0.35, 0.35, 0.35), color: 0x6C63FF },
+  { geo: new THREE.OctahedronGeometry(0.2), color: 0xFFFFFF },
+  { geo: new THREE.TetrahedronGeometry(0.3), color: 0x43E8D8 },
+  { geo: new THREE.BoxGeometry(0.2, 0.2, 0.2), color: 0xFF6584 },
+  { geo: new THREE.IcosahedronGeometry(0.2, 0), color: 0x6C63FF },
+  { geo: new THREE.OctahedronGeometry(0.15), color: 0xFFFFFF },
+];
+
+shapeDefs.forEach(({ geo, color }, i) => {
+  const mat = new THREE.MeshPhongMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: 0.2,
+    transparent: true,
+    opacity: 0.8,
+    shininess: 100
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  const angle = (i / shapeDefs.length) * Math.PI * 2;
+  const r = 4 + Math.random() * 3;
+  mesh.position.set(
+    Math.cos(angle) * r + 2,
+    Math.sin(angle) * r * 0.5,
+    -3 + Math.random() * 2
+  );
+  mesh.userData = {
+    rotSpeed: { x: (Math.random() - 0.5) * 0.02, y: (Math.random() - 0.5) * 0.02 },
+    floatPhase: Math.random() * Math.PI * 2,
+    floatSpeed: 0.3 + Math.random() * 0.5,
+    radius: r,
+    angle: angle
+  };
+  scene.add(mesh);
+  geoShapes.push(mesh);
+});
+
+// Star field
+const starCount = 800;
+const starPos = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount; i++) {
+  starPos[i * 3] = (Math.random() - 0.5) * 60;
+  starPos[i * 3 + 1] = (Math.random() - 0.5) * 40;
+  starPos[i * 3 + 2] = (Math.random() - 0.5) * 30 - 15;
+}
+const starGeo = new THREE.BufferGeometry();
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+const starMat = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.02, transparent: true, opacity: 0.6 });
+scene.add(new THREE.Points(starGeo, starMat));
+
+// Nebula-like large orbs
+const nebulaColors = [0x6C63FF, 0x43E8D8, 0xFF6584];
+nebulaColors.forEach((color, i) => {
+  const g = new THREE.SphereGeometry(3 + i, 16, 16);
+  const m = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.025 - i * 0.005 });
+  const mesh = new THREE.Mesh(g, m);
+  mesh.position.set([-4, 6, -2][i], [2, -4, 5][i], -15);
+  scene.add(mesh);
+});
+
+let mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', e => {
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = Date.now() * 0.001;
+
+  // Rotate central ico
+  ico.rotation.x = t * 0.3;
+  ico.rotation.y = t * 0.5;
+  icoWire.rotation.x = ico.rotation.x;
+  icoWire.rotation.y = ico.rotation.y;
+
+  // Pulse ico
+  const pulse = 1 + Math.sin(t * 2) * 0.04;
+  ico.scale.setScalar(pulse);
+  icoWire.scale.setScalar(pulse * 1.01);
+
+  // Rings orbit
+  rings[0].rotation.x = t * 0.4;
+  rings[0].rotation.y = t * 0.6;
+  rings[1].rotation.y = t * -0.3;
+  rings[1].rotation.z = t * 0.5;
+  rings[2].rotation.x = t * -0.2;
+  rings[2].rotation.z = t * -0.4;
+
+  // Floating shapes
+  geoShapes.forEach((shape, i) => {
+    shape.rotation.x += shape.userData.rotSpeed.x;
+    shape.rotation.y += shape.userData.rotSpeed.y;
+    shape.position.y += Math.sin(t * shape.userData.floatSpeed + shape.userData.floatPhase) * 0.003;
+  });
+
+  // Lights orbit
+  pointLight.position.x = Math.cos(t * 0.5) * 8;
+  pointLight.position.y = Math.sin(t * 0.3) * 5;
+  pointLight2.position.x = Math.cos(t * 0.4 + Math.PI) * 7;
+  pointLight2.position.y = Math.sin(t * 0.6) * 4;
+
+  // Mouse parallax
+  camera.position.x += (mouseX * 0.8 - camera.position.x) * 0.04;
+  camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.04;
+  camera.lookAt(scene.position);
+
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ==========================================
+// CARD MINI PREVIEWS
+// ==========================================
+document.querySelectorAll('.card-preview').forEach(canvas => {
+  const type = canvas.dataset.type;
+  const w = canvas.offsetWidth || 600, h = canvas.offsetHeight || 340;
+  canvas.width = w; canvas.height = h;
+
+  const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  r.setSize(w, h);
+  r.setPixelRatio(1);
+
+  const s = new THREE.Scene();
+  const c = new THREE.PerspectiveCamera(60, w / h, 0.1, 50);
+  c.position.z = 5;
+
+  if (type === 'juice') {
+    const colors = [0xFF6B35, 0xC8E86F, 0xF5C842, 0xFF9F1C];
+    for (let i = 0; i < 30; i++) {
+      const g = new THREE.SphereGeometry(Math.random() * 0.15 + 0.05, 8, 8);
+      const m = new THREE.MeshBasicMaterial({ color: colors[i % colors.length], transparent: true, opacity: Math.random() * 0.5 + 0.2 });
+      const mesh = new THREE.Mesh(g, m);
+      mesh.position.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 5 - 2);
+      mesh.userData.speed = { y: Math.random() * 0.01 + 0.005 };
+      s.add(mesh);
+    }
+    const al = new THREE.AmbientLight(0xFF6B35, 0.2);
+    s.add(al);
+    function anim() {
+      requestAnimationFrame(anim);
+      s.children.forEach(child => {
+        if (child instanceof THREE.Mesh) {
+          child.position.y += child.userData.speed.y;
+          if (child.position.y > 5) child.position.y = -5;
+          child.rotation.x += 0.02;
+        }
+      });
+      r.render(s, c);
+    }
+    anim();
+  } else {
+    // Restaurant
+    const count = 200;
+    const pos = new Float32Array(count * 3);
+    const vel = [];
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 14;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 5 - 2;
+      vel.push((Math.random() - 0.5) * 0.005, Math.random() * 0.006 + 0.002, 0);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ color: 0xC9A84C, size: 0.04, transparent: true, opacity: 0.7 });
+    s.add(new THREE.Points(geo, mat));
+
+    const pAttr = geo.attributes.position;
+    function anim() {
+      requestAnimationFrame(anim);
+      for (let i = 0; i < count; i++) {
+        pAttr.array[i * 3] += vel[i * 3];
+        pAttr.array[i * 3 + 1] += vel[i * 3 + 1];
+        if (pAttr.array[i * 3 + 1] > 6) pAttr.array[i * 3 + 1] = -6;
+      }
+      pAttr.needsUpdate = true;
+      r.render(s, c);
+    }
+    anim();
+  }
+});
+
+// ==========================================
+// SCROLL REVEAL
+// ==========================================
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add
