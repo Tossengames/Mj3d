@@ -116,6 +116,45 @@ h1 em{font-style:italic;color:var(--red);}
 footer{position:relative;z-index:10;background:var(--ink);color:#fff;padding:2.5rem 5rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}
 .fade-up{opacity:0;transform:translateY(35px);transition:opacity .7s,transform .7s;}
 .fade-up.vis{opacity:1;transform:translateY(0);}
+
+/* ── TABLET ── */
+@media(max-width:960px){
+  nav{padding:1.2rem 2rem;}
+  nav ul{gap:1.5rem;}
+  #hero{grid-template-columns:1fr;padding:7rem 2.5rem 4rem;gap:3rem;}
+  .dish-grid{grid-template-columns:1fr 1fr;}
+  .menu-intro{grid-template-columns:1fr;gap:2rem;}
+  .menu-grid{grid-template-columns:1fr 1fr;}
+  .amb-grid{grid-template-columns:1fr 1fr;}
+  #reservation{padding:6rem 2.5rem;}
+  footer{padding:2rem 2.5rem;gap:1rem;flex-wrap:wrap;justify-content:center;text-align:center;}
+}
+
+/* ── MOBILE ── */
+@media(max-width:600px){
+  #cursor{display:none;}
+  body{cursor:auto;}
+  nav{padding:1rem 1.2rem;}
+  nav ul{display:none;}
+  .reserve-btn{display:none;}
+  #hero{padding:5.5rem 1.2rem 3rem;gap:2rem;}
+  .cuisine-tag{font-size:.62rem;}
+  .award-row{gap:.6rem;}
+  .award{font-size:.72rem;padding:.3rem .8rem;}
+  .hero-btns{flex-direction:column;gap:.75rem;}
+  .btn-red,.btn-line{width:100%;justify-content:center;padding:.9rem 1.5rem;}
+  .dish-grid{grid-template-columns:1fr 1fr;gap:.8rem;}
+  .dish-card:nth-child(1){grid-column:span 2;}
+  #menu{padding:5rem 1.2rem;}
+  .menu-intro{gap:1.5rem;}
+  .menu-grid{grid-template-columns:1fr;gap:1rem;}
+  .amb-grid{grid-template-columns:1fr;gap:1rem;}
+  #ambiance{padding:4rem 1.2rem;}
+  #reservation{padding:5rem 1.2rem;}
+  .hours-row{gap:1rem;}
+  .hr{padding:1rem 1.5rem;}
+  footer{flex-direction:column;gap:.5rem;text-align:center;padding:1.5rem 1.2rem;font-size:.72rem;}
+}
 </style>
 </head>
 <body>
