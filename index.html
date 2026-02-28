@@ -313,7 +313,7 @@
   /* Project Cards */
   .projects-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 2rem;
   }
 
@@ -570,6 +570,43 @@
   }
 
   .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── TABLET ── */
+  @media(max-width: 1024px) {
+    nav { padding: 1.5rem 2.5rem; }
+    #hero { padding: 0 2.5rem 6rem; }
+    .hero-stats { right: 2.5rem; bottom: 6rem; }
+    #work, #skills, #contact { padding: 6rem 2.5rem; }
+    .projects-grid { grid-template-columns: 1fr 1fr; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+    footer { padding: 2rem 2.5rem; }
+  }
+
+  /* ── MOBILE ── */
+  @media(max-width: 640px) {
+    #cursor { display: none; }
+    body { cursor: auto; }
+    nav { padding: 1.2rem 1.5rem; }
+    nav ul { display: none; }
+    h1 { font-size: clamp(2.8rem, 12vw, 4rem); letter-spacing: -2px; }
+    #hero { padding: 0 1.5rem 5rem; align-items: center; }
+    .hero-tag { font-size: .65rem; }
+    .hero-sub { font-size: .95rem; }
+    .hero-actions { flex-direction: column; gap: .75rem; }
+    .btn-primary, .btn-outline { width: 100%; justify-content: center; padding: .9rem 1.5rem; }
+    .hero-stats { display: none; }
+    #work { padding: 5rem 1.5rem; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .card-visual { aspect-ratio: 4/3; }
+    .card-body { padding: 1.4rem; }
+    #skills { padding: 5rem 1.5rem; }
+    .skills-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .skill-card { padding: 1.5rem 1.2rem; }
+    #contact { padding: 5rem 1.5rem; }
+    .contact-title { letter-spacing: -2px; }
+    footer { padding: 1.5rem; flex-direction: column; text-align: center; gap: .75rem; }
+  }
 </style>
 </head>
 <body>
@@ -683,6 +720,96 @@
           <span class="tech-chip">Interactive</span>
           <span class="tech-chip">Canvas API</span>
           <span class="tech-chip">Data Viz</span>
+        </div>
+      </div>
+    </a>
+    <a href="demo/fastfood.html" target="_blank" class="project-card fade-in" style="transform:none!important;">
+      <div class="card-visual" style="background:linear-gradient(135deg,#FF6B00,#FFD000);">
+        <div class="card-tag tag-orange">3D Interactive</div>
+        <div class="card-overlay">🍔</div>
+        <div class="card-visit">↗</div>
+      </div>
+      <div class="card-body">
+        <p class="card-category" style="color:var(--accent);">Food & Beverage</p>
+        <h3 class="card-title">STACKD — Fast Food</h3>
+        <p class="card-desc">3D food viewer built from Three.js geometry — burgers, drinks, fries & more. Pick from a menu grid, drag to rotate, add to cart.</p>
+        <div class="card-tech">
+          <span class="tech-chip">Three.js 3D</span>
+          <span class="tech-chip">Procedural Models</span>
+          <span class="tech-chip">Drag to Rotate</span>
+          <span class="tech-chip">Live Cart</span>
+        </div>
+      </div>
+    </a>
+    <a href="demo/economics.html" target="_blank" class="project-card fade-in" style="transform:none!important;">
+      <div class="card-visual" style="background:linear-gradient(135deg,#0D0D0D,#1A2A40);">
+        <div class="card-tag" style="background:rgba(200,0,30,.2);color:#FF4455;border:1px solid rgba(200,0,30,.3);">Editorial</div>
+        <div class="card-overlay">🌍</div>
+        <div class="card-visit">↗</div>
+      </div>
+      <div class="card-body">
+        <p class="card-category" style="color:var(--accent3);">News & Media</p>
+        <h3 class="card-title">MERIDIAN — Economics</h3>
+        <p class="card-desc">Premium economic news publication with 3D interactive globe, live market ticker, interactive charts, and a live currency converter.</p>
+        <div class="card-tech">
+          <span class="tech-chip">3D Globe</span>
+          <span class="tech-chip">Live Ticker</span>
+          <span class="tech-chip">FX Calculator</span>
+          <span class="tech-chip">Editorial</span>
+        </div>
+      </div>
+    </a>
+    <a href="demo/store.html" target="_blank" class="project-card fade-in" style="transform:none!important;">
+      <div class="card-visual" style="background:linear-gradient(135deg,#F9F7F4,#E8E3DC);">
+        <div class="card-tag" style="background:rgba(184,144,26,.15);color:#8B6914;border:1px solid rgba(184,144,26,.3);">E-Commerce</div>
+        <div class="card-overlay">🛍️</div>
+        <div class="card-visit">↗</div>
+      </div>
+      <div class="card-body">
+        <p class="card-category" style="color:var(--accent2);">Product Store</p>
+        <h3 class="card-title">STUDIO — Product Store</h3>
+        <p class="card-desc">Luxury product showcase with 3D previews per item, expandable feature lists, modal detail views, category filtering, and live cart.</p>
+        <div class="card-tech">
+          <span class="tech-chip">3D Per Product</span>
+          <span class="tech-chip">Modal View</span>
+          <span class="tech-chip">Live Cart</span>
+          <span class="tech-chip">Premium UI</span>
+        </div>
+      </div>
+    </a>
+    <a href="demo/shoes.html" target="_blank" class="project-card fade-in" style="transform:none!important;">
+      <div class="card-visual" style="background:linear-gradient(135deg,#0A0A0A,#1A1A2E);">
+        <div class="card-tag" style="background:rgba(232,197,71,.15);color:#E8C547;border:1px solid rgba(232,197,71,.3);">3D Showcase</div>
+        <div class="card-overlay">👟</div>
+        <div class="card-visit">↗</div>
+      </div>
+      <div class="card-body">
+        <p class="card-category" style="color:var(--accent);">Fashion & Retail</p>
+        <h3 class="card-title">SOLE — 3D Shoe Showcase</h3>
+        <p class="card-desc">Full 3D shoe viewer with procedurally generated shoe geometry, 8 styles, color variants, size picker, drag-to-rotate, and live cart.</p>
+        <div class="card-tech">
+          <span class="tech-chip">Procedural 3D</span>
+          <span class="tech-chip">Drag to Rotate</span>
+          <span class="tech-chip">Color Variants</span>
+          <span class="tech-chip">Size Picker</span>
+        </div>
+      </div>
+    </a>
+    <a href="demo/furniture.html" target="_blank" class="project-card fade-in" style="transform:none!important;">
+      <div class="card-visual" style="background:linear-gradient(135deg,#2A1506,#3A1F0D);">
+        <div class="card-tag" style="background:rgba(200,147,74,.15);color:#C8934A;border:1px solid rgba(200,147,74,.3);">Wood & 3D</div>
+        <div class="card-overlay">🪑</div>
+        <div class="card-visit">↗</div>
+      </div>
+      <div class="card-body">
+        <p class="card-category" style="color:var(--accent2);">Furniture & Retail</p>
+        <h3 class="card-title">GRAIN — Wooden Furniture</h3>
+        <p class="card-desc">Wood-textured furniture store with 12 3D procedural models, full-screen 3D viewer, wood finish selector, category filter and cart.</p>
+        <div class="card-tech">
+          <span class="tech-chip">Wood UI</span>
+          <span class="tech-chip">12 3D Models</span>
+          <span class="tech-chip">Full Viewer</span>
+          <span class="tech-chip">Wood Selector</span>
         </div>
       </div>
     </a>
