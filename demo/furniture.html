@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRAIN — Handcrafted Wooden Furniture</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Jost:wght@300;400;500;600&display=swap');
+
+/* ─── WOOD PALETTE ─── */
+:root {
+  --oak:      #C8934A;
+  --walnut:   #6B3F2A;
+  --maple:    #E8B97A;
+  --grain:    #A0622A;
+  --bark:     #3A1F0D;
+  --cream:    #F5EFE4;
+  --parchment:#EDE3D2;
+  --sand:     #D6C4A8;
+  --ink:      #1C0F06;
+  --muted:    #8A6A52;
+  --border:   #C8A882;
+  --surface:  #FAF5ED;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Jost', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── WOOD GRAIN TEXTURE (CSS) ─── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(
+      92deg,
+      transparent 0px, transparent 3px,
+      rgba(160,98,42,.03) 3px, rgba(160,98,42,.03) 4px
+    ),
+    repeating-linear-gradient(
+      88deg,
+      transparent 0px, transparent 8px,
+      rgba(107,63,42,.02) 8px, rgba(107,63,42,.02) 9px
+    );
+}
+
+/* ─── CURSOR ─── */
+#cur { position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); mix-blend-mode:multiply; }
+#cur-outer {
+  width:40px; height:40px; border-radius:50%;
+  border:1.5px solid var(--walnut);
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  transition:width .35s cubic-bezier(.23,1,.32,1), height .35s cubic-bezier(.23,1,.32,1), border-color .3s;
+}
+#cur-inner { width:6px; height:6px; background:var(--walnut); border-radius:50%; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
+.hovering #cur-outer { width:64px; height:64px; border-color:var(--oak); }
+.hovering #cur-inner { background:var(--oak); }
+
+/* ─── WOOD BUTTON STYLE ─── */
+.wood-btn {
+  display:inline-flex; align-items:center; gap:.6rem;
+  background: linear-gradient(145deg, #C8934A 0%, #A0622A 40%, #8B5020 100%);
+  color:#FAF5ED;
+  padding:.9rem 2.2rem;
+  border-radius:4px;
+  font-family:'Jost',sans-serif; font-size:.8rem; font-weight:600; letter-spacing:2px; text-transform:uppercase;
+  border:none; cursor:none; text-decoration:none;
+  position:relative; overflow:hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 4px 16px rgba(58,31,13,.25), 0 1px 0 rgba(58,31,13,.4);
+  transition:transform .25s, box-shadow .25s;
+}
+.wood-btn::before {
+  content:'';
+  position:absolute; inset:0;
+  background: repeating-linear-gradient(90deg, transparent 0, transparent 6px, rgba(255,255,255,.04) 6px, rgba(255,255,255,.04) 7px);
+}
+.wood-btn:hover { transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 8px 24px rgba(58,31,13,.3), 0 1px 0 rgba(58,31,13,.4); }
+.wood-btn:active { transform:translateY(0); }
+
+.wood-btn-outline {
+  display:inline-flex; align-items:center; gap:.6rem;
+  background: transparent;
+  color:var(--walnut);
+  padding:.85rem 2.2rem;
+  border-radius:4px;
+  font-family:'Jost',sans-serif; font-size:.8rem; font-weight:600; letter-spacing:2px; text-transform:uppercase;
+  border:1.5px solid var(--border); cursor:none; text-decoration:none;
+  transition:background .25s, border-color .25s, transform .25s;
+}
+.wood-btn-outline:hover { background:rgba(200,147,74,.08); border-color:var(--oak); transform:translateY(-2px); }
+
+/* ─── WOOD CARD STYLE ─── */
+.wood-card {
+  background: linear-gradient(160deg, #FAF5ED 0%, #EDE3D2 100%);
+  border:1px solid var(--border);
+  border-radius:6px;
+  position:relative; overflow:hidden;
+  box-shadow: 0 2px 8px rgba(58,31,13,.08), 0 1px 0 rgba(255,255,255,.8) inset;
+}
+.wood-card::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(93deg, transparent 0, transparent 18px, rgba(160,98,42,.025) 18px, rgba(160,98,42,.025) 19px);
+}
+
+/* ─── NAV ─── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:1.2rem 3rem;
+  background: rgba(245,239,228,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1.5px solid var(--border);
+  box-shadow:0 2px 20px rgba(58,31,13,.08);
+}
+nav::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(90deg, transparent 0, transparent 12px, rgba(160,98,42,.03) 12px, rgba(160,98,42,.03) 13px);
+}
+.nav-logo {
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem; font-weight:900; letter-spacing:2px;
+  color:var(--bark);
+  position:relative;
+}
+.nav-logo span { color:var(--oak); font-style:italic; }
+.nav-tagline { font-size:.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-top:.1rem; }
+.nav-links { display:flex; gap:2.5rem; list-style:none; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:.78rem; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; transition:color .2s; }
+.nav-links a:hover { color:var(--bark); }
+.nav-right { display:flex; align-items:center; gap:1.2rem; }
+.nav-cart {
+  display:flex; align-items:center; gap:.5rem;
+  background:linear-gradient(145deg,#C8934A,#8B5020);
+  color:#FAF5ED; padding:.55rem 1.3rem; border-radius:4px;
+  font-size:.72rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  cursor:none; box-shadow:0 3px 10px rgba(58,31,13,.2);
+  transition:opacity .2s;
+  position:relative; overflow:hidden;
+}
+.nav-cart::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent 0,transparent 6px,rgba(255,255,255,.06) 6px,rgba(255,255,255,.06) 7px); }
+.nav-cart:hover { opacity:.88; }
+.cart-bubble { background:var(--bark); color:#FAF5ED; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.58rem; font-weight:800; }
+
+/* ─── HERO ─── */
+#hero {
+  min-height:100vh;
+  display:grid; grid-template-columns:1fr 1fr;
+  padding-top:72px;
+  position:relative;
+}
+.hero-left {
+  display:flex; flex-direction:column; justify-content:center;
+  padding:5rem 4rem 5rem 3rem;
+  position:relative; z-index:10;
+}
+.hero-eyebrow {
+  display:flex; align-items:center; gap:1rem;
+  font-size:.65rem; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:var(--muted);
+  margin-bottom:1.8rem;
+}
+.hero-eyebrow-line { width:36px; height:1px; background:var(--oak); }
+.hero-h1 {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3rem,5vw,5.2rem); font-weight:900; line-height:1.0; letter-spacing:-1px;
+  color:var(--bark); margin-bottom:1.5rem;
+}
+.hero-h1 em { font-style:italic; color:var(--oak); }
+.hero-p { font-size:.95rem; color:var(--muted); line-height:1.8; font-weight:300; max-width:380px; margin-bottom:2.5rem; }
+.hero-actions { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:3.5rem; }
+.hero-badges { display:flex; gap:1.5rem; flex-wrap:wrap; padding-top:2rem; border-top:1px solid var(--border); }
+.hero-badge {
+  display:flex; align-items:center; gap:.5rem;
+  font-size:.72rem; color:var(--muted); font-weight:400;
+}
+.badge-icon { font-size:1rem; }
+
+.hero-right {
+  position:relative; overflow:hidden;
+  background:linear-gradient(135deg, #2A1506 0%, #3A1F0D 40%, #4A2810 100%);
+}
+.hero-right::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(88deg, transparent 0,transparent 8px, rgba(255,255,255,.015) 8px, rgba(255,255,255,.015) 9px),
+             repeating-linear-gradient(2deg,   transparent 0,transparent 40px, rgba(255,255,255,.01) 40px, rgba(255,255,255,.01) 41px);
+}
+#heroCanvas { position:absolute; inset:0; width:100%; height:100%; }
+.hero-canvas-hint {
+  position:absolute; bottom:2rem; right:2rem; z-index:10;
+  font-size:.6rem; letter-spacing:3px; text-transform:uppercase;
+  color:rgba(245,239,228,.35);
+  display:flex; align-items:center; gap:.5rem;
+}
+.hint-pulse { width:6px; height:6px; background:var(--oak); border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+
+/* ─── SECTION HEADER ─── */
+.sec-header { text-align:center; margin-bottom:4rem; position:relative; }
+.sec-eyebrow { font-size:.62rem; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:var(--oak); margin-bottom:.9rem; display:flex; align-items:center; justify-content:center; gap:1rem; }
+.sec-eyebrow::before, .sec-eyebrow::after { content:''; width:40px; height:1px; background:var(--sand); }
+.sec-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3.2rem); font-weight:700; color:var(--bark); line-height:1.15; }
+.sec-sub { font-size:.9rem; color:var(--muted); font-weight:300; max-width:500px; margin:.8rem auto 0; line-height:1.7; }
+
+/* ─── CATEGORY TABS ─── */
+#catbar {
+  background:var(--surface);
+  border-top:1.5px solid var(--border);
+  border-bottom:1.5px solid var(--border);
+  padding:0 3rem;
+  display:flex; align-items:center; gap:0;
+  position:sticky; top:72px; z-index:100;
+  overflow-x:auto; scrollbar-width:none;
+  box-shadow:0 2px 12px rgba(58,31,13,.06);
+}
+#catbar::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0,transparent 16px,rgba(160,98,42,.025) 16px,rgba(160,98,42,.025) 17px);
+}
+#catbar::-webkit-scrollbar { display:none; }
+.cat-tab {
+  position:relative; padding:1.1rem 1.8rem;
+  font-size:.72rem; font-weight:600; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); background:none; border:none; cursor:none;
+  font-family:'Jost',sans-serif; white-space:nowrap;
+  transition:color .25s;
+}
+.cat-tab::after { content:''; position:absolute; bottom:0; left:50%; right:50%; height:2px; background:var(--oak); transition:left .3s, right .3s; border-radius:1px; }
+.cat-tab:hover { color:var(--bark); }
+.cat-tab.active { color:var(--bark); }
+.cat-tab.active::after, .cat-tab:hover::after { left:1.8rem; right:1.8rem; }
+.cat-divider { width:1px; height:20px; background:var(--border); margin:0 .3rem; flex-shrink:0; }
+.cat-count { font-size:.55rem; color:var(--sand); margin-left:.3rem; font-weight:500; }
+
+/* ─── PRODUCT GRID ─── */
+#products { padding:4rem 3rem; }
+.prod-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+
+/* PRODUCT CARD */
+.prod-card {
+  background:linear-gradient(160deg,#FAF5ED,#EDE3D2);
+  border:1px solid var(--border);
+  border-radius:6px; overflow:hidden; cursor:none;
+  position:relative;
+  box-shadow:0 4px 20px rgba(58,31,13,.08), 0 1px 0 rgba(255,255,255,.7) inset;
+  transition:transform .35s cubic-bezier(.23,1,.32,1), box-shadow .35s;
+}
+.prod-card::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(92deg,transparent 0,transparent 14px,rgba(160,98,42,.03) 14px,rgba(160,98,42,.03) 15px);
+  z-index:1;
+}
+.prod-card:hover { transform:translateY(-6px); box-shadow:0 16px 40px rgba(58,31,13,.14), 0 1px 0 rgba(255,255,255,.7) inset; }
+
+.prod-preview {
+  height:220px; position:relative; overflow:hidden;
+  background:linear-gradient(145deg,#2A1506,#3D1F0A);
+  display:flex; align-items:center; justify-content:center;
+}
+.prod-preview::after {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(87deg,transparent 0,transparent 10px,rgba(255,255,255,.015) 10px,rgba(255,255,255,.015) 11px);
+  pointer-events:none; z-index:1;
+}
+.pcard-canvas { position:absolute; inset:0; width:100%; height:100%; }
+
+.prod-badge {
+  position:absolute; top:1rem; left:1rem; z-index:10;
+  font-size:.55rem; font-weight:800; letter-spacing:2.5px; text-transform:uppercase;
+  padding:.3rem .8rem; border-radius:3px;
+}
+.badge-new      { background:var(--oak); color:#FAF5ED; }
+.badge-sale     { background:#8B1A1A; color:#FAF5ED; }
+.badge-handmade { background:var(--bark); color:var(--maple); }
+.badge-popular  { background:var(--parchment); color:var(--walnut); border:1px solid var(--border); }
+
+.view-btn {
+  position:absolute; top:1rem; right:1rem; z-index:10;
+  background:rgba(245,239,228,.12); backdrop-filter:blur(8px);
+  border:1px solid rgba(245,239,228,.2);
+  color:#FAF5ED; padding:.4rem .9rem; border-radius:3px;
+  font-size:.6rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  cursor:none; transition:background .2s;
+}
+.view-btn:hover { background:rgba(245,239,228,.22); }
+
+.prod-body { padding:1.4rem 1.5rem 1.5rem; position:relative; z-index:2; }
+.prod-category { font-size:.6rem; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--oak); margin-bottom:.4rem; }
+.prod-name { font-family:'Playfair Display',serif; font-size:1.15rem; font-weight:700; color:var(--bark); margin-bottom:.5rem; line-height:1.2; }
+.prod-desc { font-size:.78rem; color:var(--muted); line-height:1.65; font-weight:300; margin-bottom:1.1rem; }
+.prod-wood { display:flex; align-items:center; gap:.5rem; margin-bottom:1rem; flex-wrap:wrap; }
+.wood-chip {
+  font-size:.58rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  padding:.25rem .7rem; border-radius:2px;
+  border:1px solid var(--border); color:var(--muted); background:rgba(200,147,74,.06);
+  cursor:none; transition:background .2s, border-color .2s;
+}
+.wood-chip.selected, .wood-chip:hover { background:rgba(200,147,74,.15); border-color:var(--oak); color:var(--walnut); }
+.prod-footer { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding-top:1rem; border-top:1px solid var(--border); }
+.prod-price-wrap {}
+.prod-old { font-size:.72rem; color:var(--sand); text-decoration:line-through; }
+.prod-price { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:var(--bark); line-height:1; }
+.prod-add {
+  display:flex; align-items:center; gap:.5rem;
+  background:linear-gradient(145deg,#C8934A,#8B5020);
+  color:#FAF5ED; padding:.65rem 1.4rem; border-radius:4px;
+  font-size:.68rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  border:none; cursor:none; font-family:'Jost',sans-serif;
+  position:relative; overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 3px 8px rgba(58,31,13,.2);
+  transition:transform .2s, box-shadow .2s;
+}
+.prod-add::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent 0,transparent 5px,rgba(255,255,255,.05) 5px,rgba(255,255,255,.05) 6px); }
+.prod-add:hover { transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 6px 16px rgba(58,31,13,.25); }
+.prod-add.added { background:linear-gradient(145deg,#5A8B3A,#3A6020); }
+
+/* ─── 3D VIEWER MODAL ─── */
+#viewer {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(28,15,6,.85); backdrop-filter:blur(12px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition:opacity .4s;
+  padding:1.5rem;
+}
+#viewer.open { opacity:1; pointer-events:all; }
+.viewer-box {
+  display:grid; grid-template-columns:1fr 420px;
+  width:100%; max-width:1100px; max-height:90vh;
+  background:linear-gradient(160deg,#FAF5ED,#EDE3D2);
+  border:1px solid var(--border); border-radius:8px; overflow:hidden;
+  box-shadow:0 40px 80px rgba(28,15,6,.4);
+  transform:scale(.95) translateY(20px);
+  transition:transform .45s cubic-bezier(.23,1,.32,1);
+}
+#viewer.open .viewer-box { transform:scale(1) translateY(0); }
+
+.viewer-stage {
+  background:linear-gradient(145deg,#1C0A02,#2A1506,#3A1F0D);
+  position:relative; min-height:480px;
+}
+.viewer-stage::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(87deg,transparent 0,transparent 12px,rgba(255,255,255,.012) 12px,rgba(255,255,255,.012) 13px);
+  pointer-events:none; z-index:1;
+}
+#viewerCanvas { position:absolute; inset:0; width:100%; height:100%; cursor:grab; }
+#viewerCanvas:active { cursor:grabbing; }
+.viewer-controls {
+  position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; z-index:10;
+}
+.vctrl {
+  background:rgba(245,239,228,.1); border:1px solid rgba(245,239,228,.15);
+  color:rgba(245,239,228,.7); padding:.4rem 1rem; border-radius:3px;
+  font-size:.6rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  cursor:none; transition:background .2s; font-family:'Jost',sans-serif;
+}
+.vctrl:hover { background:rgba(245,239,228,.18); color:#FAF5ED; }
+.viewer-drag-hint {
+  position:absolute; top:1.2rem; left:50%; transform:translateX(-50%);
+  font-size:.58rem; letter-spacing:2.5px; text-transform:uppercase;
+  color:rgba(245,239,228,.3); z-index:10;
+  animation:hintOut 3s 2s forwards;
+}
+@keyframes hintOut { to{opacity:0} }
+
+.viewer-info { padding:2.5rem; overflow-y:auto; display:flex; flex-direction:column; }
+.viewer-close {
+  position:absolute; top:1.2rem; right:1.2rem; z-index:20;
+  width:36px; height:36px; border-radius:50%;
+  background:rgba(28,15,6,.15); border:1px solid rgba(28,15,6,.1);
+  color:var(--bark); font-size:1rem; cursor:none; display:flex; align-items:center; justify-content:center;
+  transition:background .2s;
+}
+.viewer-close:hover { background:rgba(28,15,6,.25); }
+.viewer-cat { font-size:.6rem; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--oak); margin-bottom:.6rem; }
+.viewer-name { font-family:'Playfair Display',serif; font-size:1.9rem; font-weight:700; color:var(--bark); line-height:1.15; margin-bottom:.8rem; }
+.viewer-desc { font-size:.85rem; color:var(--muted); line-height:1.75; font-weight:300; margin-bottom:1.5rem; }
+
+.spec-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin-bottom:1.5rem; }
+.spec-item { background:rgba(200,147,74,.06); border:1px solid var(--border); border-radius:4px; padding:.7rem .9rem; }
+.spec-label { font-size:.58rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:.2rem; }
+.spec-val { font-size:.85rem; font-weight:600; color:var(--bark); }
+
+.viewer-wood-sel { margin-bottom:1.5rem; }
+.wood-sel-label { font-size:.6rem; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem; display:flex; justify-content:space-between; }
+.wood-options { display:flex; gap:.5rem; flex-wrap:wrap; }
+.wood-opt {
+  padding:.45rem 1rem; border-radius:3px;
+  border:1px solid var(--border); background:transparent;
+  font-size:.65rem; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  color:var(--muted); cursor:none; font-family:'Jost',sans-serif;
+  transition:all .2s;
+}
+.wood-opt:hover { border-color:var(--oak); color:var(--walnut); background:rgba(200,147,74,.08); }
+.wood-opt.active { background:linear-gradient(145deg,#C8934A,#8B5020); color:#FAF5ED; border-color:transparent; box-shadow:0 3px 8px rgba(58,31,13,.2); }
+
+.viewer-price-row { display:flex; align-items:baseline; gap:1rem; margin-bottom:1.5rem; }
+.viewer-price { font-family:'Playfair Display',serif; font-size:2.5rem; font-weight:700; color:var(--bark); }
+.viewer-old   { font-size:.9rem; color:var(--sand); text-decoration:line-through; }
+
+.viewer-actions { display:flex; gap:.75rem; margin-top:auto; }
+.viewer-buy {
+  flex:1; padding:1rem; background:linear-gradient(145deg,#C8934A,#8B5020);
+  color:#FAF5ED; border:none; border-radius:4px;
+  font-family:'Jost',sans-serif; font-size:.78rem; font-weight:600; letter-spacing:2px; text-transform:uppercase;
+  cursor:none; position:relative; overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 4px 12px rgba(58,31,13,.25);
+  transition:transform .2s, box-shadow .2s;
+}
+.viewer-buy::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent 0,transparent 6px,rgba(255,255,255,.05) 6px,rgba(255,255,255,.05) 7px); }
+.viewer-buy:hover { transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 8px 24px rgba(58,31,13,.3); }
+.viewer-wish {
+  width:48px; height:48px; border-radius:4px; border:1.5px solid var(--border);
+  background:transparent; color:var(--muted); font-size:1.1rem;
+  cursor:none; display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.viewer-wish:hover { border-color:var(--oak); color:var(--walnut); background:rgba(200,147,74,.08); }
+.viewer-wish.on { color:#8B1A1A; border-color:#C8734A; }
+
+/* ─── FEATURES STRIP ─── */
+#features { padding:4rem 3rem; background:var(--bark); position:relative; overflow:hidden; }
+#features::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(88deg,transparent 0,transparent 12px,rgba(255,255,255,.02) 12px,rgba(255,255,255,.02) 13px);
+}
+.feat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; position:relative; }
+.feat-item { text-align:center; }
+.feat-icon { font-size:2rem; margin-bottom:.8rem; display:block; }
+.feat-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--maple); margin-bottom:.4rem; }
+.feat-text { font-size:.78rem; color:rgba(245,239,228,.5); line-height:1.65; font-weight:300; }
+
+/* ─── TOAST ─── */
+#toast {
+  position:fixed; bottom:2.5rem; left:50%; transform:translateX(-50%) translateY(80px);
+  background:var(--bark); color:var(--maple);
+  padding:.85rem 2.2rem; border-radius:4px;
+  font-size:.78rem; font-weight:600; letter-spacing:.5px;
+  box-shadow:0 8px 24px rgba(28,15,6,.3);
+  z-index:700; transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap;
+  border:1px solid rgba(200,147,74,.3);
+}
+#toast.show { transform:translateX(-50%) translateY(0); }
+
+/* ─── LOADING ─── */
+#loading {
+  position:fixed; inset:0; z-index:900;
+  background:var(--bark); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.2rem;
+  transition:opacity .8s;
+}
+#loading::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(88deg,transparent 0,transparent 10px,rgba(255,255,255,.018) 10px,rgba(255,255,255,.018) 11px),
+             repeating-linear-gradient(2deg,transparent 0,transparent 50px,rgba(255,255,255,.01) 50px,rgba(255,255,255,.01) 51px);
+}
+#loading.gone { opacity:0; pointer-events:none; }
+.load-logo { font-family:'Playfair Display',serif; font-size:3.5rem; font-weight:900; letter-spacing:4px; color:var(--maple); position:relative; }
+.load-logo span { color:var(--oak); font-style:italic; }
+.load-sub { font-size:.6rem; letter-spacing:4px; text-transform:uppercase; color:rgba(232,185,122,.4); position:relative; }
+.load-bar-wrap { width:180px; height:2px; background:rgba(200,147,74,.2); border-radius:1px; overflow:hidden; position:relative; }
+.load-bar { height:100%; background:var(--oak); border-radius:1px; animation:loadBar 1.6s ease forwards; }
+@keyframes loadBar { from{width:0} to{width:100%} }
+
+/* ─── FOOTER ─── */
+footer {
+  background:var(--bark); color:rgba(245,239,228,.4);
+  padding:2.5rem 3rem; display:flex; justify-content:space-between;
+  align-items:center; flex-wrap:wrap; gap:1rem;
+  border-top:2px solid rgba(200,147,74,.2);
+  position:relative;
+}
+footer::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent 0,transparent 14px,rgba(255,255,255,.015) 14px,rgba(255,255,255,.015) 15px); pointer-events:none; }
+.foot-logo { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; color:var(--maple); letter-spacing:2px; }
+.foot-logo span { color:var(--oak); font-style:italic; }
+.foot-links { display:flex; gap:2rem; }
+.foot-links a { color:rgba(245,239,228,.4); text-decoration:none; font-size:.72rem; letter-spacing:1px; text-transform:uppercase; transition:color .2s; }
+.foot-links a:hover { color:var(--maple); }
+
+/* ─── SCROLL REVEAL ─── */
+.reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1024px){
+  .prod-grid { grid-template-columns:1fr 1fr; }
+  .viewer-box { grid-template-columns:1fr 360px; }
+  .feat-grid { grid-template-columns:1fr 1fr; gap:2rem; }
+}
+@media(max-width:768px){
+  nav { padding:1rem 1.5rem; }
+  .nav-links { display:none; }
+  #hero { grid-template-columns:1fr; }
+  .hero-right { height:60vw; min-height:280px; }
+  .hero-left { padding:3.5rem 1.5rem 2.5rem; }
+  #catbar { padding:0 1rem; }
+  #products { padding:3rem 1.2rem; }
+  .prod-grid { grid-template-columns:1fr 1fr; gap:1rem; }
+  .prod-preview { height:170px; }
+  .viewer-box { grid-template-columns:1fr; max-height:95vh; }
+  .viewer-stage { min-height:300px; }
+  .feat-grid { grid-template-columns:1fr 1fr; }
+  footer { flex-direction:column; text-align:center; padding:2rem 1.5rem; }
+  .foot-links { flex-wrap:wrap; justify-content:center; gap:1.2rem; }
+}
+@media(max-width:520px){
+  #cur { display:none; } body { cursor:auto; }
+  .prod-grid { grid-template-columns:1fr; }
+  nav { padding:.8rem 1rem; }
+  .hero-left { padding:3rem 1rem 2rem; }
+  .hero-h1 { font-size:2.5rem; }
+  #products { padding:2rem .8rem; }
+  .feat-grid { grid-template-columns:1fr; gap:1.5rem; }
+  #features { padding:3rem 1.2rem; }
+  .spec-grid { grid-template-columns:1fr; }
+  .viewer-info { padding:1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="cur"><div id="cur-outer"></div><div id="cur-inner"></div></div>
+<div id="toast"></div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="load-logo">GR<span>AI</span>N</div>
+  <div class="load-bar-wrap"><div class="load-bar"></div></div>
+  <div class="load-sub">Crafting your experience</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div>
+    <div class="nav-logo">GR<span>AI</span>N</div>
+    <div class="nav-tagline">Handcrafted Wooden Furniture</div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Collection</a></li>
+    <li><a href="#">Craftsmanship</a></li>
+    <li><a href="#">Bespoke</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-cart" id="navCart">
+      🛒 &nbsp;Cart <div class="cart-bubble" id="cartN">0</div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow"><span class="hero-eyebrow-line"></span>Since 1987 · Hand Made</div>
+    <h1 class="hero-h1">Where wood<br>becomes <em>art.</em></h1>
+    <p class="hero-p">Every piece is hand-selected, hand-crafted, and finished to last a lifetime. No shortcuts. No compromises. Just honest wood and honest work.</p>
+    <div class="hero-actions">
+      <a href="#products" class="wood-btn">View Collection →</a>
+      <a href="#" class="wood-btn-outline">Our Story</a>
+    </div>
+    <div class="hero-badges">
+      <div class="hero-badge"><span class="badge-icon">🌲</span> Sustainably Sourced</div>
+      <div class="hero-badge"><span class="badge-icon">✋</span> Hand-Finished</div>
+      <div class="hero-badge"><span class="badge-icon">♾️</span> Lifetime Warranty</div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-canvas-hint"><span class="hint-pulse"></span> Drag to rotate</div>
+  </div>
+</section>
+
+<!-- CATEGORY BAR -->
+<div id="catbar">
+  <button class="cat-tab active" data-cat="all">All Pieces <span class="cat-count">12</span></button>
+  <div class="cat-divider"></div>
+  <button class="cat-tab" data-cat="tables">Tables <span class="cat-count">4</span></button>
+  <div class="cat-divider"></div>
+  <button class="cat-tab" data-cat="chairs">Chairs <span class="cat-count">3</span></button>
+  <div class="cat-divider"></div>
+  <button class="cat-tab" data-cat="storage">Storage <span class="cat-count">3</span></button>
+  <div class="cat-divider"></div>
+  <button class="cat-tab" data-cat="beds">Beds <span class="cat-count">2</span></button>
+</div>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="sec-header reveal">
+    <div class="sec-eyebrow">Our Collection</div>
+    <h2 class="sec-title">Pieces Built to Last Generations</h2>
+    <p class="sec-sub">Each item is made to order in our workshop, using timber aged at least three years. Lead time: 4–6 weeks.</p>
+  </div>
+  <div class="prod-grid" id="prodGrid"></div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="feat-grid">
+    <div class="feat-item reveal">
+      <span class="feat-icon">🌲</span>
+      <div class="feat-title">Forest Certified</div>
+      <div class="feat-text">Every plank traces back to a responsibly managed forest. We know every tree we use.</div>
+    </div>
+    <div class="feat-item reveal">
+      <span class="feat-icon">✋</span>
+      <div class="feat-title">Hand Finished</div>
+      <div class="feat-text">Joinery cut by hand, surfaces sanded through 12 grits, finished with natural oils only.</div>
+    </div>
+    <div class="feat-item reveal">
+      <span class="feat-icon">📐</span>
+      <div class="feat-title">Made to Measure</div>
+      <div class="feat-text">Every dimension can be adjusted to your space. No extra charge for bespoke sizing.</div>
+    </div>
+    <div class="feat-item reveal">
+      <span class="feat-icon">♾️</span>
+      <div class="feat-title">Lifetime Guarantee</div>
+      <div class="feat-text">Structural defects repaired or replaced, for life. We stand behind every joint we cut.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3D VIEWER MODAL -->
+<div id="viewer">
+  <div class="viewer-box">
+    <div class="viewer-stage">
+      <canvas id="viewerCanvas"></canvas>
+      <div class="viewer-drag-hint">✦ Drag to rotate · Scroll to zoom</div>
+      <div class="viewer-controls">
+        <button class="vctrl" id="vFront">Front</button>
+        <button class="vctrl" id="vSide">Side</button>
+        <button class="vctrl" id="vTop">Top</button>
+        <button class="vctrl" id="vReset">Reset</button>
+      </div>
+    </div>
+    <div class="viewer-info">
+      <button class="viewer-close" id="viewerClose">✕</button>
+      <div class="viewer-cat" id="vCat"></div>
+      <div class="viewer-name" id="vName"></div>
+      <div class="viewer-desc" id="vDesc"></div>
+      <div class="spec-grid" id="vSpecs"></div>
+      <div class="viewer-wood-sel">
+        <div class="wood-sel-label"><span>Wood Finish</span><span id="vWoodName" style="color:var(--oak)"></span></div>
+        <div class="wood-options" id="vWoodOpts"></div>
+      </div>
+      <div class="viewer-price-row">
+        <div class="viewer-price" id="vPrice"></div>
+        <div class="viewer-old" id="vOld"></div>
+      </div>
+      <div class="viewer-actions">
+        <button class="viewer-buy" id="vBuyBtn">Add to Cart</button>
+        <button class="viewer-wish" id="vWishBtn">♡</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <div class="foot-logo">GR<span>AI</span>N</div>
+    <div style="font-size:.65rem;margin-top:.3rem;letter-spacing:2px;text-transform:uppercase;color:rgba(245,239,228,.25)">Handcrafted Since 1987</div>
+  </div>
+  <div class="foot-links">
+    <a href="#">About</a><a href="#">Workshop</a><a href="#">Care Guide</a><a href="#">Privacy</a><a href="#">Contact</a>
+  </div>
+  <div style="font-size:.7rem">© 2025 GRAIN Furniture. All rights reserved.</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+// FURNITURE DATA
+// ═══════════════════════════════════════════════════════════
+const WOODS = {
+  oak:    { name:'Oak',        dark:0x8B5A2B, mid:0xC8934A, light:0xE8C07A, rough:0.8 },
+  walnut: { name:'Walnut',     dark:0x3A1F0D, mid:0x6B3F2A, light:0x9B6A4A, rough:0.75},
+  maple:  { name:'Maple',      dark:0xC8924A, mid:0xE8B97A, light:0xF5D4A0, rough:0.65},
+  cherry: { name:'Cherry',     dark:0x6B1A1A, mid:0xA0402A, light:0xC8704A, rough:0.7 },
+  ash:    { name:'Ash',        dark:0x8A7A6A, mid:0xB8A888, light:0xD8C8B0, rough:0.72},
+  ebony:  { name:'Ebony',      dark:0x0D0A08, mid:0x1A1208, light:0x2A1E10, rough:0.55},
+};
+
+const PIECES = [
+  {
+    id:0, cat:'tables', name:'The Alderton Dining Table', short:'Alderton Table',
+    badge:'badge-popular', badgeText:'Popular',
+    desc:'A generously proportioned dining table with hand-cut mortise and tenon joinery. Seats 8 comfortably. The tapered legs are a signature of our workshop.',
+    price:2800, oldPrice:null,
+    specs:{ Dimensions:'220×90×76 cm', Seats:'6–8 people', Joinery:'Mortise & tenon', Finish:'Natural oil' },
+    woods:['oak','walnut','maple','cherry','ash'],
+    model:'dining_table',
+  },
+  {
+    id:1, cat:'chairs', name:'The Wren Armchair', short:'Wren Chair',
+    badge:'badge-handmade', badgeText:'Handmade',
+    desc:'A sculpted armchair with a continuous bent-wood back and steam-curved armrests. Ergonomically shaped for long conversations over dinner.',
+    price:780, oldPrice:950,
+    specs:{ Dimensions:'62×58×88 cm', Seat:'47 cm high', Back:'Curved walnut', Cushion:'Optional' },
+    woods:['oak','walnut','cherry','ash'],
+    model:'armchair',
+  },
+  {
+    id:2, cat:'storage', name:'The Pemberton Sideboard', short:'Pemberton Sideboard',
+    badge:'badge-new', badgeText:'New',
+    desc:'Clean-lined sideboard with dovetail-jointed drawers and push-to-open doors. The recessed base gives it a floating quality.',
+    price:3200, oldPrice:null,
+    specs:{ Dimensions:'180×45×80 cm', Storage:'3 drawers, 2 doors', Joints:'Hand-cut dovetail', Legs:'Recessed steel' },
+    woods:['walnut','oak','ebony','ash'],
+    model:'sideboard',
+  },
+  {
+    id:3, cat:'tables', name:'The Brook Coffee Table', short:'Brook Table',
+    badge:null, badgeText:'',
+    desc:'A low, wide coffee table with a live-edge top and cast bronze hairpin legs. Each top is unique — a slice of one single tree.',
+    price:1450, oldPrice:null,
+    specs:{ Dimensions:'~130×70×40 cm', Top:'Live-edge solid slab', Legs:'Cast bronze', Finish:'Hard wax oil' },
+    woods:['oak','walnut','maple','cherry'],
+    model:'coffee_table',
+  },
+  {
+    id:4, cat:'tables', name:'The Studio Desk', short:'Studio Desk',
+    badge:'badge-popular', badgeText:'Popular',
+    desc:'A generous writing desk with integrated cable management and a hidden drawer. Made for those who spend long days at work.',
+    price:1900, oldPrice:2200,
+    specs:{ Dimensions:'160×75×76 cm', Drawer:'Hidden, full-width', Cable:'Rear trough', Top:'3cm thick slab' },
+    woods:['oak','walnut','maple','ash','ebony'],
+    model:'desk',
+  },
+  {
+    id:5, cat:'chairs', name:'The Spindle Chair', short:'Spindle Chair',
+    badge:null, badgeText:'',
+    desc:'A classic Windsor-inspired dining chair, modernised. 9 hand-turned spindles, saddle seat, and angled legs. Stacks for storage.',
+    price:520, oldPrice:null,
+    specs:{ Dimensions:'48×46×92 cm', Seat:'46 cm high', Spindles:'9 hand-turned', Stackable:'Yes, x6' },
+    woods:['oak','ash','maple','cherry'],
+    model:'spindle_chair',
+  },
+  {
+    id:6, cat:'storage', name:'The Tall Bookcase', short:'Tall Bookcase',
+    badge:null, badgeText:'',
+    desc:'Floor-to-ceiling shelving with adjustable shelf positions. Tongue-and-groove back panel adds rigidity and texture.',
+    price:2100, oldPrice:null,
+    specs:{ Dimensions:'90×35×220 cm', Shelves:'7 adjustable', Back:'Tongue & groove', Load:'40 kg/shelf' },
+    woods:['oak','walnut','maple','ash'],
+    model:'bookcase',
+  },
+  {
+    id:7, cat:'beds', name:'The Haven Bed Frame', short:'Haven Bed',
+    badge:'badge-handmade', badgeText:'Handmade',
+    desc:'A low-profile platform bed with a solid-wood headboard and under-frame storage drawers. Available in King and Super King.',
+    price:3800, oldPrice:null,
+    specs:{ Size:'King (150×200cm)', Headboard:'Solid, 100cm tall', Storage:'4 drawers', Height:'28 cm platform' },
+    woods:['walnut','oak','ebony','cherry'],
+    model:'bed',
+  },
+  {
+    id:8, cat:'tables', name:'The Garden Bench Table', short:'Bench Table',
+    badge:null, badgeText:'',
+    desc:'A solid outdoor dining set — table and two matching benches in naturally durable timber. Weathers to a silver-grey or oil yearly to keep the warmth.',
+    price:2200, oldPrice:null,
+    specs:{ Dimensions:'200×80×76 cm', Includes:'Table + 2 benches', Material:'Solid oak or teak', Outdoor:'Yes — treated' },
+    woods:['oak','ash'],
+    model:'bench_table',
+  },
+  {
+    id:9, cat:'chairs', name:'The Cradle Rocking Chair', short:'Cradle Rocker',
+    badge:'badge-new', badgeText:'New',
+    desc:'A sculptural rocking chair with laminated bent-wood rockers and a woven rush seat. Designed for a lifetime of evenings.',
+    price:1100, oldPrice:null,
+    specs:{ Dimensions:'60×88×95 cm', Rocker:'Laminate bent-wood', Seat:'Woven rush', Weight:'7.2 kg' },
+    woods:['oak','cherry','walnut','ash'],
+    model:'rocking_chair',
+  },
+  {
+    id:10, cat:'storage', name:'The Chest of Drawers', short:'Chest of Drawers',
+    badge:null, badgeText:'',
+    desc:'Six deep drawers on wooden runners — no metal. Hand-fitted to run silently. Brass ring pulls cast to our own pattern.',
+    price:2600, oldPrice:null,
+    specs:{ Dimensions:'90×50×120 cm', Drawers:'6 deep drawers', Runners:'Solid wood', Pulls:'Cast brass' },
+    woods:['walnut','oak','cherry','ebony'],
+    model:'chest',
+  },
+  {
+    id:11, cat:'beds', name:'The Loft Bunk Bed', short:'Loft Bunk',
+    badge:'badge-popular', badgeText:'Popular',
+    desc:'A study loft bunk — desk and storage below, sleep above. Solid construction, integrated ladder, and under-desk shelving.',
+    price:2900, oldPrice:3400,
+    specs:{ Size:'Single (90×200cm)', Height:'190 cm total', Below:'Desk + 3 shelves', Ladder:'Angled, non-slip' },
+    woods:['oak','maple','ash'],
+    model:'bunk',
+  },
+];
+
+// ═══════════════════════════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════════════════════════
+const curEl=document.getElementById('cur');
+let cx=0,cy=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;});
+(function ac(){cx+=(tx-cx)*.16;cy+=(ty-cy)*.16;curEl.style.left=cx+'px';curEl.style.top=cy+'px';requestAnimationFrame(ac);})();
+function setHover(on){ on?document.body.classList.add('hovering'):document.body.classList.remove('hovering'); }
+
+// ═══════════════════════════════════════════════════════
+// WOOD MATERIAL FACTORY
+// ═══════════════════════════════════════════════════════
+function woodMat(woodKey, variant='mid'){
+  const w=WOODS[woodKey]||WOODS.oak;
+  return new THREE.MeshStandardMaterial({
+    color:new THREE.Color(w[variant]),
+    roughness:w.rough, metalness:0.02,
+  });
+}
+function darkWoodMat(woodKey){ return woodMat(woodKey,'dark'); }
+function lightWoodMat(woodKey){ return woodMat(woodKey,'light'); }
+
+// ─── FURNITURE MODEL BUILDERS ───────────────────────────
+function box(w,h,d){ return new THREE.BoxGeometry(w,h,d); }
+function cyl(rt,rb,h,s=16){ return new THREE.CylinderGeometry(rt,rb,h,s); }
+function sphere(r,w=12,h=8){ return new THREE.SphereGeometry(r,w,h); }
+
+function addMesh(parent, geo, mat, px=0,py=0,pz=0, rx=0,ry=0,rz=0, sx=1,sy=1,sz=1){
+  const m=new THREE.Mesh(geo,mat);
+  m.position.set(px,py,pz); m.rotation.set(rx,ry,rz); m.scale.set(sx,sy,sz);
+  m.castShadow=true; m.receiveShadow=true;
+  parent.add(m); return m;
+}
+
+// ─── TABLE LEGS helper ───
+function addTableLegs(g, mat, lx, lz, height, radius=0.055){
+  [[-lx,lz],[lx,lz],[-lx,-lz],[lx,-lz]].forEach(([x,z])=>{
+    addMesh(g, cyl(radius,radius*1.1,height,12), mat, x,-height/2,z);
+  });
+}
+
+// DINING TABLE
+function buildDiningTable(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  addMesh(g, box(3.2,0.1,1.1), m, 0,0,0);                   // top slab
+  addMesh(g, box(3.0,0.06,0.9), lightWoodMat(wood), 0,0.02,0); // lighter face
+  addMesh(g, box(3.1,0.04,0.06), md, 0,-0.04,0.52);          // front apron
+  addMesh(g, box(3.1,0.04,0.06), md, 0,-0.04,-0.52);         // back apron
+  addMesh(g, box(0.06,0.04,0.9), md, -1.55,-0.04,0);         // side apron
+  addMesh(g, box(0.06,0.04,0.9), md, 1.55,-0.04,0);
+  addTableLegs(g,md,1.45,0.42,1.4,0.065);
+  g.position.y=0.7; return g;
+}
+
+// COFFEE TABLE
+function buildCoffeeTable(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  // Live-edge top — slightly irregular
+  const topGeo=box(2.0,0.12,0.9);
+  addMesh(g,topGeo,m,0,0,0);
+  addMesh(g,box(1.95,0.05,0.85),lightWoodMat(wood),0,0.035,0);
+  // Hairpin legs — thin metal look
+  const legMat=new THREE.MeshStandardMaterial({color:0x8B7355,roughness:0.3,metalness:0.6});
+  [[-0.85,0.38],[-0.85,-0.38],[0.85,0.38],[0.85,-0.38]].forEach(([x,z])=>{
+    addMesh(g,cyl(0.012,0.012,0.38,8),legMat,x,-0.25,z);
+    addMesh(g,cyl(0.012,0.012,0.25,8),legMat,x+0.04,-0.32,z,0,0,0.35);
+  });
+  g.position.y=0.4; return g;
+}
+
+// DESK
+function buildDesk(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  addMesh(g,box(2.4,0.1,0.8),m,0,0,0);                     // top
+  addMesh(g,box(2.3,0.05,0.75),lightWoodMat(wood),0,0.025,0);
+  addMesh(g,box(2.38,0.04,0.06),md,0,-0.04,0.37);
+  addMesh(g,box(2.38,0.04,0.06),md,0,-0.04,-0.37);
+  // Side panels (table legs as panels)
+  addMesh(g,box(0.04,0.72,0.75),md,-1.18,-0.41,0);
+  addMesh(g,box(0.04,0.72,0.75),md, 1.18,-0.41,0);
+  // Stretcher
+  addMesh(g,box(2.3,0.04,0.05),md,0,-0.78,0.3);
+  // Hidden drawer
+  addMesh(g,box(1.8,0.1,0.7),md,0,-0.16,0);
+  addMesh(g,box(1.78,0.08,0.68),lightWoodMat(wood),0,-0.16,0.01);
+  addMesh(g,box(0.18,0.025,0.012),new THREE.MeshStandardMaterial({color:0x8B7040,roughness:0.3,metalness:0.5}),0,-0.16,0.37);
+  g.position.y=0.77; return g;
+}
+
+// ARMCHAIR
+function buildArmchair(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  const cushMat=new THREE.MeshStandardMaterial({color:0xD4B896,roughness:0.9,metalness:0});
+  // Seat frame
+  addMesh(g,box(0.68,0.04,0.62),md,0,0,0);
+  // Seat cushion
+  addMesh(g,box(0.64,0.09,0.58),cushMat,0,0.065,0);
+  // Back frame
+  addMesh(g,box(0.68,0.04,0.06),md,0,0.42,-0.29,0.35);
+  addMesh(g,box(0.64,0.06,0.42),cushMat,0,0.32,-0.27,0.35);
+  // Arms
+  addMesh(g,box(0.06,0.02,0.56),md,-0.35,0.2,0.03);
+  addMesh(g,box(0.06,0.02,0.56),md, 0.35,0.2,0.03);
+  // Arm supports
+  addMesh(g,cyl(0.025,0.03,0.18,8),md,-0.35,0.10,0.24);
+  addMesh(g,cyl(0.025,0.03,0.18,8),md, 0.35,0.10,0.24);
+  addMesh(g,cyl(0.025,0.03,0.18,8),md,-0.35,0.10,-0.25);
+  addMesh(g,cyl(0.025,0.03,0.18,8),md, 0.35,0.10,-0.25);
+  // Legs
+  addTableLegs(g,md,0.28,0.24,0.42,0.035);
+  g.position.y=0.42; return g;
+}
+
+// SPINDLE CHAIR
+function buildSpindleChair(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  const cushMat=new THREE.MeshStandardMaterial({color:0xC8A87A,roughness:0.9});
+  // Seat — saddle shape (rounded box)
+  addMesh(g,box(0.52,0.06,0.48),m,0,0,0);
+  addMesh(g,box(0.48,0.04,0.44),cushMat,0,0.04,0);
+  // 9 spindles
+  for(let i=0;i<9;i++){
+    const x=(i-4)*0.055;
+    const bend=Math.sin(i*Math.PI/8)*0.04;
+    addMesh(g,cyl(0.012,0.015,0.62,8),md,x,0.46,bend-0.16,bend*0.5);
+  }
+  // Top rail
+  addMesh(g,box(0.52,0.04,0.06),md,0,0.77,-0.15,0.2);
+  // Legs — angled
+  [[-0.22,-0.24],[0.22,-0.24],[-0.22,0.22],[0.22,0.22]].forEach(([x,z],i)=>{
+    const ang=i<2?-0.12:0.12;
+    addMesh(g,cyl(0.022,0.028,0.48,8),md,x,-0.27,z,ang,0,i%2===0?0.08:-0.08);
+  });
+  g.position.y=0.48; return g;
+}
+
+// SIDEBOARD
+function buildSideboard(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood); const ml=lightWoodMat(wood);
+  // Carcass
+  addMesh(g,box(2.6,0.75,0.5),m,0,0,0);
+  // Face frame
+  addMesh(g,box(2.56,0.71,0.02),md,0,0,0.26);
+  // Door/drawer divisions
+  addMesh(g,box(0.02,0.71,0.03),md,-0.86,0,0.275);
+  addMesh(g,box(0.02,0.71,0.03),md, 0.86,0,0.275);
+  // Drawers (top third)
+  addMesh(g,box(0.82,0.22,0.02),ml,-1.29,0.24,0.275);
+  addMesh(g,box(0.82,0.22,0.02),ml, 0,0.24,0.275);
+  addMesh(g,box(0.82,0.22,0.02),ml, 1.29,0.24,0.275);
+  // Drawer pulls — brass
+  const bMat=new THREE.MeshStandardMaterial({color:0xB8902A,roughness:0.2,metalness:0.8});
+  [-1.29,0,1.29].forEach(x=>addMesh(g,box(0.14,0.018,0.018),bMat,x,0.24,0.288));
+  // Door panels (bottom)
+  addMesh(g,box(1.68,0.4,0.02),ml,-0.43,-0.1,0.275);
+  addMesh(g,box(0.82,0.4,0.02),ml, 1.29,-0.1,0.275);
+  // Recessed base
+  addMesh(g,box(2.4,0.06,0.38),md,0,-0.405,0.04);
+  // Feet
+  [[-1.1,0.18],[1.1,0.18],[-1.1,-0.18],[1.1,-0.18]].forEach(([x,z])=>addMesh(g,box(0.08,0.1,0.08),md,x,-0.425,z));
+  // Top
+  addMesh(g,box(2.64,0.05,0.54),m,0,0.4,0.02);
+  g.position.y=0.52; return g;
+}
+
+// BOOKCASE
+function buildBookcase(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood); const ml=lightWoodMat(wood);
+  // Sides
+  addMesh(g,box(0.04,2.6,0.38),md,-0.63,0,0);
+  addMesh(g,box(0.04,2.6,0.38),md, 0.63,0,0);
+  // Top+bottom boards
+  addMesh(g,box(1.26,0.04,0.38),m, 0, 1.28,0);
+  addMesh(g,box(1.26,0.04,0.38),m, 0,-1.28,0);
+  // Back panel (lighter)
+  addMesh(g,box(1.22,2.54,0.01),ml,0,0,-0.195);
+  // Shelves — 5
+  [-0.9,-0.5,0,0.5,0.95].forEach(y=>addMesh(g,box(1.2,0.03,0.35),m,0,y,0.015));
+  // Books placeholder rows
+  const bookColors=[0x8B1A1A,0x1A4A8B,0x2A7A3A,0x8B6A1A,0x4A1A8B];
+  [-0.9,-0.5,0,0.5].forEach((y,ri)=>{
+    let bx=-0.55;
+    for(let i=0;i<6;i++){
+      const bw=0.04+Math.random()*0.05;
+      const bh=0.12+Math.random()*0.08;
+      const bMat=new THREE.MeshStandardMaterial({color:bookColors[(ri+i)%5],roughness:0.9});
+      addMesh(g,box(bw,bh,0.28),bMat,bx,y+0.08,0.035);
+      bx+=bw+0.005;
+    }
+  });
+  g.position.y=1.3; return g;
+}
+
+// CHEST OF DRAWERS
+function buildChest(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood); const ml=lightWoodMat(wood);
+  addMesh(g,box(0.88,1.2,0.5),m,0,0,0);
+  addMesh(g,box(0.86,1.18,0.02),md,0,0,0.26);
+  // 6 drawer faces
+  for(let i=0;i<6;i++){
+    const y=-0.5+i*0.195;
+    addMesh(g,box(0.82,0.17,0.02),ml,0,y,0.263);
+    const bMat=new THREE.MeshStandardMaterial({color:0xC8A030,roughness:0.2,metalness:0.7});
+    addMesh(g,new THREE.TorusGeometry(0.025,0.008,6,16),bMat,0,y,0.278,Math.PI/2);
+  }
+  addMesh(g,box(0.92,0.04,0.54),m,0,0.62,0); // top
+  addMesh(g,box(0.84,0.08,0.46),md,0,-0.64,0.02); // plinth
+  g.position.y=0.65; return g;
+}
+
+// BED
+function buildBed(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  const mattMat=new THREE.MeshStandardMaterial({color:0xF0EAE0,roughness:0.95});
+  const pillMat=new THREE.MeshStandardMaterial({color:0xFAF5ED,roughness:0.98});
+  // Platform
+  addMesh(g,box(1.8,0.18,2.2),md,0,-0.09,0);
+  addMesh(g,box(1.74,0.14,2.14),m,0,-0.07,0);
+  // Mattress
+  addMesh(g,box(1.62,0.22,2.0),mattMat,0,0.11,0);
+  // Pillows
+  addMesh(g,box(0.65,0.1,0.45),pillMat,-0.45,0.23,-0.7,0.05);
+  addMesh(g,box(0.65,0.1,0.45),pillMat, 0.45,0.23,-0.7,-0.04);
+  // Headboard
+  addMesh(g,box(1.82,1.0,0.08),md,0,0.5,-1.14);
+  addMesh(g,box(1.7,0.88,0.04),m,0,0.5,-1.1);
+  // Horizontal rails in headboard
+  [0.1,0.4,0.7].forEach(yo=>addMesh(g,box(1.66,0.05,0.03),md,0,yo,-1.07));
+  // Footboard
+  addMesh(g,box(1.82,0.3,0.07),md,0,0.15,1.14);
+  // Storage drawers
+  [-0.55,0.55].forEach(x=>{
+    addMesh(g,box(0.7,0.16,0.5),m,x,-0.09,0.85);
+    const bMat=new THREE.MeshStandardMaterial({color:0xC0902A,roughness:0.3,metalness:0.5});
+    addMesh(g,box(0.2,0.02,0.016),bMat,x,-0.09,1.12);
+  });
+  // Legs
+  [[-0.84,-1.06],[0.84,-1.06],[-0.84,1.06],[0.84,1.06]].forEach(([x,z])=>addMesh(g,box(0.07,0.12,0.07),md,x,-0.24,z));
+  g.position.y=0.24; return g;
+}
+
+// ROCKING CHAIR
+function buildRockingChair(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  const rushMat=new THREE.MeshStandardMaterial({color:0xC8B090,roughness:0.95});
+  // Seat
+  addMesh(g,box(0.55,0.05,0.5),m,0,0,0);
+  addMesh(g,box(0.5,0.04,0.45),rushMat,0,0.03,0);
+  // Spindles (7)
+  for(let i=0;i<7;i++){
+    const x=(i-3)*0.07; const lean=(i-3)*0.012;
+    addMesh(g,cyl(0.01,0.013,0.65,8),md,x,0.42,lean-0.18,lean);
+  }
+  // Top rail (curved arc approximated)
+  addMesh(g,box(0.54,0.05,0.07),md,0,0.75,-0.16,0.22);
+  // Arms
+  addMesh(g,box(0.05,0.025,0.5),md,-0.29,0.2,0.02);
+  addMesh(g,box(0.05,0.025,0.5),md, 0.29,0.2,0.02);
+  // Legs
+  addMesh(g,cyl(0.022,0.026,0.44,8),md,-0.25,-0.2,-0.18,-0.1,0, 0.08);
+  addMesh(g,cyl(0.022,0.026,0.44,8),md, 0.25,-0.2,-0.18,-0.1,0,-0.08);
+  addMesh(g,cyl(0.022,0.026,0.44,8),md,-0.25,-0.2, 0.2, 0.1,0, 0.08);
+  addMesh(g,cyl(0.022,0.026,0.44,8),md, 0.25,-0.2, 0.2, 0.1,0,-0.08);
+  // Rockers — curved arcs
+  for(let s of [-0.27,0.27]){
+    for(let i=0;i<12;i++){
+      const a=-0.6+i*0.12; const x2=Math.sin(a)*0.7; const y2=-Math.cos(a)*0.7+0.5;
+      addMesh(g,cyl(0.018,0.018,0.13,8),md,s,y2-0.42,x2,0,0,a);
+    }
+  }
+  g.position.y=0.46; return g;
+}
+
+// BENCH TABLE (outdoor)
+function buildBenchTable(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  // Table top (planks)
+  [-0.3,-0.1,0.1,0.3].forEach(z=>addMesh(g,box(2.8,0.07,0.18),m,0,0,z));
+  // Table legs (A-frame)
+  [[-1.1,0],[1.1,0]].forEach(([x,__])=>{
+    addMesh(g,box(0.06,0.78,0.06),md,x,-0.43,-0.32, 0.2);
+    addMesh(g,box(0.06,0.78,0.06),md,x,-0.43, 0.32,-0.2);
+    addMesh(g,box(0.06,0.06,0.72),md,x,-0.8,0);
+  });
+  // Benches
+  [-0.82,0.82].forEach((z,si)=>{
+    const dir=si===0?1:-1;
+    [-0.2,0,0.2].forEach(dz=>addMesh(g,box(2.6,0.06,0.16),m,0,-0.48,z+dz*0.3));
+    [[-1.0,z+dir*0.18],[1.0,z+dir*0.18]].forEach(([x,bz])=>{
+      addMesh(g,cyl(0.03,0.035,0.42,8),md,x,-0.7,bz,0.15*dir);
+    });
+  });
+  g.position.y=0.82; return g;
+}
+
+// BUNK BED
+function buildBunk(wood){
+  const g=new THREE.Group(); const m=woodMat(wood); const md=darkWoodMat(wood);
+  const mattMat=new THREE.MeshStandardMaterial({color:0xF0EAE0,roughness:0.95});
+  // Posts
+  [[-0.72,-0.92],[0.72,-0.92],[-0.72,0.92],[0.72,0.92]].forEach(([x,z])=>addMesh(g,box(0.07,2.0,0.07),md,x,0,z));
+  // Lower bunk frame
+  addMesh(g,box(1.5,0.1,1.9),m,0,-0.55,0);
+  addMesh(g,box(1.42,0.08,1.82),mattMat,0,-0.46,0);
+  // Upper bunk frame
+  addMesh(g,box(1.5,0.1,1.9),m,0,0.55,0);
+  addMesh(g,box(1.42,0.08,1.82),mattMat,0,0.64,0);
+  // Guard rails upper
+  addMesh(g,box(1.5,0.06,0.05),md,0,0.9,-0.92);
+  addMesh(g,box(0.65,0.06,0.05),md,-0.43,0.9,0.92);
+  // Ladder
+  addMesh(g,box(0.03,2.0,0.03),md,0.82,0,0.98);
+  [-0.4,0,0.4].forEach(y=>addMesh(g,box(0.18,0.025,0.03),md,0.73,y,0.98));
+  // Desk below
+  addMesh(g,box(1.42,0.05,0.6),md,0,-0.72,0.62);
+  addMesh(g,box(1.4,0.04,0.58),lightWoodMat(wood),0,-0.695,0.62);
+  g.position.y=1.0; return g;
+}
+
+function buildModel(modelKey, woodKey){
+  switch(modelKey){
+    case 'dining_table':  return buildDiningTable(woodKey);
+    case 'coffee_table':  return buildCoffeeTable(woodKey);
+    case 'desk':          return buildDesk(woodKey);
+    case 'armchair':      return buildArmchair(woodKey);
+    case 'spindle_chair': return buildSpindleChair(woodKey);
+    case 'sideboard':     return buildSideboard(woodKey);
+    case 'bookcase':      return buildBookcase(woodKey);
+    case 'chest':         return buildChest(woodKey);
+    case 'bed':           return buildBed(woodKey);
+    case 'rocking_chair': return buildRockingChair(woodKey);
+    case 'bench_table':   return buildBenchTable(woodKey);
+    case 'bunk':          return buildBunk(woodKey);
+    default:              return buildDiningTable(woodKey);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// HERO THREE.JS SCENE
+// ═══════════════════════════════════════════════════════
+(function heroScene(){
+  const canvas=document.getElementById('heroCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(40,1,0.1,100);
+  camera.position.set(3,2.5,5);camera.lookAt(0,0,0);
+
+  scene.add(new THREE.AmbientLight(0xFFEED0,0.5));
+  const key=new THREE.SpotLight(0xFFEED0,4,20,Math.PI/5,0.4);
+  key.position.set(6,8,5);key.castShadow=true;scene.add(key);
+  const fill=new THREE.DirectionalLight(0xC8934A,0.5);fill.position.set(-4,2,3);scene.add(fill);
+  const rim=new THREE.DirectionalLight(0xFFEED0,0.3);rim.position.set(-2,4,-6);scene.add(rim);
+
+  // Floor plane
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.MeshStandardMaterial({color:0x1C0A02,roughness:0.9,metalness:0.0}));
+  floor.rotation.x=-Math.PI/2;floor.position.y=-1.5;floor.receiveShadow=true;scene.add(floor);
+
+  // Featured piece in hero — dining table
+  const piece=buildDiningTable('walnut');
+  piece.scale.set(0.7,0.7,0.7);
+  scene.add(piece);
+
+  // Floating wood particles
+  const particles=[];
+  for(let i=0;i<18;i++){
+    const geo=Math.random()>.5?new THREE.BoxGeometry(.08,.08,.08):new THREE.CylinderGeometry(.03,.04,.12,8);
+    const w=Object.keys(WOODS)[Math.floor(Math.random()*6)];
+    const pm=new THREE.Mesh(geo,woodMat(w,['dark','mid','light'][Math.floor(Math.random()*3)]));
+    pm.position.set((Math.random()-.5)*5,(Math.random()-.5)*3,(Math.random()-.5)*3-2);
+    pm.userData={ph:Math.random()*Math.PI*2,spd:(Math.random()-.5)*.02};
+    scene.add(pm);particles.push(pm);
+  }
+
+  let mx=0,my=0,isDrag=false,lastMx=0,rotY=0;
+  canvas.addEventListener('mousedown',e=>{isDrag=true;lastMx=e.clientX;});
+  window.addEventListener('mousemove',e=>{
+    if(isDrag){rotY+=(e.clientX-lastMx)*.01;lastMx=e.clientX;}
+    mx=(e.clientX/innerWidth-.5)*2;my=-(e.clientY/innerHeight-.5)*2;
+  });
+  window.addEventListener('mouseup',()=>isDrag=false);
+  canvas.addEventListener('touchstart',e=>{isDrag=true;lastMx=e.touches[0].clientX;},{passive:true});
+  canvas.addEventListener('touchmove',e=>{if(isDrag){rotY+=(e.touches[0].clientX-lastMx)*.013;lastMx=e.touches[0].clientX;}},{passive:true});
+  canvas.addEventListener('touchend',()=>isDrag=false);
+
+  function resize(){
+    const hero=document.querySelector('.hero-right');
+    const w=hero.clientWidth,h=hero.clientHeight||innerHeight;
+    renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+  resize();window.addEventListener('resize',()=>setTimeout(resize,100));
+
+  let t=0;
+  (function loop(){
+    requestAnimationFrame(loop);t+=.008;
+    piece.rotation.y=rotY+t*.25;
+    piece.position.y=Math.sin(t*.6)*.06;
+    particles.forEach(p=>{
+      p.rotation.x+=p.userData.spd;p.rotation.y+=p.userData.spd*1.3;
+      p.position.y+=Math.sin(t+p.userData.ph)*.003;
+    });
+    camera.position.x+=(mx*.4-camera.position.x)*.04;
+    camera.position.y+=(2.5+my*.3-camera.position.y)*.04;
+    camera.lookAt(0,0,0);
+    renderer.render(scene,camera);
+  })();
+})();
+
+// ═══════════════════════════════════════════════════════
+// MINI CARD PREVIEW SCENES
+// ═══════════════════════════════════════════════════════
+function buildCardScene(canvas,piece,woodKey){
+  if(canvas._init)return; canvas._init=true;
+  const r=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  r.setPixelRatio(Math.min(devicePixelRatio,2));
+  r.shadowMap.enabled=true;
+  r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.1;
+  const sc=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(40,1,0.1,50);
+
+  // Position camera based on model type
+  const camPositions={
+    dining_table:[2.5,2,3.5],coffee_table:[2,1.8,3],desk:[2.5,2,3.5],
+    armchair:[2,1.8,3],spindle_chair:[1.8,1.8,2.8],sideboard:[2.5,1.8,3.5],
+    bookcase:[2,2.5,3.5],chest:[2,1.8,3],bed:[2.5,2,4],rocking_chair:[2,1.8,3],
+    bench_table:[3,2.5,4],bunk:[2.5,2.5,4],
+  };
+  const cp=camPositions[piece.model]||[2.5,2,3.5];
+  cam.position.set(...cp);cam.lookAt(0,0,0);
+
+  sc.add(new THREE.AmbientLight(0xFFEED0,.6));
+  const kl=new THREE.SpotLight(0xFFEED0,3,15,Math.PI/5,.4);kl.position.set(5,6,4);kl.castShadow=true;sc.add(kl);
+  const fl=new THREE.DirectionalLight(0xC8934A,.4);fl.position.set(-3,2,2);sc.add(fl);
+
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.MeshStandardMaterial({color:0x1C0A02,roughness:.9}));
+  floor.rotation.x=-Math.PI/2;floor.position.y=-0.02;floor.receiveShadow=true;sc.add(floor);
+
+  const model=buildModel(piece.model,woodKey);
+  // Scale to fit preview
+  const scales={bookcase:.28,bunk:.22,bench_table:.26,bed:.25,dining_table:.28,sideboard:.28};
+  const s=scales[piece.model]||.35;
+  model.scale.set(s,s,s);sc.add(model);
+
+  function resize(){
+    const w=canvas.offsetWidth||220,h=canvas.offsetHeight||220;
+    r.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();
+  }
+  resize();window.addEventListener('resize',()=>setTimeout(resize,80));
+
+  let t=0;
+  (function loop(){
+    requestAnimationFrame(loop);t+=.01;
+    model.rotation.y=t*.4;model.position.y=Math.sin(t*.7)*.02;
+    r.render(sc,cam);
+  })();
+  return {renderer:r,model};
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER PRODUCT GRID
+// ═══════════════════════════════════════════════════════
+let currentCat='all';
+
+function renderGrid(cat='all'){
+  const items=cat==='all'?PIECES:PIECES.filter(p=>p.cat===cat);
+  const grid=document.getElementById('prodGrid');
+  grid.innerHTML=items.map((p,idx)=>`
+    <div class="prod-card reveal" data-id="${p.id}" style="transition-delay:${idx*.05}s">
+      <div class="prod-preview">
+        <canvas class="pcard-canvas" id="cc${p.id}"></canvas>
+        ${p.badge?`<div class="prod-badge ${p.badge}">${p.badgeText}</div>`:''}
+        <button class="view-btn" data-id="${p.id}">View in 3D</button>
+      </div>
+      <div class="prod-body">
+        <div class="prod-category">${p.cat.charAt(0).toUpperCase()+p.cat.slice(1)}</div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-desc">${p.desc.substring(0,90)}…</div>
+        <div class="prod-wood">
+          ${p.woods.slice(0,4).map((w,i)=>`<span class="wood-chip${i===0?' selected':''}" data-id="${p.id}" data-wi="${i}" data-wood="${w}">${WOODS[w].name}</span>`).join('')}
+        </div>
+        <div class="prod-footer">
+          <div class="prod-price-wrap">
+            ${p.oldPrice?`<div class="prod-old">$${p.oldPrice.toLocaleString()}</div>`:''}
+            <div class="prod-price">$${p.price.toLocaleString()}</div>
+          </div>
+          <button class="prod-add" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}">+ Add</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Init card canvases
+  setTimeout(()=>{
+    items.forEach((p,idx)=>{
+      const c=document.getElementById('cc'+p.id);
+      if(c) setTimeout(()=>buildCardScene(c,p,p.woods[0]),idx*80);
+    });
+    bindGridEvents();
+    observeReveal();
+  },60);
+}
+
+function bindGridEvents(){
+  // View in 3D buttons
+  document.querySelectorAll('.view-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      openViewer(+btn.dataset.id);
+    });
+    btn.addEventListener('mouseenter',()=>setHover(true));
+    btn.addEventListener('mouseleave',()=>setHover(false));
+  });
+  // Wood chips on cards
+  document.querySelectorAll('.wood-chip').forEach(chip=>{
+    chip.addEventListener('click',e=>{
+      e.stopPropagation();
+      const pid=chip.dataset.id;
+      document.querySelectorAll(`.wood-chip[data-id="${pid}"]`).forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      // Rebuild card scene with new wood
+      const c=document.getElementById('cc'+pid);
+      if(c){c._init=false; const p=PIECES.find(x=>x.id===+pid); buildCardScene(c,p,chip.dataset.wood);}
+    });
+    chip.addEventListener('mouseenter',()=>setHover(true));
+    chip.addEventListener('mouseleave',()=>setHover(false));
+  });
+  // Add to cart
+  document.querySelectorAll('.prod-add').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const pid=+btn.dataset.id;
+      const selChip=document.querySelector(`.wood-chip[data-id="${pid}"].selected`);
+      const woodName=selChip?WOODS[selChip.dataset.wood].name:'Oak';
+      addToCart(btn.dataset.name,btn.dataset.price,woodName,btn);
+    });
+    btn.addEventListener('mouseenter',()=>setHover(true));
+    btn.addEventListener('mouseleave',()=>setHover(false));
+  });
+  // Card click opens viewer
+  document.querySelectorAll('.prod-card').forEach(card=>{
+    card.addEventListener('click',()=>openViewer(+card.dataset.id));
+    card.addEventListener('mouseenter',()=>setHover(true));
+    card.addEventListener('mouseleave',()=>setHover(false));
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// FULL 3D VIEWER
+// ═══════════════════════════════════════════════════════
+let viewerRenderer=null, viewerScene=null, viewerCamera=null, viewerModel=null;
+let vRotY=0.4, vRotX=0.1, vTargetRY=0.4, vTargetRX=0.1;
+let vZoom=5.5, vAutoRot=true, vDrag=false, vLast=0;
+let currentViewerPiece=null, currentViewerWood='oak';
+
+function initViewerRenderer(){
+  if(viewerRenderer)return;
+  const canvas=document.getElementById('viewerCanvas');
+  viewerRenderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  viewerRenderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  viewerRenderer.shadowMap.enabled=true;
+  viewerRenderer.toneMapping=THREE.ACESFilmicToneMapping;
+  viewerRenderer.toneMappingExposure=1.2;
+
+  viewerScene=new THREE.Scene();
+  viewerCamera=new THREE.PerspectiveCamera(38,1,.1,100);
+
+  viewerScene.add(new THREE.AmbientLight(0xFFEED0,.4));
+  const kl=new THREE.SpotLight(0xFFEED0,5,20,Math.PI/4,.35);kl.position.set(5,8,5);kl.castShadow=true;viewerScene.add(kl);
+  const fl=new THREE.DirectionalLight(0xC8934A,.6);fl.position.set(-5,2,3);viewerScene.add(fl);
+  const rl=new THREE.DirectionalLight(0xFFEED0,.35);rl.position.set(-2,4,-6);viewerScene.add(rl);
+  const gl=new THREE.PointLight(0xC8934A,.3,10);gl.position.set(0,-3,0);viewerScene.add(gl);
+
+  // Floor
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.MeshStandardMaterial({color:0x1C0A02,roughness:.9,metalness:.02}));
+  floor.rotation.x=-Math.PI/2;floor.position.y=0;floor.receiveShadow=true;viewerScene.add(floor);
+  // Floor reflection
+  const rfGeo=new THREE.PlaneGeometry(30,30);
+  const rfMat=new THREE.MeshBasicMaterial({color:0x3A1F0D,transparent:true,opacity:.18,side:THREE.DoubleSide});
+  const rf=new THREE.Mesh(rfGeo,rfMat);rf.rotation.x=-Math.PI/2;rf.position.y=0.01;viewerScene.add(rf);
+
+  // Drag controls
+  const vc=document.getElementById('viewerCanvas');
+  vc.addEventListener('mousedown',e=>{vDrag=true;vLast=e.clientX;vAutoRot=false;});
+  window.addEventListener('mousemove',e=>{
+    if(!vDrag)return;
+    vTargetRY+=(e.clientX-vLast)*.012;
+    vLast=e.clientX;
+  });
+  window.addEventListener('mouseup',()=>{if(vDrag){vDrag=false;setTimeout(()=>vAutoRot=true,2500);}});
+  vc.addEventListener('touchstart',e=>{vDrag=true;vLast=e.touches[0].clientX;vAutoRot=false;},{passive:true});
+  vc.addEventListener('touchmove',e=>{if(vDrag){vTargetRY+=(e.touches[0].clientX-vLast)*.014;vLast=e.touches[0].clientX;}},{passive:true});
+  vc.addEventListener('touchend',()=>{vDrag=false;setTimeout(()=>vAutoRot=true,2500);});
+  vc.addEventListener('wheel',e=>{vZoom=Math.max(2.5,Math.min(12,vZoom+e.deltaY*.01));},{passive:true});
+
+  // Camera preset buttons
+  document.getElementById('vFront').addEventListener('click',()=>{vTargetRY=0;vTargetRX=0.05;vZoom=5.5;vAutoRot=false;setTimeout(()=>vAutoRot=true,3000);});
+  document.getElementById('vSide').addEventListener('click', ()=>{vTargetRY=Math.PI/2;vTargetRX=0.05;vZoom=5.5;vAutoRot=false;setTimeout(()=>vAutoRot=true,3000);});
+  document.getElementById('vTop').addEventListener('click',  ()=>{vTargetRY=0;vTargetRX=1.2;vZoom=6;vAutoRot=false;setTimeout(()=>vAutoRot=true,3000);});
+  document.getElementById('vReset').addEventListener('click',()=>{vTargetRY=0.4;vTargetRX=0.15;vZoom=5.5;vAutoRot=true;});
+  [document.getElementById('vFront'),document.getElementById('vSide'),document.getElementById('vTop'),document.getElementById('vReset')].forEach(b=>{
+    b.addEventListener('mouseenter',()=>setHover(true));
+    b.addEventListener('mouseleave',()=>setHover(false));
+  });
+
+  function resizeViewer(){
+    const stage=document.querySelector('.viewer-stage');
+    const w=stage.clientWidth,h=stage.clientHeight||500;
+    viewerRenderer.setSize(w,h);viewerCamera.aspect=w/h;viewerCamera.updateProjectionMatrix();
+  }
+  resizeViewer();window.addEventListener('resize',()=>setTimeout(resizeViewer,100));
+
+  let tv=0;
+  (function vLoop(){
+    requestAnimationFrame(vLoop);tv+=.008;
+    if(vAutoRot)vTargetRY+=.006;
+    vRotY+=(vTargetRY-vRotY)*.06;
+    vRotX+=(vTargetRX-vRotX)*.06;
+    const r=vZoom;
+    viewerCamera.position.set(Math.sin(vRotY)*Math.cos(vRotX)*r, Math.sin(vRotX)*r+1.5, Math.cos(vRotY)*Math.cos(vRotX)*r);
+    viewerCamera.lookAt(0,0.5,0);
+    if(viewerModel){ viewerModel.position.y=Math.sin(tv*.5)*.04; }
+    viewerRenderer.render(viewerScene,viewerCamera);
+  })();
+}
+
+function loadViewerModel(piece,woodKey){
+  if(viewerModel){ viewerScene.remove(viewerModel); viewerModel.traverse(m=>{if(m.geometry)m.geometry.dispose();if(m.material){if(Array.isArray(m.material))m.material.forEach(x=>x.dispose());else m.material.dispose();}}); viewerModel=null; }
+  const scales={bookcase:.5,bunk:.42,bench_table:.46,bed:.44,dining_table:.55,sideboard:.5};
+  const s=scales[piece.model]||.65;
+  const model=buildModel(piece.model,woodKey);
+  model.scale.set(s,s,s);
+  // Animate in
+  model.scale.set(.01,.01,.01);
+  let st=0;
+  function si(){st=Math.min(st+.07,1);const sv=1-Math.pow(1-st,3);model.scale.set(s*sv,s*sv,s*sv);if(st<1)requestAnimationFrame(si);}
+  si();
+  viewerScene.add(model);
+  viewerModel=model;
+}
+
+function openViewer(id){
+  initViewerRenderer();
+  const piece=PIECES.find(p=>p.id===id);
+  if(!piece)return;
+  currentViewerPiece=piece;
+  currentViewerWood=piece.woods[0];
+
+  loadViewerModel(piece,currentViewerWood);
+
+  // Populate info panel
+  document.getElementById('vCat').textContent=piece.cat.charAt(0).toUpperCase()+piece.cat.slice(1);
+  document.getElementById('vName').textContent=piece.name;
+  document.getElementById('vDesc').textContent=piece.desc;
+  document.getElementById('vPrice').textContent='$'+piece.price.toLocaleString();
+  document.getElementById('vOld').textContent=piece.oldPrice?'$'+piece.oldPrice.toLocaleString():'';
+
+  // Specs
+  document.getElementById('vSpecs').innerHTML=Object.entries(piece.specs).map(([k,v])=>`
+    <div class="spec-item"><div class="spec-label">${k}</div><div class="spec-val">${v}</div></div>
+  `).join('');
+
+  // Wood options
+  document.getElementById('vWoodName').textContent=WOODS[currentViewerWood].name;
+  document.getElementById('vWoodOpts').innerHTML=piece.woods.map(w=>`
+    <button class="wood-opt${w===currentViewerWood?' active':''}" data-wood="${w}">${WOODS[w].name}</button>
+  `).join('');
+  document.querySelectorAll('.wood-opt').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.wood-opt').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentViewerWood=btn.dataset.wood;
+      document.getElementById('vWoodName').textContent=WOODS[currentViewerWood].name;
+      loadViewerModel(currentViewerPiece,currentViewerWood);
+    });
+    btn.addEventListener('mouseenter',()=>setHover(true));
+    btn.addEventListener('mouseleave',()=>setHover(false));
+  });
+
+  // Buy button
+  const vb=document.getElementById('vBuyBtn');
+  vb.textContent='Add to Cart';
+  vb.onclick=()=>{ addToCart(piece.name,piece.price,WOODS[currentViewerWood].name,vb); };
+
+  // Wish button
+  const wb=document.getElementById('vWishBtn');
+  wb.className='viewer-wish'; wb.textContent='♡';
+  wb.onclick=()=>{ wb.classList.toggle('on'); wb.textContent=wb.classList.contains('on')?'♥':'♡'; showToast(wb.classList.contains('on')?`♥ Saved to wishlist`:`Removed from wishlist`); };
+
+  document.getElementById('viewer').classList.add('open');
+  document.body.style.overflow='hidden';
+  vTargetRY=0.4; vTargetRX=0.15; vZoom=5.5; vAutoRot=true;
+
+  [vb,wb].forEach(b=>{b.addEventListener('mouseenter',()=>setHover(true));b.addEventListener('mouseleave',()=>setHover(false));});
+}
+
+function closeViewer(){
+  document.getElementById('viewer').classList.remove('open');
+  document.body.style.overflow='';
+  vAutoRot=false;
+}
+document.getElementById('viewerClose').addEventListener('click',closeViewer);
+document.getElementById('viewer').addEventListener('click',e=>{if(e.target===document.getElementById('viewer'))closeViewer();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer();});
+document.getElementById('viewerClose').addEventListener('mouseenter',()=>setHover(true));
+document.getElementById('viewerClose').addEventListener('mouseleave',()=>setHover(false));
+
+// ═══════════════════════════════════════════════════════
+// CART
+// ═══════════════════════════════════════════════════════
+let cartCount=0;
+function addToCart(name,price,wood,btn){
+  cartCount++;
+  document.getElementById('cartN').textContent=cartCount;
+  if(btn){btn.textContent='✓ Added';btn.classList.add('added');setTimeout(()=>{btn.textContent=btn.classList.contains('viewer-buy')?'Add to Cart':'+ Add';btn.classList.remove('added');},2000);}
+  showToast(`✓ ${name} (${wood}) added to cart`);
+}
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ═══════════════════════════════════════════════════════
+// CATEGORY FILTER
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('.cat-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    currentCat=tab.dataset.cat;
+    renderGrid(currentCat);
+  });
+  tab.addEventListener('mouseenter',()=>setHover(true));
+  tab.addEventListener('mouseleave',()=>setHover(false));
+});
+
+// NAV hover
+document.querySelectorAll('a,button,.nav-cart').forEach(el=>{
+  el.addEventListener('mouseenter',()=>setHover(true));
+  el.addEventListener('mouseleave',()=>setHover(false));
+});
+
+// ═══════════════════════════════════════════════════════
+// SCROLL REVEAL
+// ═══════════════════════════════════════════════════════
+function observeReveal(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting)setTimeout(()=>{e.target.classList.add('visible');},i*60);
+    });
+  },{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+observeReveal();
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+setTimeout(()=>{
+  renderGrid('all');
+  document.getElementById('loading').classList.add('gone');
+},1500);
+</script>
+</body>
+</html>
