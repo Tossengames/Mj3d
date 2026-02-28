@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MERIDIAN — Economic Intelligence</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Franklin:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  --ink:     #0D0D0D;
+  --paper:   #F7F4EE;
+  --cream:   #FFFDF8;
+  --red:     #C8001E;
+  --gold:    #B8860B;
+  --steel:   #2C3E50;
+  --muted:   #6B6560;
+  --border:  #D8D2C8;
+  --up:      #0A7A3C;
+  --down:    #C8001E;
+  --blue:    #0047AA;
+  --surface: #FFFFFF;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+#cur { position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform .1s; }
+#cur-ring { width:32px; height:32px; border:1.5px solid var(--red); border-radius:50%; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); transition:width .3s,height .3s,opacity .3s; }
+#cur-dot  { width:5px; height:5px; background:var(--red); border-radius:50%; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
+#cur.hover #cur-ring { width:60px; height:60px; opacity:.5; }
+
+/* ── TICKER ── */
+#ticker {
+  background: var(--ink);
+  color: #fff;
+  padding: .55rem 0;
+  overflow: hidden;
+  border-bottom: 2px solid var(--red);
+  position: sticky; top:0; z-index:200;
+}
+.ticker-track { display:flex; white-space:nowrap; animation: tickscroll 55s linear infinite; }
+.tick-item { display:inline-flex; align-items:center; gap:.5rem; padding:0 2.5rem; font-size:.72rem; font-weight:600; letter-spacing:.5px; font-family:'Libre Franklin',sans-serif; }
+.tick-name { color:rgba(255,255,255,.55); }
+.tick-val  { color:#fff; }
+.tick-chg  { font-size:.65rem; font-weight:700; }
+.tick-up   { color:#4ADE80; }
+.tick-dn   { color:#FF6B6B; }
+.tick-sep  { color:rgba(255,255,255,.15); margin:0 1rem; }
+@keyframes tickscroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ── MASTHEAD ── */
+#masthead {
+  background: var(--cream);
+  border-bottom: 3px solid var(--ink);
+  padding: 1.2rem 3rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 2rem;
+}
+.mast-date { font-size:.72rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; font-weight:600; }
+.mast-logo {
+  text-align:center;
+  font-family:'Playfair Display',serif;
+  font-size: clamp(2.2rem,4vw,3.5rem);
+  font-weight:900;
+  letter-spacing:-1px;
+  color:var(--ink);
+  line-height:1;
+}
+.mast-logo span { color:var(--red); }
+.mast-sub { font-size:.6rem; letter-spacing:4px; text-transform:uppercase; color:var(--muted); display:block; margin-top:.3rem; }
+.mast-nav { display:flex; justify-content:flex-end; gap:0; }
+.mast-nav a { color:var(--ink); text-decoration:none; font-size:.78rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; padding:.4rem .9rem; border-left:1px solid var(--border); transition:color .2s,background .2s; }
+.mast-nav a:last-child { border-right:1px solid var(--border); }
+.mast-nav a:hover { color:var(--red); }
+.mast-nav .sub-btn { background:var(--red); color:#fff; padding:.4rem 1.2rem; border-left:none; border-right:none; margin-left:.75rem; }
+.mast-nav .sub-btn:hover { background:var(--ink); color:#fff; }
+
+/* ── SECTION NAV ── */
+#secnav {
+  background: var(--ink);
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#secnav::-webkit-scrollbar { display:none; }
+#secnav a { color:rgba(255,255,255,.65); text-decoration:none; font-size:.75rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; padding:.7rem 1.5rem; white-space:nowrap; transition:color .2s,background .2s; border-right:1px solid rgba(255,255,255,.08); }
+#secnav a:hover, #secnav a.active { color:#fff; background:var(--red); }
+
+/* ── LAYOUT WRAPPER ── */
+.wrap { max-width:1380px; margin:0 auto; padding:0 2.5rem; }
+
+/* ── BREAKING BANNER ── */
+.breaking-banner {
+  background: var(--red); color:#fff;
+  padding:.6rem 2.5rem;
+  display:flex; align-items:center; gap:1.2rem;
+  font-size:.8rem;
+}
+.brk-pill { background:rgba(255,255,255,.2); font-size:.6rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; padding:.2rem .8rem; border-radius:2px; white-space:nowrap; }
+.brk-text { font-weight:500; }
+.brk-time { margin-left:auto; opacity:.7; font-size:.7rem; white-space:nowrap; }
+
+/* ── HERO GRID ── */
+#hero {
+  padding: 2.5rem 0;
+  border-bottom: 2px solid var(--border);
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  grid-template-rows: auto;
+  gap: 0;
+}
+
+/* Feature story left */
+.feature-story {
+  padding-right: 2.5rem;
+  border-right: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+.feature-main { grid-column: span 2; }
+.feature-visual {
+  width:100%; aspect-ratio:16/9;
+  background: var(--ink);
+  border-radius:4px;
+  overflow:hidden;
+  margin-bottom:1.2rem;
+  position:relative;
+}
+#globeCanvas { width:100%; height:100%; display:block; }
+.feature-overlay {
+  position:absolute; bottom:0; left:0; right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.75));
+  padding:1.5rem;
+}
+.feature-cat { font-size:.62rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--red); background:#fff; display:inline-block; padding:.2rem .6rem; margin-bottom:.6rem; }
+.feature-hed {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.5rem,2.5vw,2.2rem);
+  font-weight:900;
+  line-height:1.15;
+  color:#fff;
+}
+.feature-dek { font-size:.88rem; color:rgba(255,255,255,.75); margin-top:.5rem; line-height:1.5; }
+.feature-byline { font-size:.72rem; color:rgba(255,255,255,.5); margin-top:.75rem; }
+.feature-byline strong { color:rgba(255,255,255,.8); }
+
+/* secondary stories */
+.sec-story { padding-bottom:1.5rem; border-bottom:1px solid var(--border); margin-bottom:1.5rem; cursor:none; }
+.sec-story:last-child { border-bottom:none; margin-bottom:0; }
+.sec-cat { font-size:.6rem; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:var(--red); margin-bottom:.4rem; }
+.sec-hed { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; line-height:1.25; margin-bottom:.4rem; transition:color .2s; }
+.sec-story:hover .sec-hed { color:var(--red); }
+.sec-dek { font-size:.8rem; color:var(--muted); line-height:1.5; }
+.sec-time { font-size:.68rem; color:var(--muted); margin-top:.4rem; font-weight:500; }
+
+/* RIGHT COLUMN */
+.right-col {
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Markets widget */
+.widget { border-bottom:1px solid var(--border); padding-bottom:1.5rem; margin-bottom:1.5rem; }
+.widget:last-child { border-bottom:none; }
+.widget-title {
+  font-size:.62rem; font-weight:800; letter-spacing:3px; text-transform:uppercase;
+  color:var(--muted); padding-bottom:.6rem; border-bottom:2px solid var(--ink);
+  margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;
+}
+.wt-live { display:flex; align-items:center; gap:.4rem; font-size:.6rem; color:var(--up); }
+.wt-dot { width:6px; height:6px; background:var(--up); border-radius:50%; animation:blink 1.2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.market-row { display:flex; justify-content:space-between; align-items:center; padding:.5rem 0; border-bottom:1px solid rgba(0,0,0,.05); cursor:none; transition:background .2s; border-radius:4px; }
+.market-row:hover { background:rgba(0,0,0,.02); }
+.mr-name { font-size:.8rem; font-weight:700; color:var(--ink); }
+.mr-sub  { font-size:.65rem; color:var(--muted); }
+.mr-right { text-align:right; }
+.mr-val  { font-size:.88rem; font-weight:700; font-variant-numeric:tabular-nums; }
+.mr-chg  { font-size:.7rem; font-weight:600; font-variant-numeric:tabular-nums; }
+.mr-bar  { height:2px; border-radius:1px; margin-top:.3rem; transition:width .8s ease; }
+
+/* Sparkline mini chart */
+.sparkline { display:inline-block; vertical-align:middle; }
+
+/* Opinion block */
+.opinion-item { padding:.85rem 0; border-bottom:1px solid var(--border); cursor:none; }
+.opinion-item:last-child { border-bottom:none; }
+.op-topic { font-size:.6rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:.3rem; }
+.op-hed { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; line-height:1.3; font-style:italic; transition:color .2s; }
+.opinion-item:hover .op-hed { color:var(--red); }
+.op-author { font-size:.68rem; color:var(--muted); margin-top:.3rem; }
+
+/* ── MARKET BANDS ── */
+.market-band {
+  background:var(--ink); color:#fff;
+  padding:1.8rem 0;
+  margin:0;
+  border-top:1px solid rgba(255,255,255,.05);
+}
+.band-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:0; }
+.band-item { padding:0 2rem; border-right:1px solid rgba(255,255,255,.1); text-align:center; }
+.band-item:last-child { border-right:none; }
+.band-label { font-size:.6rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:.4rem; }
+.band-val   { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; letter-spacing:-.5px; }
+.band-chg   { font-size:.72rem; font-weight:600; margin-top:.15rem; }
+.band-spark { margin-top:.5rem; }
+
+/* ── MAIN CONTENT GRID ── */
+#maincontent { padding:2.5rem 0; }
+.content-grid { display:grid; grid-template-columns:1fr 1fr 1fr 300px; gap:2.5rem; }
+
+/* Article card */
+.art-card { cursor:none; }
+.art-card:hover .art-hed { color:var(--red); }
+.art-thumb {
+  aspect-ratio:3/2; background:var(--border);
+  border-radius:3px; overflow:hidden;
+  margin-bottom:.9rem; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  font-size:4rem;
+}
+.art-cat   { font-size:.6rem; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:var(--red); margin-bottom:.4rem; }
+.art-hed   { font-family:'Playfair Display',serif; font-size:1.08rem; font-weight:700; line-height:1.3; margin-bottom:.4rem; transition:color .2s; }
+.art-dek   { font-size:.8rem; color:var(--muted); line-height:1.55; margin-bottom:.5rem; }
+.art-meta  { font-size:.68rem; color:var(--muted); display:flex; gap:1rem; align-items:center; }
+.art-dot   { width:3px; height:3px; background:var(--border); border-radius:50%; }
+
+/* aside column */
+.aside-col { border-left:1px solid var(--border); padding-left:2rem; }
+.aside-section { margin-bottom:2rem; padding-bottom:2rem; border-bottom:1px solid var(--border); }
+.aside-section:last-child { border-bottom:none; }
+.aside-title { font-size:.6rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--muted); padding-bottom:.6rem; border-bottom:2px solid var(--ink); margin-bottom:1rem; }
+
+.mini-story { padding:.65rem 0; border-bottom:1px solid rgba(0,0,0,.06); cursor:none; }
+.mini-story:last-child { border-bottom:none; }
+.ms-num { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--border); font-weight:700; line-height:1; float:left; margin-right:.6rem; }
+.ms-hed { font-size:.82rem; font-weight:600; line-height:1.35; transition:color .2s; }
+.mini-story:hover .ms-hed { color:var(--red); }
+.ms-time { font-size:.65rem; color:var(--muted); margin-top:.2rem; clear:both; }
+
+/* ── CALCULATOR ── */
+#calculator { background:var(--steel); color:#fff; padding:3rem 0; }
+.calc-inner { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+.calc-left h2 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3vw,2.8rem); font-weight:900; line-height:1.15; margin-bottom:.75rem; }
+.calc-left h2 em { font-style:italic; color:#F5C842; }
+.calc-left p { font-size:.9rem; color:rgba(255,255,255,.6); line-height:1.7; }
+.calc-card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:2rem; }
+.calc-row { display:grid; grid-template-columns:1fr auto 1fr; gap:1rem; align-items:end; margin-bottom:1.5rem; }
+.calc-field { display:flex; flex-direction:column; gap:.4rem; }
+.calc-label { font-size:.62rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.45); }
+.calc-input { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:8px; color:#fff; padding:.75rem 1rem; font-size:1.1rem; font-weight:600; font-family:'Libre Franklin',sans-serif; outline:none; width:100%; transition:border-color .2s; }
+.calc-input:focus { border-color:rgba(245,200,66,.5); }
+.calc-select { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:8px; color:#fff; padding:.75rem .8rem; font-size:.9rem; font-family:'Libre Franklin',sans-serif; outline:none; width:100%; cursor:pointer; }
+.calc-select option { background:var(--steel); }
+.calc-arrow { font-size:1.5rem; color:rgba(255,255,255,.3); padding-bottom:.7rem; text-align:center; }
+.calc-result { background:rgba(245,200,66,.1); border:1px solid rgba(245,200,66,.25); border-radius:8px; padding:1.2rem 1.5rem; text-align:center; }
+.calc-result-label { font-size:.62rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.45); margin-bottom:.4rem; }
+.calc-result-val { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; color:#F5C842; letter-spacing:-.5px; }
+.calc-result-rate { font-size:.72rem; color:rgba(255,255,255,.4); margin-top:.3rem; }
+.calc-update-btn { width:100%; padding:.85rem; background:#F5C842; color:var(--steel); border:none; border-radius:8px; font-weight:800; font-size:.9rem; cursor:pointer; font-family:'Libre Franklin',sans-serif; letter-spacing:.5px; transition:opacity .2s; margin-top:.5rem; }
+.calc-update-btn:hover { opacity:.88; }
+
+/* ── CHART SECTION ── */
+#charts { padding:2.5rem 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:2.5rem; }
+.chart-panel { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:1.5rem; }
+.cp-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.2rem; }
+.cp-title  { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; }
+.cp-sub    { font-size:.72rem; color:var(--muted); margin-top:.2rem; }
+.cp-val    { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; letter-spacing:-.5px; }
+.cp-chg    { font-size:.75rem; font-weight:600; text-align:right; }
+.cp-tabs   { display:flex; gap:.3rem; margin-bottom:1rem; }
+.cp-tab    { font-size:.65rem; font-weight:700; padding:.25rem .7rem; border-radius:4px; border:1px solid var(--border); cursor:pointer; transition:background .2s,color .2s; background:transparent; font-family:'Libre Franklin',sans-serif; }
+.cp-tab.active, .cp-tab:hover { background:var(--ink); color:#fff; border-color:var(--ink); }
+canvas.linechart { width:100%!important; height:180px!important; }
+
+/* ── OPINION ROW ── */
+#opinions { padding:2.5rem 0; background:var(--cream); border-bottom:2px solid var(--ink); }
+.opinions-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; }
+.op-card { border-left:3px solid var(--red); padding-left:1.2rem; cursor:none; }
+.op-card:hover .oc-hed { color:var(--red); }
+.oc-label { font-size:.58rem; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:var(--red); margin-bottom:.5rem; }
+.oc-hed   { font-family:'Playfair Display',serif; font-size:.98rem; font-weight:700; line-height:1.3; font-style:italic; margin-bottom:.6rem; transition:color .2s; }
+.oc-author{ font-size:.72rem; color:var(--muted); font-weight:600; }
+.oc-role  { font-size:.65rem; color:var(--muted); }
+
+/* ── NEWSLETTER ── */
+#newsletter {
+  background: var(--ink);
+  padding: 3.5rem 0;
+  text-align:center;
+}
+.nl-eyebrow { font-size:.65rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--red); margin-bottom:1rem; }
+.nl-hed { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3vw,2.8rem); font-weight:900; color:#fff; margin-bottom:.75rem; line-height:1.15; }
+.nl-hed em { font-style:italic; color:#F5C842; }
+.nl-sub { font-size:.9rem; color:rgba(255,255,255,.55); max-width:440px; margin:0 auto 2rem; }
+.nl-form { display:flex; gap:.75rem; max-width:480px; margin:0 auto; }
+.nl-input { flex:1; padding:.85rem 1.2rem; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; border-radius:6px; font-family:'Libre Franklin',sans-serif; font-size:.9rem; outline:none; }
+.nl-input:focus { border-color:rgba(245,200,66,.4); }
+.nl-input::placeholder { color:rgba(255,255,255,.3); }
+.nl-btn { padding:.85rem 1.8rem; background:var(--red); color:#fff; border:none; border-radius:6px; font-weight:700; font-size:.88rem; cursor:pointer; font-family:'Libre Franklin',sans-serif; white-space:nowrap; transition:background .2s; }
+.nl-btn:hover { background:#A00018; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  color:rgba(255,255,255,.45);
+  border-top:2px solid var(--red);
+  padding:2rem 0;
+}
+.foot-inner { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; font-size:.72rem; }
+.foot-logo { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:900; color:#fff; }
+.foot-logo span { color:var(--red); }
+.foot-links { display:flex; gap:2rem; }
+.foot-links a { color:rgba(255,255,255,.45); text-decoration:none; transition:color .2s; }
+.foot-links a:hover { color:#fff; }
+
+/* ── ARTICLE THUMBNAILS colored ── */
+.thumb-markets  { background:linear-gradient(135deg,#0D2137,#1A4070); }
+.thumb-tech     { background:linear-gradient(135deg,#0D2A1A,#1A5230); }
+.thumb-policy   { background:linear-gradient(135deg,#2A0D0D,#701A1A); }
+.thumb-global   { background:linear-gradient(135deg,#1A1A0D,#504010); }
+.thumb-energy   { background:linear-gradient(135deg,#0D1A2A,#204060); }
+.thumb-labour   { background:linear-gradient(135deg,#1A0D2A,#402060); }
+.thumb-emoji    { font-size:3.5rem; opacity:.7; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:1200px){
+  .content-grid { grid-template-columns:1fr 1fr 300px; }
+  .content-grid .art-card:nth-child(3) { grid-column:span 2; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start; }
+  .band-grid { grid-template-columns:repeat(3,1fr); }
+  .band-item:nth-child(4),.band-item:nth-child(5) { display:none; }
+}
+@media(max-width:960px){
+  #masthead { grid-template-columns:1fr; text-align:center; padding:1.2rem 1.5rem; }
+  .mast-date { display:none; }
+  .mast-nav { justify-content:center; flex-wrap:wrap; }
+  .wrap { padding:0 1.5rem; }
+  .hero-grid { grid-template-columns:1fr; }
+  .feature-story { border-right:none; padding-right:0; border-bottom:1px solid var(--border); padding-bottom:2rem; }
+  .right-col { padding-left:0; }
+  .content-grid { grid-template-columns:1fr 1fr; }
+  .aside-col { display:none; }
+  .charts-grid { grid-template-columns:1fr; }
+  .opinions-grid { grid-template-columns:1fr 1fr; }
+  .calc-inner { grid-template-columns:1fr; gap:2rem; }
+  .band-grid { grid-template-columns:repeat(2,1fr); }
+  .band-item:nth-child(n) { display:block; }
+  .band-item:nth-child(5) { display:none; }
+}
+@media(max-width:640px){
+  #cur { display:none; } body { cursor:auto; }
+  #masthead { padding:1rem; }
+  .mast-logo { font-size:2rem; }
+  .mast-nav { display:none; }
+  .wrap { padding:0 1rem; }
+  .feature-story { grid-template-columns:1fr; }
+  .feature-main { grid-column:unset; }
+  .content-grid { grid-template-columns:1fr; }
+  .content-grid .art-card:nth-child(3) { grid-column:unset; display:block; }
+  .band-grid { grid-template-columns:1fr 1fr; gap:0; }
+  .band-item { padding:.75rem 1rem; }
+  .band-val  { font-size:1.2rem; }
+  .opinions-grid { grid-template-columns:1fr; gap:1.5rem; }
+  .nl-form { flex-direction:column; }
+  .foot-inner { flex-direction:column; text-align:center; }
+  .foot-links { flex-wrap:wrap; justify-content:center; gap:1rem; }
+  .calc-row { grid-template-columns:1fr; }
+  .calc-arrow { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div id="cur"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+
+<!-- ── LIVE TICKER ── -->
+<div id="ticker">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- ── MASTHEAD ── -->
+<header id="masthead">
+  <div class="mast-date" id="mastDate"></div>
+  <div>
+    <div class="mast-logo">MERI<span>D</span>IAN</div>
+    <div class="mast-sub">Economic Intelligence · Est. 2024</div>
+  </div>
+  <nav class="mast-nav">
+    <a href="#">Markets</a>
+    <a href="#">Economy</a>
+    <a href="#">Technology</a>
+    <a href="#">Policy</a>
+    <a href="#">Opinion</a>
+    <a href="#" class="sub-btn">Subscribe</a>
+  </nav>
+</header>
+
+<!-- ── SECTION NAV ── -->
+<nav id="secnav">
+  <a href="#" class="active">Front Page</a>
+  <a href="#">Markets</a>
+  <a href="#">US Economy</a>
+  <a href="#">Europe</a>
+  <a href="#">Asia Pacific</a>
+  <a href="#">Technology</a>
+  <a href="#">Energy</a>
+  <a href="#">Central Banks</a>
+  <a href="#">Trade</a>
+  <a href="#">Climate Economy</a>
+  <a href="#">Personal Finance</a>
+</nav>
+
+<!-- ── BREAKING ── -->
+<div class="breaking-banner">
+  <div class="brk-pill">Breaking</div>
+  <div class="brk-text">Federal Reserve signals possible rate cut in June meeting as PCE inflation falls to 2.4% — dollar weakens against major currencies</div>
+  <div class="brk-time" id="brkTime"></div>
+</div>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+
+      <!-- Feature + secondary stories -->
+      <div class="feature-story">
+        <div class="feature-main">
+          <div class="feature-visual">
+            <canvas id="globeCanvas"></canvas>
+            <div class="feature-overlay">
+              <div class="feature-cat">Global Economy</div>
+              <h1 class="feature-hed">The World Economy Enters a New Phase — And Nobody Agrees On What Comes Next</h1>
+              <p class="feature-dek">As central banks pivot, emerging markets surge and geopolitical fault lines deepen, economists are divided on whether 2025 marks a soft landing or the beginning of structural stagnation.</p>
+              <div class="feature-byline">By <strong>Eleanor Marsh</strong> · Chief Economics Correspondent · <span id="heroTime"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-story">
+          <div class="sec-cat">Central Banks</div>
+          <h2 class="sec-hed">Fed Holds Rates Steady But Signals June Cut Is Live as Inflation Cools Faster Than Expected</h2>
+          <p class="sec-dek">Chair Powell described the latest PCE data as "encouraging" while cautioning that the committee needs "a few more months" of evidence before acting.</p>
+          <div class="sec-time">2 hours ago · 8 min read</div>
+        </div>
+        <div class="sec-story">
+          <div class="sec-cat">Trade</div>
+          <h2 class="sec-hed">New Transatlantic Trade Framework Reaches Draft Stage After 18 Months of Negotiations</h2>
+          <p class="sec-dek">The proposed deal would eliminate tariffs on $420bn of goods annually and create the world's largest bilateral trading zone.</p>
+          <div class="sec-time">4 hours ago · 6 min read</div>
+        </div>
+        <div class="sec-story">
+          <div class="sec-cat">Technology</div>
+          <h2 class="sec-hed">AI Productivity Gains Begin to Show in GDP Data — But Distribution Remains Uneven</h2>
+          <p class="sec-dek">A new IMF working paper finds AI-adopting firms post 12–18% productivity gains, while the median worker sees no wage benefit.</p>
+          <div class="sec-time">6 hours ago · 10 min read</div>
+        </div>
+        <div class="sec-story">
+          <div class="sec-cat">Energy</div>
+          <h2 class="sec-hed">Oil Slips Below $70 as OPEC+ Compliance Wavers and US Shale Output Surprises</h2>
+          <p class="sec-dek">Brent crude fell to its lowest in six months as output data from Texas and North Dakota exceeded analyst forecasts by a wide margin.</p>
+          <div class="sec-time">7 hours ago · 5 min read</div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="right-col">
+
+        <!-- Markets widget -->
+        <div class="widget">
+          <div class="widget-title">
+            Markets
+            <span class="wt-live"><span class="wt-dot"></span>Live</span>
+          </div>
+          <div id="marketRows"></div>
+        </div>
+
+        <!-- Opinion -->
+        <div class="widget">
+          <div class="widget-title">Opinion &amp; Analysis</div>
+          <div class="opinion-item">
+            <div class="op-topic">Monetary Policy</div>
+            <div class="op-hed">"The Fed Is Right to Wait — Rushing Cuts Would Repeat the Mistakes of 1976"</div>
+            <div class="op-author">Prof. James Whitfield, Harvard Kennedy School</div>
+          </div>
+          <div class="opinion-item">
+            <div class="op-topic">Trade War</div>
+            <div class="op-hed">"Tariffs Are a Tax on Your Own Citizens. Washington Needs to Remember That"</div>
+            <div class="op-author">Claudia Reinholt, Peterson Institute</div>
+          </div>
+          <div class="opinion-item">
+            <div class="op-topic">Tech Economy</div>
+            <div class="op-hed">"The AI Productivity Paradox Will Not Fix Itself Without Radical Retraining Policy"</div>
+            <div class="op-author">Dr. Yemi Adeyemi, LSE</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MARKET BAND ── -->
+<div class="market-band">
+  <div class="wrap">
+    <div class="band-grid" id="bandGrid"></div>
+  </div>
+</div>
+
+<!-- ── CHARTS ── -->
+<section id="charts">
+  <div class="wrap">
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="cp-header">
+          <div>
+            <div class="cp-title">S&amp;P 500 Index</div>
+            <div class="cp-sub">US Large Cap · Real-time simulation</div>
+          </div>
+          <div>
+            <div class="cp-val" id="spVal">5,842</div>
+            <div class="cp-chg up" id="spChg">▲ +1.24%</div>
+          </div>
+        </div>
+        <div class="cp-tabs">
+          <button class="cp-tab active" onclick="setRange(this,'sp',5)">5D</button>
+          <button class="cp-tab" onclick="setRange(this,'sp',30)">1M</button>
+          <button class="cp-tab" onclick="setRange(this,'sp',90)">3M</button>
+          <button class="cp-tab" onclick="setRange(this,'sp',365)">1Y</button>
+        </div>
+        <canvas class="linechart" id="spChart"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="cp-header">
+          <div>
+            <div class="cp-title">10-Year Treasury Yield</div>
+            <div class="cp-sub">US Government Bonds · Real-time simulation</div>
+          </div>
+          <div>
+            <div class="cp-val" id="tnVal">4.22%</div>
+            <div class="cp-chg down" id="tnChg">▼ -0.04%</div>
+          </div>
+        </div>
+        <div class="cp-tabs">
+          <button class="cp-tab active" onclick="setRange(this,'tn',5)">5D</button>
+          <button class="cp-tab" onclick="setRange(this,'tn',30)">1M</button>
+          <button class="cp-tab" onclick="setRange(this,'tn',90)">3M</button>
+          <button class="cp-tab" onclick="setRange(this,'tn',365)">1Y</button>
+        </div>
+        <canvas class="linechart" id="tnChart"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN ARTICLES ── -->
+<section id="maincontent">
+  <div class="wrap">
+    <div class="content-grid" id="articleGrid"></div>
+  </div>
+</section>
+
+<!-- ── CURRENCY CALCULATOR ── -->
+<section id="calculator">
+  <div class="wrap">
+    <div class="calc-inner">
+      <div class="calc-left">
+        <h2>Live Currency<br><em>Converter</em></h2>
+        <p>Convert between 12 major currencies using today's illustrative exchange rates. Rates update automatically every 5 seconds to simulate live market movement.</p>
+      </div>
+      <div class="calc-card">
+        <div class="calc-row">
+          <div class="calc-field">
+            <label class="calc-label">Amount</label>
+            <input class="calc-input" id="calcAmount" type="number" value="1000" min="0">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">From</label>
+            <select class="calc-select" id="calcFrom"></select>
+          </div>
+          <div class="calc-arrow">→</div>
+          <div class="calc-field">
+            <label class="calc-label">To</label>
+            <select class="calc-select" id="calcTo"></select>
+          </div>
+        </div>
+        <div class="calc-result">
+          <div class="calc-result-label">Converted Amount</div>
+          <div class="calc-result-val" id="calcResult">—</div>
+          <div class="calc-result-rate" id="calcRate">Enter an amount to convert</div>
+        </div>
+        <button class="calc-update-btn" onclick="doConvert()">Convert Now</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── OPINIONS ── -->
+<section id="opinions">
+  <div class="wrap">
+    <div style="margin-bottom:1.5rem;">
+      <div style="font-size:.6rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--red);padding-bottom:.6rem;border-bottom:2px solid var(--ink);margin-bottom:1.2rem;">Opinion &amp; Commentary</div>
+    </div>
+    <div class="opinions-grid">
+      <div class="op-card">
+        <div class="oc-label">Central Banks</div>
+        <div class="oc-hed">"Rate Cuts Are Coming — The Question Is Whether Anyone Will Care"</div>
+        <div class="oc-author">Martin Fell</div>
+        <div class="oc-role">Former Deputy Governor, Bank of England</div>
+      </div>
+      <div class="op-card">
+        <div class="oc-label">Globalisation</div>
+        <div class="oc-hed">"The Era of Frictionless Trade Is Over. Here Is What Replaces It"</div>
+        <div class="oc-author">Dr. Priya Nair</div>
+        <div class="oc-role">Senior Fellow, Brookings Institution</div>
+      </div>
+      <div class="op-card">
+        <div class="oc-label">Inequality</div>
+        <div class="oc-hed">"GDP Growth Without Wage Growth Is Not Progress — It Is Extraction"</div>
+        <div class="oc-author">Rosa Timmermans</div>
+        <div class="oc-role">Director, European Policy Institute</div>
+      </div>
+      <div class="op-card">
+        <div class="oc-label">Digital Economy</div>
+        <div class="oc-hed">"Central Bank Digital Currencies Are Inevitable. The Debate Is Now About Control"</div>
+        <div class="oc-author">Prof. Kwame Asante</div>
+        <div class="oc-role">MIT Digital Currency Initiative</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEWSLETTER ── -->
+<section id="newsletter">
+  <div class="wrap">
+    <div class="nl-eyebrow">Morning Briefing</div>
+    <h2 class="nl-hed">The economic intelligence<br>you need, <em>before markets open.</em></h2>
+    <p class="nl-sub">Join 340,000 readers who start their day with Meridian's flagship newsletter. Concise. Sharp. Essential.</p>
+    <div class="nl-form">
+      <input class="nl-input" type="email" placeholder="your@email.com">
+      <button class="nl-btn">Subscribe Free →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="wrap">
+    <div class="foot-inner">
+      <div class="foot-logo">MERI<span>D</span>IAN</div>
+      <div class="foot-links">
+        <a href="#">About</a><a href="#">Careers</a><a href="#">Advertise</a>
+        <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a>
+      </div>
+      <div>© 2025 Meridian Economic Intelligence. All data illustrative.</div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════════════════════════
+const curEl=document.getElementById('cur');
+let cx=0,cy=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;});
+(function ac(){cx+=(tx-cx)*.15;cy+=(ty-cy)*.15;curEl.style.left=cx+'px';curEl.style.top=cy+'px';requestAnimationFrame(ac);})();
+document.querySelectorAll('a,button,input,select,.art-card,.sec-story,.market-row,.opinion-item,.op-card,.mini-story').forEach(el=>{
+  el.addEventListener('mouseenter',()=>curEl.classList.add('hover'));
+  el.addEventListener('mouseleave',()=>curEl.classList.remove('hover'));
+});
+
+// ═══════════════════════════════════════════════════════
+// DATE / TIME
+// ═══════════════════════════════════════════════════════
+function fmtDate(){
+  const d=new Date();
+  const opts={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  return d.toLocaleDateString('en-GB',opts).toUpperCase();
+}
+function fmtTime(){
+  const d=new Date();
+  return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+ ' GMT';
+}
+document.getElementById('mastDate').textContent=fmtDate();
+document.getElementById('heroTime').textContent=fmtTime();
+document.getElementById('brkTime').textContent=fmtTime();
+setInterval(()=>{
+  document.getElementById('heroTime').textContent=fmtTime();
+  document.getElementById('brkTime').textContent=fmtTime();
+},60000);
+
+// ═══════════════════════════════════════════════════════
+// MARKET DATA (simulated live)
+// ═══════════════════════════════════════════════════════
+const MARKETS = [
+  {name:'S&P 500',   sym:'SPX',   val:5842,   chg:+1.24, cat:'Index'},
+  {name:'NASDAQ',    sym:'NDX',   val:19450,  chg:+1.41, cat:'Index'},
+  {name:'FTSE 100',  sym:'UKX',   val:8920,   chg:+0.52, cat:'Index'},
+  {name:'EUR/USD',   sym:'EURUSD',val:1.0842, chg:-0.18, cat:'FX'},
+  {name:'GBP/USD',   sym:'GBPUSD',val:1.2654, chg:+0.09, cat:'FX'},
+  {name:'USD/JPY',   sym:'USDJPY',val:149.82, chg:+0.31, cat:'FX'},
+  {name:'Brent Crude',sym:'BRT',  val:69.84,  chg:-0.92, cat:'Commodity'},
+  {name:'Gold',      sym:'XAU',   val:2641,   chg:+0.22, cat:'Commodity'},
+  {name:'Bitcoin',   sym:'BTC',   val:91240,  chg:+3.84, cat:'Crypto'},
+  {name:'10Y UST',   sym:'US10Y', val:4.22,   chg:-0.04, cat:'Bond'},
+];
+
+const BAND_DATA = [
+  {label:'S&P 500',   val:'5,842', chg:'+1.24%', up:true },
+  {label:'NASDAQ',    val:'19,450',chg:'+1.41%', up:true },
+  {label:'Brent',     val:'$69.84',chg:'-0.92%', up:false},
+  {label:'Gold',      val:'$2,641',chg:'+0.22%', up:true },
+  {label:'BTC/USD',   val:'$91,240',chg:'+3.84%',up:true },
+];
+
+// Render market rows (right sidebar)
+function renderMarketRows(){
+  const container=document.getElementById('marketRows');
+  container.innerHTML=MARKETS.slice(0,8).map(m=>{
+    const up=m.chg>=0;
+    const pct=Math.abs(m.chg);
+    const barW=Math.min(pct*15,100);
+    const valStr = m.sym==='EURUSD'||m.sym==='GBPUSD'?m.val.toFixed(4):
+                   m.sym==='USDJPY'?m.val.toFixed(2):
+                   m.val>1000?m.val.toLocaleString():m.val.toFixed(2);
+    return `<div class="market-row">
+      <div><div class="mr-name">${m.sym}</div><div class="mr-sub">${m.name}</div></div>
+      <div class="mr-right">
+        <div class="mr-val">${valStr}</div>
+        <div class="mr-chg" style="color:var(--${up?'up':'down'})">${up?'▲':'▼'} ${up?'+':''}${m.chg.toFixed(2)}%</div>
+        <div class="mr-bar" style="width:${barW}px;background:var(--${up?'up':'down'});opacity:.5;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderMarketRows();
+
+// Band
+document.getElementById('bandGrid').innerHTML=BAND_DATA.map(b=>`
+  <div class="band-item">
+    <div class="band-label">${b.label}</div>
+    <div class="band-val">${b.val}</div>
+    <div class="band-chg" style="color:${b.up?'#4ADE80':'#FF6B6B'}">${b.chg}</div>
+  </div>
+`).join('');
+
+// Live simulation — jiggle values every 3s
+setInterval(()=>{
+  MARKETS.forEach(m=>{
+    const jitter=(Math.random()-.48)*0.15;
+    m.val*=(1+jitter*0.001);
+    m.chg+=jitter*0.05;
+    m.chg=Math.max(-5,Math.min(5,m.chg));
+  });
+  renderMarketRows();
+  // Update S&P display
+  const sp=MARKETS[0];
+  document.getElementById('spVal').textContent=Math.round(sp.val).toLocaleString();
+  const spUp=sp.chg>=0;
+  document.getElementById('spChg').textContent=(spUp?'▲ +':'▼ ')+Math.abs(sp.chg).toFixed(2)+'%';
+  document.getElementById('spChg').className='cp-chg '+(spUp?'up':'down');
+  document.getElementById('spChg').style.color=spUp?'var(--up)':'var(--down)';
+  // Update ticker
+  buildTicker();
+},3500);
+
+// ═══════════════════════════════════════════════════════
+// TICKER
+// ═══════════════════════════════════════════════════════
+function buildTicker(){
+  const items=MARKETS.map(m=>{
+    const up=m.chg>=0;
+    const valStr=m.sym==='EURUSD'||m.sym==='GBPUSD'?m.val.toFixed(4):
+                 m.sym==='USDJPY'?m.val.toFixed(2):
+                 m.val>1000?m.val.toLocaleString():m.val.toFixed(2);
+    return `<span class="tick-item"><span class="tick-name">${m.sym}</span><span class="tick-val">${valStr}</span><span class="tick-chg ${up?'tick-up':'tick-dn'}">${up?'▲':'▼'}${Math.abs(m.chg).toFixed(2)}%</span></span><span class="tick-sep">|</span>`;
+  });
+  const full=[...items,...items].join('');
+  document.getElementById('tickerTrack').innerHTML=full;
+}
+buildTicker();
+
+// ═══════════════════════════════════════════════════════
+// THREE.JS GLOBE
+// ═══════════════════════════════════════════════════════
+(function buildGlobe(){
+  const canvas=document.getElementById('globeCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(40,2,0.1,100);
+  camera.position.set(0,0,4.5);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xFFFFFF,0.3));
+  const sun=new THREE.DirectionalLight(0xFFF5E0,1.5);
+  sun.position.set(5,3,5);scene.add(sun);
+  const rim=new THREE.DirectionalLight(0x4080FF,0.4);
+  rim.position.set(-5,-2,-3);scene.add(rim);
+
+  // Globe base — deep ocean
+  const globe=new THREE.Mesh(
+    new THREE.SphereGeometry(1.5,64,64),
+    new THREE.MeshPhongMaterial({color:0x0A1628,shininess:60,specular:0x224488})
+  );
+  scene.add(globe);
+
+  // Latitude/longitude grid lines
+  const gridMat=new THREE.LineBasicMaterial({color:0x1A3055,transparent:true,opacity:0.6});
+  for(let lat=-75;lat<=75;lat+=15){
+    const pts=[];
+    for(let lon=0;lon<=360;lon+=3){
+      const φ=lat*Math.PI/180,λ=lon*Math.PI/180;
+      const r=1.502;
+      pts.push(new THREE.Vector3(r*Math.cos(φ)*Math.cos(λ),r*Math.sin(φ),r*Math.cos(φ)*Math.sin(λ)));
+    }
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),gridMat));
+  }
+  for(let lon=0;lon<360;lon+=15){
+    const pts=[];
+    for(let lat=-90;lat<=90;lat+=3){
+      const φ=lat*Math.PI/180,λ=lon*Math.PI/180;
+      const r=1.502;
+      pts.push(new THREE.Vector3(r*Math.cos(φ)*Math.cos(λ),r*Math.sin(φ),r*Math.cos(φ)*Math.sin(λ)));
+    }
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),gridMat));
+  }
+
+  // Continent land masses — simplified dots
+  const landCoords=[
+    // North America
+    [40,240],[45,250],[50,240],[35,260],[30,270],[25,280],[20,260],[55,235],[60,225],
+    // South America
+    [-10,300],[-15,310],[-20,315],[-30,305],[-40,295],[-5,295],[0,310],
+    // Europe
+    [50,0],[55,10],[45,5],[60,25],[65,20],[48,15],[52,20],[57,15],
+    // Africa
+    [10,20],[0,30],[-10,25],[20,15],[30,25],[-20,20],[-30,15],[5,35],
+    // Asia
+    [40,80],[50,90],[55,70],[35,100],[45,110],[60,100],[20,80],[30,70],[25,90],[50,130],[35,135],
+    // Australia
+    [-25,135],[-30,145],[-35,150],[-20,125],[-28,140],
+    // Greenland
+    [70,320],[72,330],[68,310],[75,325],
+  ];
+  const dotGeo=new THREE.SphereGeometry(0.018,6,6);
+  const dotMat=new THREE.MeshBasicMaterial({color:0x2A6B3A});
+  landCoords.forEach(([lat,lon])=>{
+    const φ=lat*Math.PI/180,λ=lon*Math.PI/180;
+    const r=1.52;
+    const dot=new THREE.Mesh(dotGeo,dotMat);
+    dot.position.set(r*Math.cos(φ)*Math.cos(λ),r*Math.sin(φ),r*Math.cos(φ)*Math.sin(λ));
+    scene.add(dot);
+  });
+
+  // News hotspots — glowing markers
+  const hotspots=[
+    {lat:40,lon:360-74,color:0xFF3333,scale:1.4},  // New York
+    {lat:51,lon:0,      color:0xFF8800,scale:1.2},  // London
+    {lat:35,lon:139,    color:0xFFCC00,scale:1.1},  // Tokyo
+    {lat:22,lon:114,    color:0xFF3333,scale:1.3},  // Hong Kong
+    {lat:48,lon:2,      color:0x44AAFF,scale:1.0},  // Paris
+    {lat:52,lon:13,     color:0x44AAFF,scale:1.0},  // Berlin
+    {lat:1,  lon:103,   color:0xFFCC00,scale:1.0},  // Singapore
+  ];
+  const hotGroups=[];
+  hotspots.forEach(h=>{
+    const φ=h.lat*Math.PI/180,λ=h.lon*Math.PI/180;
+    const r=1.54;
+    const x=r*Math.cos(φ)*Math.cos(λ),y=r*Math.sin(φ),z=r*Math.cos(φ)*Math.sin(λ);
+    const g=new THREE.Group();
+    g.position.set(x,y,z);
+    // Core dot
+    const core=new THREE.Mesh(new THREE.SphereGeometry(0.025*h.scale,8,8),new THREE.MeshBasicMaterial({color:h.color}));
+    g.add(core);
+    // Pulse ring
+    const ring=new THREE.Mesh(new THREE.RingGeometry(0.04,0.055,16),new THREE.MeshBasicMaterial({color:h.color,transparent:true,opacity:0.7,side:THREE.DoubleSide}));
+    ring.lookAt(new THREE.Vector3(0,0,0));ring.userData.pulse=Math.random()*Math.PI*2;
+    g.add(ring);
+    scene.add(g);
+    hotGroups.push({g,ring,h});
+  });
+
+  // Atmosphere glow
+  const atmoGeo=new THREE.SphereGeometry(1.65,32,32);
+  const atmoMat=new THREE.MeshBasicMaterial({color:0x224488,transparent:true,opacity:0.08,side:THREE.BackSide});
+  scene.add(new THREE.Mesh(atmoGeo,atmoMat));
+
+  // Stars
+  const starPos=new Float32Array(600*3);
+  for(let i=0;i<600;i++){starPos[i*3]=(Math.random()-.5)*20;starPos[i*3+1]=(Math.random()-.5)*20;starPos[i*3+2]=(Math.random()-.5)*20-6;}
+  const starGeo=new THREE.BufferGeometry();starGeo.setAttribute('position',new THREE.BufferAttribute(starPos,3));
+  scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xFFFFFF,size:0.025,transparent:true,opacity:0.5})));
+
+  // Mouse interaction
+  let mx=0,my=0,isDrag=false,lastMx=0,rotY=0,rotX=0;
+  canvas.addEventListener('mousedown',e=>{isDrag=true;lastMx=e.clientX;});
+  window.addEventListener('mousemove',e=>{
+    if(isDrag){const dx=e.clientX-lastMx;rotY+=dx*0.008;lastMx=e.clientX;}
+    mx=(e.clientX/innerWidth-.5)*2;my=-(e.clientY/innerHeight-.5)*2;
+  });
+  window.addEventListener('mouseup',()=>isDrag=false);
+
+  function resize(){
+    const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight||400;
+    renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+  resize();window.addEventListener('resize',()=>setTimeout(resize,100));
+
+  let t=0;
+  (function loop(){
+    requestAnimationFrame(loop);t+=0.007;
+    globe.rotation.y=rotY+t*0.15;
+    globe.rotation.x=rotX+Math.sin(t*0.2)*0.04;
+    hotGroups.forEach(({g,ring,h})=>{
+      g.rotation.copy(globe.rotation);
+      ring.userData.pulse+=0.05;
+      const s=1+Math.sin(ring.userData.pulse)*0.5;
+      ring.scale.set(s,s,1);
+      ring.material.opacity=0.7*(1-Math.abs(Math.sin(ring.userData.pulse))*0.5);
+    });
+    camera.position.x+=(mx*0.3-camera.position.x)*0.03;
+    camera.position.y+=(my*0.2-camera.position.y)*0.03;
+    camera.lookAt(scene.position);
+    renderer.render(scene,camera);
+  })();
+})();
+
+// ═══════════════════════════════════════════════════════
+// LINE CHARTS
+// ═══════════════════════════════════════════════════════
+const chartState = { sp:{ range:5, data:null }, tn:{ range:5, data:null } };
+
+function genSeriesData(base,days,volatility,trend){
+  const arr=[];let v=base;
+  for(let i=0;i<days;i++){
+    v+=trend+(Math.random()-.49)*volatility;
+    arr.push(+v.toFixed(4));
+  }
+  return arr;
+}
+
+function drawLineChart(canvasId,data,color,minOverride){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const w=canvas.offsetWidth||600,h=180;
+  canvas.width=w*devicePixelRatio;canvas.height=h*devicePixelRatio;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);
+  const pad={t:10,r:10,b:28,l:48};
+  const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  const min=minOverride||Math.min(...data)*0.9995;
+  const max=Math.max(...data)*1.0005;
+  const toX=i=>pad.l+i*(cw/(data.length-1));
+  const toY=v=>pad.t+ch-(v-min)/(max-min)*ch;
+  // Grid
+  ctx.strokeStyle='#F0EDE8';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+i*(ch/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    const val=max-(i/4)*(max-min);
+    ctx.fillStyle='#999';ctx.font=`10px 'Libre Franklin',sans-serif`;ctx.textAlign='right';
+    ctx.fillText(val>100?val.toFixed(0):val.toFixed(2),pad.l-4,y+3.5);
+  }
+  // Gradient fill
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+  grad.addColorStop(0,color+'30');grad.addColorStop(1,color+'00');
+  // Line
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.beginPath();data.forEach((v,i)=>i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)));ctx.stroke();
+  // Fill
+  ctx.lineTo(toX(data.length-1),pad.t+ch);ctx.lineTo(pad.l,pad.t+ch);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  // Last point dot
+  const lx=toX(data.length-1),ly=toY(data[data.length-1]);
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(lx,ly,2,0,Math.PI*2);ctx.fill();
+  // X-axis labels
+  const step=Math.max(1,Math.floor(data.length/6));
+  for(let i=0;i<data.length;i+=step){
+    ctx.fillStyle='#aaa';ctx.font=`10px 'Libre Franklin',sans-serif`;ctx.textAlign='center';
+    const label=data.length<=7?['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i]||'':
+                 data.length<=31?'D'+(i+1):'M'+(Math.floor(i/30)+1);
+    ctx.fillText(label,toX(i),h-pad.b+16);
+  }
+}
+
+function initCharts(){
+  chartState.sp.data=genSeriesData(5700,chartState.sp.range,25,2);
+  chartState.tn.data=genSeriesData(4.5,chartState.tn.range,0.02,-0.001);
+  setTimeout(()=>{drawLineChart('spChart',chartState.sp.data,'#0A7A3C');drawLineChart('tnChart',chartState.tn.data,'#C8001E',0);},80);
+}
+initCharts();
+window.addEventListener('resize',()=>setTimeout(()=>{drawLineChart('spChart',chartState.sp.data,'#0A7A3C');drawLineChart('tnChart',chartState.tn.data,'#C8001E',0);},120));
+
+function setRange(btn,chart,days){
+  btn.parentElement.querySelectorAll('.cp-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  chartState[chart].range=days;
+  const issp=chart==='sp';
+  chartState[chart].data=genSeriesData(issp?5200:4.2,days,issp?30:0.025,issp?3:-0.001);
+  drawLineChart(chart+'Chart',chartState[chart].data,issp?'#0A7A3C':'#C8001E',issp?undefined:0);
+}
+
+// ═══════════════════════════════════════════════════════
+// ARTICLES GRID
+// ═══════════════════════════════════════════════════════
+const ARTICLES=[
+  {cat:'Markets',     hed:'How Passive Investing Conquered Wall Street — And What Comes Next',                  dek:'Index funds now control over 50% of US equity assets. The implications for price discovery and governance are only beginning to surface.', time:'3h ago', read:'7 min', thumb:'thumb-markets', emoji:'📈'},
+  {cat:'Technology',  hed:'The Semiconductor Race Is No Longer Just About Chips — It Is About Water',          dek:'Taiwan\'s chip fabs consume 10% of the island\'s water. As climate stress intensifies, the location of future fabs will be determined by water access.', time:'5h ago',read:'8 min',thumb:'thumb-tech',emoji:'💡'},
+  {cat:'Policy',      hed:'Wealth Taxes Are Back on the G20 Agenda. Can They Work This Time?',                 dek:'A proposed 2% levy on fortunes above $1 billion would raise an estimated $250bn annually. But enforcement across borders remains the central challenge.', time:'6h ago',read:'6 min',thumb:'thumb-policy',emoji:'⚖️'},
+  {cat:'Global',      hed:'India Overtakes Germany to Become the World\'s Third Largest Economy',              dek:'The milestone, achieved in purchasing power parity terms, reflects a decade of structural reform and demographic dividend — but challenges in services exports remain.', time:'8h ago',read:'5 min',thumb:'thumb-global',emoji:'🌏'},
+  {cat:'Energy',      hed:'Solar Now Cheaper Than Gas in 130 Countries — The Investment Math Has Permanently Shifted', dek:'Levelised cost data from BloombergNEF shows solar has crossed the threshold in every major economy, reshaping the case for new fossil fuel projects entirely.', time:'10h ago',read:'9 min',thumb:'thumb-energy',emoji:'☀️'},
+  {cat:'Labour',      hed:'Remote Work Is Ending the Urban Premium — And Reshaping Entire Economies',          dek:'Cities that premised their growth on white-collar density are facing a structural recalibration as talent disperses and office real estate reprices.',  time:'11h ago',read:'7 min',thumb:'thumb-labour',emoji:'🏙️'},
+];
+const ASIDE_STORIES=[
+  {hed:'ECB Minutes Reveal Deeper Divisions on Pace of Easing Than Markets Expected',time:'1h ago'},
+  {hed:'China\'s Property Crisis Enters Year Three With No Resolution in Sight',time:'2h ago'},
+  {hed:'UK Wage Growth Slows to 5.2% — Still Above BOE Comfort Zone',time:'3h ago'},
+  {hed:'Japan\'s Yen Intervention Costs Reach Record ¥42 Trillion',time:'4h ago'},
+  {hed:'Copper Hits 18-Month High on Data Centre Construction Boom',time:'5h ago'},
+];
+
+const grid=document.getElementById('articleGrid');
+grid.innerHTML=ARTICLES.map(a=>`
+  <div class="art-card">
+    <div class="art-thumb ${a.thumb}">${a.emoji ? `<span class="thumb-emoji">${a.emoji}</span>` : ''}</div>
+    <div class="art-cat">${a.cat}</div>
+    <h3 class="art-hed">${a.hed}</h3>
+    <p class="art-dek">${a.dek}</p>
+    <div class="art-meta"><span>${a.time}</span><span class="art-dot"></span><span>${a.read} read</span></div>
+  </div>
+`).join('')+`
+  <div class="aside-col">
+    <div class="aside-section">
+      <div class="aside-title">Latest News</div>
+      ${ASIDE_STORIES.map((s,i)=>`
+        <div class="mini-story">
+          <div class="ms-num">${i+1}</div>
+          <div class="ms-hed">${s.hed}</div>
+          <div class="ms-time">${s.time}</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+`;
+
+// ═══════════════════════════════════════════════════════
+// CURRENCY CALCULATOR
+// ═══════════════════════════════════════════════════════
+const CURRENCIES = {
+  USD:{ name:'US Dollar',    symbol:'$',  rate:1.0000 },
+  EUR:{ name:'Euro',         symbol:'€',  rate:0.9220 },
+  GBP:{ name:'Brit. Pound',  symbol:'£',  rate:0.7900 },
+  JPY:{ name:'Jap. Yen',     symbol:'¥',  rate:149.82 },
+  CNY:{ name:'Chinese Yuan', symbol:'¥',  rate:7.2400 },
+  AUD:{ name:'Aus. Dollar',  symbol:'A$', rate:1.5420 },
+  CAD:{ name:'Can. Dollar',  symbol:'C$', rate:1.3650 },
+  CHF:{ name:'Swiss Franc',  symbol:'Fr', rate:0.8920 },
+  INR:{ name:'Indian Rupee', symbol:'₹',  rate:83.20  },
+  BRL:{ name:'Braz. Real',   symbol:'R$', rate:4.9700 },
+  MXN:{ name:'Mex. Peso',    symbol:'$',  rate:17.08  },
+  SGD:{ name:'Sing. Dollar', symbol:'S$', rate:1.3420 },
+};
+
+const fromSel=document.getElementById('calcFrom');
+const toSel=document.getElementById('calcTo');
+Object.entries(CURRENCIES).forEach(([code,cur])=>{
+  [fromSel,toSel].forEach(sel=>{
+    const opt=document.createElement('option');
+    opt.value=code;opt.textContent=`${code} — ${cur.name}`;
+    sel.appendChild(opt);
+  });
+});
+fromSel.value='USD';toSel.value='EUR';
+
+function doConvert(){
+  const amount=parseFloat(document.getElementById('calcAmount').value)||0;
+  const from=fromSel.value,to=toSel.value;
+  const rate=CURRENCIES[to].rate/CURRENCIES[from].rate;
+  const result=amount*rate;
+  const sym=CURRENCIES[to].symbol;
+  document.getElementById('calcResult').textContent=sym+result.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('calcRate').textContent=`1 ${from} = ${CURRENCIES[to].symbol}${rate.toFixed(4)} ${to} · Rate updates every 5s`;
+}
+doConvert();
+['calcAmount','calcFrom','calcTo'].forEach(id=>document.getElementById(id).addEventListener('input',doConvert));
+document.getElementById('calcFrom').addEventListener('change',doConvert);
+document.getElementById('calcTo').addEventListener('change',doConvert);
+
+// Simulate live rate drift
+setInterval(()=>{
+  Object.keys(CURRENCIES).forEach(k=>{
+    if(k!=='USD') CURRENCIES[k].rate*=(1+(Math.random()-.499)*0.0008);
+  });
+  doConvert();
+},5000);
+
+// ═══════════════════════════════════════════════════════
+// SCROLL REVEAL
+// ═══════════════════════════════════════════════════════
+const revObs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>{e.target.style.opacity='1';e.target.style.transform='translateY(0)';},i*60);}});
+},{threshold:0.08});
+[...document.querySelectorAll('.art-card,.sec-story,.op-card,.opinion-item,.chart-panel,.band-item')].forEach(el=>{
+  el.style.opacity='0';el.style.transform='translateY(22px)';el.style.transition='opacity .6s ease,transform .6s ease';
+  revObs.observe(el);
+});
+</script>
+</body>
+</html>
