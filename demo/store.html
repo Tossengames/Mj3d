@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STUDIO — Product Collection</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:       #F9F7F4;
+  --ink:      #0E0E0E;
+  --muted:    #888480;
+  --border:   #E2DDD8;
+  --surface:  #FFFFFF;
+  --gold:     #B8901A;
+  --accent:   #0E0E0E;
+  --hover:    #F2EFE9;
+  --red:      #C8001E;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+#cur { position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); }
+#cur-ring {
+  width:38px; height:38px; border:1.5px solid var(--ink); border-radius:50%;
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  transition:width .35s cubic-bezier(.23,1,.32,1), height .35s cubic-bezier(.23,1,.32,1), border-color .3s, background .3s;
+}
+#cur-dot {
+  width:5px; height:5px; background:var(--ink); border-radius:50%;
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  transition:background .3s;
+}
+body.hover-buy #cur-ring  { width:70px; height:70px; background:rgba(14,14,14,.06); border-color:var(--ink); }
+body.hover-card #cur-ring { width:55px; height:55px; border-color:var(--gold); }
+body.hover-card #cur-dot  { background:var(--gold); }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  display: flex; justify-content:space-between; align-items:center;
+  padding: 1.6rem 3.5rem;
+  background: rgba(249,247,244,.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--ink);
+}
+.nav-links { display:flex; gap:2.5rem; list-style:none; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:.8rem; font-weight:500; letter-spacing:1px; text-transform:uppercase; transition:color .2s; }
+.nav-links a:hover { color:var(--ink); }
+.nav-right { display:flex; align-items:center; gap:1.5rem; }
+.nav-cart {
+  display:flex; align-items:center; gap:.6rem;
+  font-size:.8rem; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  color:var(--ink); cursor:none; transition:opacity .2s;
+}
+.nav-cart:hover { opacity:.6; }
+.cart-bubble {
+  width:20px; height:20px; background:var(--ink); color:#fff;
+  border-radius:50%; font-size:.62rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-top: 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-left {
+  display: flex; flex-direction:column; justify-content:center;
+  padding: 5rem 3.5rem 5rem 3.5rem;
+  position: relative; z-index:10;
+}
+.hero-eyebrow {
+  font-size:.7rem; font-weight:600; letter-spacing:4px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:2rem;
+  display:flex; align-items:center; gap:1rem;
+}
+.hero-eyebrow::before { content:''; width:32px; height:1px; background:var(--muted); }
+.hero-h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 5.5vw, 5.5rem);
+  font-weight: 300; line-height: 1.05; letter-spacing: -1px;
+  color: var(--ink); margin-bottom: 1.8rem;
+}
+.hero-h1 em { font-style:italic; color:var(--gold); }
+.hero-p {
+  font-size: 1rem; color: var(--muted); line-height: 1.8;
+  max-width: 380px; margin-bottom: 3rem; font-weight: 300;
+}
+.hero-actions { display:flex; gap:1.2rem; align-items:center; flex-wrap:wrap; }
+.btn-primary {
+  display:inline-flex; align-items:center; gap:.75rem;
+  background:var(--ink); color:#fff;
+  padding:1rem 2.5rem; border-radius:2px;
+  font-size:.82rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  text-decoration:none; cursor:none;
+  transition:opacity .3s, transform .3s;
+  border:1.5px solid var(--ink);
+}
+.btn-primary:hover { opacity:.85; transform:translateY(-2px); }
+.btn-ghost {
+  display:inline-flex; align-items:center; gap:.75rem;
+  background:transparent; color:var(--ink);
+  padding:1rem 2.5rem; border-radius:2px;
+  font-size:.82rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  text-decoration:none; cursor:none;
+  border:1.5px solid var(--border);
+  transition:border-color .3s, transform .3s;
+}
+.btn-ghost:hover { border-color:var(--ink); transform:translateY(-2px); }
+.hero-stats { display:flex; gap:3rem; margin-top:3.5rem; padding-top:2.5rem; border-top:1px solid var(--border); }
+.hs { }
+.hs-num { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:600; line-height:1; color:var(--ink); }
+.hs-lbl { font-size:.68rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:.3rem; font-weight:500; }
+
+.hero-right {
+  position:relative; background:var(--ink);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+#heroCanvas { position:absolute; inset:0; width:100%; height:100%; }
+.hero-canvas-label {
+  position:absolute; bottom:2.5rem; right:2.5rem; z-index:10;
+  font-size:.65rem; color:rgba(255,255,255,.35); letter-spacing:2px; text-transform:uppercase;
+  display:flex; align-items:center; gap:.5rem;
+}
+
+/* ── CATEGORY FILTER ── */
+#catbar {
+  padding: 1.5rem 3.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; align-items:center; gap:0;
+  position:sticky; top:80px; z-index:100;
+}
+.cat-pill {
+  padding: .55rem 1.4rem; font-size:.75rem; font-weight:600; letter-spacing:1.5px;
+  text-transform:uppercase; cursor:none; border-radius:2px;
+  color:var(--muted); background:transparent; border:none; font-family:'Outfit',sans-serif;
+  transition:color .2s, background .2s; position:relative;
+}
+.cat-pill::after { content:''; position:absolute; bottom:0; left:50%; right:50%; height:1.5px; background:var(--ink); transition:left .25s, right .25s; }
+.cat-pill.active { color:var(--ink); }
+.cat-pill.active::after, .cat-pill:hover::after { left:1.4rem; right:1.4rem; }
+.cat-count { font-size:.6rem; color:var(--muted); margin-left:.3rem; }
+.cat-sep { width:1px; height:20px; background:var(--border); margin:0 .5rem; }
+
+/* ── PRODUCT SHOWCASE ── */
+#showcase { padding: 5rem 3.5rem; }
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.prod-tile {
+  background: var(--surface);
+  cursor: none;
+  transition: background .3s;
+  position: relative;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.prod-tile:hover { background: var(--hover); }
+.prod-tile.featured {
+  grid-column: span 2;
+  grid-row: span 2;
+  flex-direction: row;
+}
+
+/* Preview area */
+.prod-preview {
+  position: relative; overflow: hidden;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--bg);
+  flex-shrink:0;
+}
+.prod-tile:not(.featured) .prod-preview { aspect-ratio:4/3; }
+.prod-tile.featured .prod-preview { width:55%; height:100%; aspect-ratio:unset; }
+.preview-canvas { position:absolute; inset:0; width:100%; height:100%; }
+.prod-emoji { font-size:5rem; position:relative; z-index:2; transition:transform .6s cubic-bezier(.23,1,.32,1); filter:drop-shadow(0 8px 24px rgba(0,0,0,.12)); }
+.prod-tile:hover .prod-emoji { transform:scale(1.08) translateY(-6px); }
+.prod-badge {
+  position:absolute; top:1.2rem; left:1.2rem; z-index:10;
+  font-size:.58rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  padding:.3rem .8rem; border-radius:2px;
+}
+.badge-new    { background:var(--ink); color:#fff; }
+.badge-sale   { background:var(--red); color:#fff; }
+.badge-bundle { background:var(--gold); color:#fff; }
+.badge-popular{ background:var(--bg); color:var(--ink); border:1px solid var(--border); }
+
+/* Product body */
+.prod-body { padding:1.8rem 2rem 2rem; flex:1; display:flex; flex-direction:column; }
+.prod-tile.featured .prod-body { padding:2.5rem; }
+.prod-cat { font-size:.62rem; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem; }
+.prod-name { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600; line-height:1.2; margin-bottom:.5rem; color:var(--ink); }
+.prod-tile.featured .prod-name { font-size:2.2rem; margin-bottom:.8rem; }
+.prod-desc { font-size:.82rem; color:var(--muted); line-height:1.7; font-weight:300; margin-bottom:1.2rem; flex:1; }
+.prod-tile.featured .prod-desc { font-size:.9rem; }
+
+/* Features */
+.prod-features { margin-bottom:1.5rem; }
+.features-toggle {
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:.68rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--muted); cursor:none; padding:.5rem 0; border-top:1px solid var(--border);
+  transition:color .2s; background:none; border-left:none; border-right:none; border-bottom:none;
+  width:100%; font-family:'Outfit',sans-serif;
+}
+.features-toggle:hover { color:var(--ink); }
+.ft-arrow { transition:transform .3s; font-size:.7rem; }
+.features-toggle.open .ft-arrow { transform:rotate(180deg); }
+.features-list {
+  list-style:none; max-height:0; overflow:hidden;
+  transition:max-height .4s cubic-bezier(.23,1,.32,1), opacity .3s;
+  opacity:0;
+}
+.features-list.open { max-height:300px; opacity:1; }
+.features-list li {
+  display:flex; align-items:baseline; gap:.75rem;
+  font-size:.8rem; color:var(--muted); padding:.4rem 0;
+  border-bottom:1px solid rgba(0,0,0,.04); font-weight:300;
+}
+.features-list li:last-child { border-bottom:none; }
+.features-list li::before { content:'—'; color:var(--gold); font-size:.7rem; flex-shrink:0; }
+
+/* Price + Buy */
+.prod-footer { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:auto; }
+.prod-pricing { }
+.prod-old-price { font-size:.72rem; color:var(--muted); text-decoration:line-through; margin-bottom:.1rem; }
+.prod-price { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:600; color:var(--ink); line-height:1; }
+.prod-tile.featured .prod-price { font-size:2.5rem; }
+.prod-price sup { font-size:.8rem; vertical-align:top; margin-top:.3rem; display:inline-block; font-family:'Outfit',sans-serif; font-weight:500; }
+.buy-btn {
+  display:inline-flex; align-items:center; gap:.6rem;
+  background:var(--ink); color:#fff;
+  padding:.85rem 1.8rem; border-radius:2px;
+  font-size:.75rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  border:1.5px solid var(--ink); cursor:none; font-family:'Outfit',sans-serif;
+  transition:background .25s, transform .25s, box-shadow .25s;
+  white-space:nowrap;
+}
+.buy-btn:hover { background:var(--gold); border-color:var(--gold); transform:translateY(-2px); box-shadow:0 8px 24px rgba(184,144,26,.25); }
+.buy-btn.bought { background:var(--gold); border-color:var(--gold); }
+.prod-tile.featured .buy-btn { padding:1.1rem 2.5rem; font-size:.82rem; }
+
+/* ── FULL-SCREEN PRODUCT MODAL ── */
+#modal {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(14,14,14,.7); backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition:opacity .4s;
+  padding:2rem;
+}
+#modal.open { opacity:1; pointer-events:all; }
+.modal-box {
+  background:var(--surface); max-width:900px; width:100%;
+  border-radius:2px; overflow:hidden;
+  display:grid; grid-template-columns:1fr 1fr;
+  transform:translateY(30px) scale(.97);
+  transition:transform .4s cubic-bezier(.23,1,.32,1);
+  max-height:90vh; overflow-y:auto;
+}
+#modal.open .modal-box { transform:translateY(0) scale(1); }
+.modal-preview {
+  background:var(--bg); display:flex; align-items:center;
+  justify-content:center; position:relative; min-height:380px;
+}
+#modalCanvas { position:absolute; inset:0; width:100%; height:100%; }
+.modal-emoji { font-size:8rem; position:relative; z-index:2; filter:drop-shadow(0 12px 32px rgba(0,0,0,.15)); }
+.modal-body { padding:3rem; display:flex; flex-direction:column; }
+.modal-cat { font-size:.62rem; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:.8rem; }
+.modal-name { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; line-height:1.15; margin-bottom:1rem; }
+.modal-desc { font-size:.88rem; color:var(--muted); line-height:1.75; margin-bottom:1.5rem; font-weight:300; }
+.modal-features { margin-bottom:2rem; }
+.modal-features-title { font-size:.62rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--muted); margin-bottom:.8rem; padding-bottom:.6rem; border-bottom:1px solid var(--border); }
+.modal-features ul { list-style:none; }
+.modal-features li { display:flex; gap:.75rem; font-size:.82rem; color:var(--muted); padding:.45rem 0; border-bottom:1px solid rgba(0,0,0,.04); }
+.modal-features li::before { content:'✓'; color:var(--gold); font-weight:700; flex-shrink:0; }
+.modal-footer { margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-top:1.5rem; border-top:1px solid var(--border); }
+.modal-price-wrap .modal-old { font-size:.75rem; color:var(--muted); text-decoration:line-through; }
+.modal-price { font-family:'Cormorant Garamond',serif; font-size:2.5rem; font-weight:600; color:var(--ink); line-height:1; }
+.modal-buy { flex:1; display:flex; gap:.75rem; }
+.modal-buy-btn {
+  flex:1; padding:1rem; background:var(--ink); color:#fff;
+  border:none; border-radius:2px; font-size:.78rem; font-weight:600;
+  letter-spacing:1.5px; text-transform:uppercase; cursor:none;
+  font-family:'Outfit',sans-serif; transition:background .25s;
+}
+.modal-buy-btn:hover { background:var(--gold); }
+.modal-close {
+  position:absolute; top:1.5rem; right:1.5rem; z-index:10;
+  width:36px; height:36px; background:rgba(14,14,14,.1);
+  border:none; border-radius:50%; font-size:1.1rem; cursor:none;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s;
+}
+.modal-close:hover { background:rgba(14,14,14,.2); }
+
+/* ── TRUST STRIP ── */
+#trust {
+  padding:3rem 3.5rem;
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  background:var(--surface);
+  display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:2rem;
+}
+.trust-item { display:flex; align-items:center; gap:.9rem; }
+.ti-icon { font-size:1.5rem; }
+.ti-text h4 { font-size:.82rem; font-weight:600; color:var(--ink); }
+.ti-text p  { font-size:.72rem; color:var(--muted); font-weight:300; margin-top:.1rem; }
+
+/* ── TESTIMONIALS ── */
+#testimonials { padding:5rem 3.5rem; }
+.testi-header { text-align:center; margin-bottom:4rem; }
+.testi-eyebrow { font-size:.68rem; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:var(--muted); margin-bottom:1rem; }
+.testi-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; font-style:italic; color:var(--ink); }
+.testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
+.testi-card { padding:2rem; border:1px solid var(--border); border-radius:2px; background:var(--surface); }
+.testi-stars { color:var(--gold); font-size:.85rem; letter-spacing:2px; margin-bottom:1rem; }
+.testi-text { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-style:italic; line-height:1.7; color:var(--ink); margin-bottom:1.2rem; }
+.testi-author { font-size:.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
+.testi-role   { font-size:.68rem; color:var(--muted); font-weight:300; margin-top:.15rem; }
+
+/* ── TOAST ── */
+#toast {
+  position:fixed; bottom:2.5rem; left:50%; transform:translateX(-50%) translateY(80px);
+  background:var(--ink); color:#fff; padding:.85rem 2rem;
+  border-radius:2px; font-size:.8rem; font-weight:600; letter-spacing:.5px;
+  z-index:600; transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap;
+}
+#toast.show { transform:translateX(-50%) translateY(0); }
+
+/* ── FOOTER ── */
+footer {
+  background:var(--ink); color:rgba(255,255,255,.4);
+  padding:2.5rem 3.5rem; display:flex; justify-content:space-between;
+  align-items:center; flex-wrap:wrap; gap:1rem;
+}
+.foot-logo { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#fff; }
+.foot-links { display:flex; gap:2rem; }
+.foot-links a { color:rgba(255,255,255,.4); text-decoration:none; font-size:.75rem; letter-spacing:1px; text-transform:uppercase; transition:color .2s; }
+.foot-links a:hover { color:#fff; }
+.foot-copy { font-size:.72rem; letter-spacing:.5px; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .showcase-grid { grid-template-columns:1fr 1fr; }
+  .prod-tile.featured { grid-column:span 2; }
+}
+@media(max-width:900px){
+  nav { padding:1.2rem 2rem; }
+  .nav-links { display:none; }
+  #hero { grid-template-columns:1fr; }
+  .hero-right { height:50vw; min-height:300px; }
+  .hero-left { padding:4rem 2rem 3rem; }
+  #catbar { padding:1.2rem 2rem; overflow-x:auto; }
+  #showcase { padding:3rem 1.5rem; }
+  .showcase-grid { grid-template-columns:1fr 1fr; gap:1px; }
+  .prod-tile.featured { grid-column:span 2; flex-direction:column; }
+  .prod-tile.featured .prod-preview { width:100%; height:280px; }
+  .testi-grid { grid-template-columns:1fr 1fr; }
+  #trust { padding:2rem 1.5rem; }
+  footer { padding:2rem; }
+}
+@media(max-width:600px){
+  #cur { display:none; } body { cursor:auto; }
+  nav { padding:1rem 1.2rem; }
+  .hero-left { padding:3.5rem 1.5rem 2.5rem; }
+  .hero-h1 { font-size:2.8rem; }
+  .hero-stats { gap:2rem; }
+  #catbar { padding:1rem 1.2rem; }
+  .cat-pill { padding:.45rem .9rem; font-size:.68rem; }
+  #showcase { padding:2rem 0; }
+  .showcase-grid { grid-template-columns:1fr; gap:1px; }
+  .prod-tile.featured { grid-column:unset; }
+  .prod-tile.featured .prod-preview { height:240px; }
+  .prod-body { padding:1.4rem; }
+  .testi-grid { grid-template-columns:1fr; }
+  #testimonials { padding:3rem 1.2rem; }
+  #trust { padding:2rem 1.2rem; flex-direction:column; align-items:flex-start; gap:1.5rem; }
+  footer { flex-direction:column; text-align:center; padding:1.8rem 1.2rem; }
+  .foot-links { flex-wrap:wrap; justify-content:center; }
+  .modal-box { grid-template-columns:1fr; }
+  .modal-preview { min-height:260px; }
+  .modal-body { padding:2rem; }
+  .modal-footer { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div id="cur"><div id="cur-ring"></div><div id="cur-dot"></div></div>
+<div id="toast"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">Studio</div>
+  <ul class="nav-links">
+    <li><a href="#">All Products</a></li>
+    <li><a href="#">Digital</a></li>
+    <li><a href="#">Physical</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-cart" id="navCart">
+      <span>Cart</span>
+      <div class="cart-bubble" id="cartBubble">0</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Premium Collection</div>
+    <h1 class="hero-h1">Crafted for<br>the <em>discerning</em><br>few.</h1>
+    <p class="hero-p">A curated collection of digital tools, physical goods, and professional services — each one designed to the highest standard and built to last.</p>
+    <div class="hero-actions">
+      <a href="#showcase" class="btn-primary">Browse Collection →</a>
+      <a href="#" class="btn-ghost">Our Story</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-num">2,400<span style="font-size:1.2rem">+</span></div><div class="hs-lbl">Customers</div></div>
+      <div class="hs"><div class="hs-num">16</div><div class="hs-lbl">Products</div></div>
+      <div class="hs"><div class="hs-num">4.9<span style="font-size:1.2rem">★</span></div><div class="hs-lbl">Avg Rating</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-canvas-label">✦ Drag to interact</div>
+  </div>
+</section>
+
+<!-- ── CATEGORY FILTER ── -->
+<div id="catbar">
+  <button class="cat-pill active" data-cat="all">All <span class="cat-count">16</span></button>
+  <div class="cat-sep"></div>
+  <button class="cat-pill" data-cat="digital">Digital <span class="cat-count">6</span></button>
+  <div class="cat-sep"></div>
+  <button class="cat-pill" data-cat="physical">Physical <span class="cat-count">5</span></button>
+  <div class="cat-sep"></div>
+  <button class="cat-pill" data-cat="service">Services <span class="cat-count">5</span></button>
+</div>
+
+<!-- ── PRODUCT SHOWCASE ── -->
+<section id="showcase">
+  <div class="showcase-grid" id="prodGrid"></div>
+</section>
+
+<!-- ── TRUST STRIP ── -->
+<div id="trust">
+  <div class="trust-item"><div class="ti-icon">🔒</div><div class="ti-text"><h4>Secure Checkout</h4><p>256-bit SSL encryption on every order</p></div></div>
+  <div class="trust-item"><div class="ti-icon">⚡</div><div class="ti-text"><h4>Instant Delivery</h4><p>Digital products delivered in seconds</p></div></div>
+  <div class="trust-item"><div class="ti-icon">↩️</div><div class="ti-text"><h4>30-Day Returns</h4><p>No questions asked, full refund</p></div></div>
+  <div class="trust-item"><div class="ti-icon">🎯</div><div class="ti-text"><h4>Lifetime Updates</h4><p>Free updates on all digital products</p></div></div>
+  <div class="trust-item"><div class="ti-icon">💬</div><div class="ti-text"><h4>Priority Support</h4><p>Respond within 12 hours, guaranteed</p></div></div>
+</div>
+
+<!-- ── TESTIMONIALS ── -->
+<section id="testimonials">
+  <div class="testi-header">
+    <div class="testi-eyebrow">Customer Stories</div>
+    <h2 class="testi-title">"Worth every penny — and then some."</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-text">"The design system alone saved my team three weeks of work. Clean, thoughtful, and genuinely production-ready."</div>
+      <div class="testi-author">James Whitfield</div>
+      <div class="testi-role">Lead Designer, Notion</div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-text">"I've bought dozens of templates. This is the first one I didn't have to strip back before using. Exceptional quality."</div>
+      <div class="testi-author">Priya Nair</div>
+      <div class="testi-role">Founder, Lune Studio</div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-text">"The consulting session was worth ten times what I paid. Sharp, direct, and exactly what my business needed to hear."</div>
+      <div class="testi-author">Marcus Reid</div>
+      <div class="testi-role">CEO, Meridian Labs</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MODAL ── -->
+<div id="modal">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-preview">
+      <canvas id="modalCanvas"></canvas>
+      <div class="modal-emoji" id="modalEmoji"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat" id="modalCat"></div>
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-features">
+        <div class="modal-features-title">What's Included</div>
+        <ul id="modalFeaturesList"></ul>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-price-wrap">
+          <div class="modal-old" id="modalOld"></div>
+          <div class="modal-price" id="modalPrice"></div>
+        </div>
+        <div class="modal-buy">
+          <button class="modal-buy-btn" id="modalBuyBtn">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="modal-close" id="modalClose">✕</button>
+</div>
+
+<footer>
+  <div class="foot-logo">Studio</div>
+  <div class="foot-links">
+    <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a><a href="#">FAQ</a>
+  </div>
+  <div class="foot-copy">© 2025 Studio. All rights reserved.</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PRODUCT DATA  — edit this to match your real products!
+// ═══════════════════════════════════════════════════════════════
+const PRODUCTS = [
+  {
+    id:1, cat:'digital', featured:true,
+    name:'Pro UI Design System', emoji:'🎨',
+    badge:'badge-popular', badgeText:'Popular',
+    cat_label:'Digital · Design',
+    price:149, oldPrice:199,
+    desc:'A production-ready Figma + CSS design system with 400+ components, dark/light modes, and full token documentation. Used by 800+ designers worldwide.',
+    features:['400+ Figma components','Full CSS/Tailwind tokens','Dark & light mode','Icon set (1,200 icons)','Lifetime access & updates','Commercial licence'],
+    model:'box',
+    colors:[0x1A1A1A, 0xB8901A, 0xF9F7F4],
+  },
+  {
+    id:2, cat:'digital',
+    name:'Notion Productivity OS', emoji:'📋',
+    badge:'badge-new', badgeText:'New',
+    cat_label:'Digital · Productivity',
+    price:49,
+    desc:'All-in-one Notion workspace template. Project management, goals, journal, CRM, and finance tracker — beautifully designed.',
+    features:['10 linked databases','Weekly & daily planner','Built-in CRM','Finance tracker','Video walkthrough'],
+    model:'tablet',
+    colors:[0x2C2C2C, 0xE8E4DC, 0x888480],
+  },
+  {
+    id:3, cat:'physical',
+    name:'Merino Wool Notebook', emoji:'📓',
+    badge:'badge-bundle', badgeText:'Bundle',
+    cat_label:'Physical · Stationery',
+    price:68,
+    desc:'Hand-bound A5 notebook with merino wool cover, 200 pages of 120gsm ivory paper. Arrives with a custom brass pen.',
+    features:['A5 format, 200 pages','120gsm ivory paper','Merino wool cover','Brass pen included','Ribbon bookmark','Gift-ready packaging'],
+    model:'book',
+    colors:[0xC8A96E, 0x4A3728, 0xF5F0E8],
+  },
+  {
+    id:4, cat:'service',
+    name:'Brand Strategy Session', emoji:'🧭',
+    badge:'badge-popular', badgeText:'Popular',
+    cat_label:'Service · Strategy',
+    price:320,
+    desc:'A focused 90-minute 1-on-1 brand strategy session. Walk away with a clear positioning statement, target audience map, and 90-day action plan.',
+    features:['90-minute video call','Pre-session questionnaire','Brand positioning doc','90-day roadmap PDF','Recording + transcript','30-day follow-up check-in'],
+    model:'gem',
+    colors:[0x0E0E0E, 0xB8901A, 0x2C2C2C],
+  },
+  {
+    id:5, cat:'digital',
+    name:'Motion Graphics Pack', emoji:'✨',
+    badge:null, badgeText:'',
+    cat_label:'Digital · Motion',
+    price:89,
+    desc:'80+ After Effects and Lottie animations — titles, transitions, social overlays, and looping backgrounds. Import in one click.',
+    features:['80+ AE animations','Lottie JSON files included','4K resolution','Social-ready formats','Unlimited projects'],
+    model:'sphere',
+    colors:[0x6A3DB8, 0xF5C842, 0xFF5533],
+  },
+  {
+    id:6, cat:'physical',
+    name:'Leather Card Wallet', emoji:'👝',
+    badge:'badge-sale', badgeText:'Sale',
+    cat_label:'Physical · Accessories',
+    price:85, oldPrice:110,
+    desc:'Full-grain Italian leather slim wallet. Holds 6 cards and cash. Develops a beautiful patina over time.',
+    features:['Full-grain Italian leather','6 card slots + cash','RFID blocking liner','3 colourways available','Personalised monogram option','Ships in 2–3 days'],
+    model:'cylinder',
+    colors:[0x6B3A2A, 0xC4872A, 0xF5E6D0],
+  },
+  {
+    id:7, cat:'service',
+    name:'1-Hour Design Review', emoji:'🔍',
+    badge:null, badgeText:'',
+    cat_label:'Service · Design',
+    price:120,
+    desc:'A surgical one-hour audit of your product, website, or brand — delivered as a Loom video with timestamped feedback and a prioritised action list.',
+    features:['60-min Loom review','Written action list','Priority scoring','Figma annotations','Follow-up Q&A (15 min)'],
+    model:'ring',
+    colors:[0x1A3050, 0x4A8FCC, 0xF0F8FF],
+  },
+  {
+    id:8, cat:'physical',
+    name:'Ceramic Pour-Over Set', emoji:'☕',
+    badge:'badge-new', badgeText:'New',
+    cat_label:'Physical · Lifestyle',
+    price:95,
+    desc:'Hand-thrown stoneware pour-over set: dripper, server, and two cups. Every piece is unique, fired in a wood kiln.',
+    features:['Hand-thrown stoneware','Dripper + server + 2 cups','Wood kiln-fired','Unique glaze finish','Dishwasher safe','Gift box included'],
+    model:'torus',
+    colors:[0x7A6A5A, 0xC8B4A0, 0xF5EDE0],
+  },
+  {
+    id:9, cat:'service',
+    name:'Monthly Retainer', emoji:'🤝',
+    badge:'badge-popular', badgeText:'Popular',
+    cat_label:'Service · Ongoing',
+    price:1200,
+    desc:'Dedicated design and strategy support, 10 hours per month. Rolling contract, cancel anytime. Ideal for growing startups.',
+    features:['10 hours/month','Priority response (4h)','Weekly check-in call','Figma design delivery','Strategy & copywriting','Cancel any time'],
+    model:'diamond',
+    colors:[0x0E0E0E, 0xB8901A, 0x3A3A3A],
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════════════════════════════════
+const curEl = document.getElementById('cur');
+let cx=0,cy=0,tx=0,ty=0;
+document.addEventListener('mousemove', e=>{tx=e.clientX; ty=e.clientY;});
+(function ac(){
+  cx+=(tx-cx)*.16; cy+=(ty-cy)*.16;
+  curEl.style.left=cx+'px'; curEl.style.top=cy+'px';
+  requestAnimationFrame(ac);
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// THREE.JS HERO SCENE
+// ═══════════════════════════════════════════════════════════════
+(function heroScene(){
+  const canvas = document.getElementById('heroCanvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0,0,6);
+
+  scene.add(new THREE.AmbientLight(0xFFFFFF, 0.4));
+  const key = new THREE.DirectionalLight(0xFFF8E8, 1.8);
+  key.position.set(5,8,5); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xB8901A, 0.5);
+  fill.position.set(-5,-2,3); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xFFFFFF, 0.3);
+  rim.position.set(0,0,-8); scene.add(rim);
+
+  // Central rotating icosahedron — wirframe + solid
+  const icoGeo = new THREE.IcosahedronGeometry(1.5, 1);
+  const icoMat = new THREE.MeshPhongMaterial({color:0x0E0E0E, shininess:120, specular:0x888888});
+  const ico = new THREE.Mesh(icoGeo, icoMat);
+  scene.add(ico);
+  const wireGeo = new THREE.IcosahedronGeometry(1.52, 1);
+  const wireMat = new THREE.MeshBasicMaterial({color:0xB8901A, wireframe:true, transparent:true, opacity:0.25});
+  const wire = new THREE.Mesh(wireGeo, wireMat);
+  scene.add(wire);
+
+  // Orbiting rings
+  const ringColors = [0xB8901A, 0x888480, 0x0E0E0E];
+  const rings = [];
+  ringColors.forEach((col,i)=>{
+    const rg = new THREE.TorusGeometry(2.2+i*0.45, 0.01, 6, 80);
+    const rm = new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:0.35-i*0.08});
+    const r = new THREE.Mesh(rg, rm);
+    r.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+    scene.add(r); rings.push(r);
+  });
+
+  // Floating geometry particles
+  const floaters = [];
+  const fGeos = [
+    new THREE.OctahedronGeometry(0.12),
+    new THREE.TetrahedronGeometry(0.1),
+    new THREE.BoxGeometry(0.14,0.14,0.14),
+  ];
+  for(let i=0;i<20;i++){
+    const m = new THREE.Mesh(
+      fGeos[i%3],
+      new THREE.MeshPhongMaterial({color:i%3===0?0xB8901A:0x888480, shininess:80, transparent:true, opacity:.6})
+    );
+    const a=Math.random()*Math.PI*2, r=2.8+Math.random()*1.5;
+    m.position.set(Math.cos(a)*r, (Math.random()-.5)*3, Math.sin(a)*r);
+    m.userData={speed:(Math.random()-.5)*.015, phase:Math.random()*Math.PI*2};
+    scene.add(m); floaters.push(m);
+  }
+
+  let mx=0, my=0, isDrag=false, lastMx=0, rotY=0;
+  canvas.addEventListener('mousedown',e=>{isDrag=true; lastMx=e.clientX;});
+  window.addEventListener('mousemove',e=>{
+    if(isDrag){rotY+=(e.clientX-lastMx)*0.01; lastMx=e.clientX;}
+    mx=(e.clientX/window.innerWidth-.5)*2;
+    my=-(e.clientY/window.innerHeight-.5)*2;
+  });
+  window.addEventListener('mouseup',()=>isDrag=false);
+
+  canvas.addEventListener('touchstart',e=>{isDrag=true; lastMx=e.touches[0].clientX;},{passive:true});
+  canvas.addEventListener('touchmove',e=>{if(isDrag){rotY+=(e.touches[0].clientX-lastMx)*0.012; lastMx=e.touches[0].clientX;}},{passive:true});
+  canvas.addEventListener('touchend',()=>isDrag=false);
+
+  function resize(){
+    const hero = document.querySelector('.hero-right');
+    const w=hero.clientWidth, h=hero.clientHeight||window.innerHeight;
+    renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();
+  }
+  resize(); window.addEventListener('resize',()=>setTimeout(resize,100));
+
+  let t=0;
+  (function loop(){
+    requestAnimationFrame(loop); t+=0.008;
+    ico.rotation.y = rotY + t*0.3;
+    ico.rotation.x = Math.sin(t*0.4)*0.3;
+    wire.rotation.copy(ico.rotation);
+    rings[0].rotation.x+=0.005; rings[0].rotation.y+=0.008;
+    rings[1].rotation.y-=0.006; rings[1].rotation.z+=0.004;
+    rings[2].rotation.x-=0.004; rings[2].rotation.z-=0.007;
+    floaters.forEach(f=>{
+      f.rotation.x+=f.userData.speed; f.rotation.y+=f.userData.speed*1.3;
+      f.position.y+=Math.sin(t*0.8+f.userData.phase)*0.004;
+    });
+    camera.position.x+=(mx*0.5-camera.position.x)*0.04;
+    camera.position.y+=(my*0.4-camera.position.y)*0.04;
+    camera.lookAt(scene.position);
+    renderer.render(scene,camera);
+  })();
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD PRODUCT MODELS (per-product Three.js scene)
+// ═══════════════════════════════════════════════════════════════
+function buildProductScene(canvasEl, model, colors) {
+  if(!canvasEl || canvasEl._init) return;
+  canvasEl._init = true;
+  const renderer = new THREE.WebGLRenderer({canvas:canvasEl, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50);
+  camera.position.set(0,0,5);
+
+  scene.add(new THREE.AmbientLight(0xFFFFFF, 0.5));
+  const key = new THREE.DirectionalLight(0xFFF8E8, 1.6);
+  key.position.set(4,6,4); scene.add(key);
+  const fill = new THREE.DirectionalLight(colors[1]||0xB8901A, 0.5);
+  fill.position.set(-4,-2,2); scene.add(fill);
+
+  let mesh;
+  const c = colors[0]||0x0E0E0E;
+  const mat = new THREE.MeshPhongMaterial({color:c, shininess:100, specular:0x444444});
+  const mat2 = new THREE.MeshPhongMaterial({color:colors[1]||0xB8901A, shininess:60});
+
+  if(model==='box'){
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(1.8,1.8,1.8), mat));
+    const edge = new THREE.Mesh(new THREE.BoxGeometry(1.85,1.85,1.85), new THREE.MeshBasicMaterial({color:colors[1], wireframe:true, transparent:true, opacity:0.25}));
+    g.add(edge); mesh = g;
+  } else if(model==='sphere'){
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(1.2,32,32), mat));
+    for(let i=0;i<3;i++){
+      const r = new THREE.Mesh(new THREE.TorusGeometry(1.5+i*0.3,0.015,8,64), new THREE.MeshBasicMaterial({color:colors[i%2+1]||0xB8901A,transparent:true,opacity:.4}));
+      r.rotation.set(i*Math.PI/3, i*Math.PI/4, 0); g.add(r);
+    }
+    mesh = g;
+  } else if(model==='tablet'){
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(2.4,1.6,0.12), mat));
+    const screen = new THREE.Mesh(new THREE.BoxGeometry(2.2,1.4,0.02), new THREE.MeshBasicMaterial({color:colors[2]||0xF9F7F4}));
+    screen.position.z=0.07; g.add(screen);
+    const lines = [0.3,0,-0.3].map(y=>{
+      const l = new THREE.Mesh(new THREE.BoxGeometry(1.6,0.06,0.01), new THREE.MeshBasicMaterial({color:colors[1]||0x888480,transparent:true,opacity:0.4}));
+      l.position.set(0,y,0.09); return l;
+    }); lines.forEach(l=>g.add(l));
+    mesh = g;
+  } else if(model==='book'){
+    const g = new THREE.Group();
+    const cover = new THREE.Mesh(new THREE.BoxGeometry(1.4,1.9,0.25), mat);
+    g.add(cover);
+    const pages = new THREE.Mesh(new THREE.BoxGeometry(1.35,1.84,0.22), new THREE.MeshPhongMaterial({color:0xFFF8F0,shininess:20}));
+    pages.position.x=0.01; pages.position.z=0.01; g.add(pages);
+    const spine = new THREE.Mesh(new THREE.BoxGeometry(0.08,1.9,0.26), mat2);
+    spine.position.x=-0.74; g.add(spine);
+    mesh = g;
+  } else if(model==='gem'){
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.OctahedronGeometry(1.3,0), mat));
+    const inner = new THREE.Mesh(new THREE.OctahedronGeometry(0.8,0), new THREE.MeshPhongMaterial({color:colors[1],shininess:200,specular:0xFFFFFF,transparent:true,opacity:0.7}));
+    g.add(inner); mesh = g;
+  } else if(model==='cylinder'){
+    mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.8,1.8,32), mat);
+  } else if(model==='ring'){
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.TorusGeometry(1.2,0.35,16,64), mat));
+    const inner2 = new THREE.Mesh(new THREE.TorusGeometry(1.2,0.32,16,64), mat2);
+    inner2.scale.set(0.7,0.7,0.7); g.add(inner2);
+    mesh = g;
+  } else if(model==='torus'){
+    mesh = new THREE.Mesh(new THREE.TorusGeometry(1.1,0.45,20,64), mat);
+  } else if(model==='diamond'){
+    const g = new THREE.Group();
+    const top = new THREE.Mesh(new THREE.ConeGeometry(1.1,0.9,8), mat);
+    top.position.y=0.45; g.add(top);
+    const bot = new THREE.Mesh(new THREE.ConeGeometry(1.1,1.1,8), mat);
+    bot.rotation.z=Math.PI; bot.position.y=-0.55; g.add(bot);
+    mesh = g;
+  } else {
+    mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2,1), mat);
+  }
+
+  scene.add(mesh);
+
+  // Ambient particles
+  const pGeo = new THREE.BufferGeometry();
+  const pPos = new Float32Array(120);
+  for(let i=0;i<40;i++){pPos[i*3]=(Math.random()-.5)*6;pPos[i*3+1]=(Math.random()-.5)*6;pPos[i*3+2]=(Math.random()-.5)*4-2;}
+  pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+  scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({color:colors[1]||0xB8901A,size:0.04,transparent:true,opacity:0.5})));
+
+  function resize(){
+    const w=canvasEl.offsetWidth, h=canvasEl.offsetHeight;
+    if(w>0&&h>0){renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();}
+  }
+  resize(); window.addEventListener('resize',()=>setTimeout(resize,100));
+
+  let t=0;
+  (function loop(){
+    requestAnimationFrame(loop); t+=0.012;
+    if(mesh){mesh.rotation.y=t*0.6; mesh.rotation.x=Math.sin(t*0.4)*0.2; mesh.position.y=Math.sin(t*0.7)*0.08;}
+    renderer.render(scene,camera);
+  })();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER PRODUCTS
+// ═══════════════════════════════════════════════════════════════
+let cart = 0;
+let currentCat = 'all';
+
+function renderProducts(cat='all') {
+  const grid = document.getElementById('prodGrid');
+  const items = cat==='all' ? PRODUCTS : PRODUCTS.filter(p=>p.cat===cat);
+  grid.innerHTML = items.map((p,idx) => `
+    <div class="prod-tile${idx===0&&cat==='all'?' featured':''}" data-id="${p.id}">
+      <div class="prod-preview">
+        <canvas class="preview-canvas" id="pcanvas${p.id}"></canvas>
+        <div class="prod-emoji">${p.emoji}</div>
+        ${p.badge ? `<div class="prod-badge ${p.badge}">${p.badgeText}</div>` : ''}
+      </div>
+      <div class="prod-body">
+        <div class="prod-cat">${p.cat_label}</div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-desc">${p.desc}</div>
+        <div class="prod-features">
+          <button class="features-toggle" data-id="${p.id}">
+            What's included <span class="ft-arrow">↓</span>
+          </button>
+          <ul class="features-list" id="fl${p.id}">
+            ${p.features.map(f=>`<li>${f}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="prod-footer">
+          <div class="prod-pricing">
+            ${p.oldPrice ? `<div class="prod-old-price">$${p.oldPrice}</div>` : ''}
+            <div class="prod-price"><sup>$</sup>${p.price}</div>
+          </div>
+          <button class="buy-btn" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}">
+            Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Init canvases after render
+  setTimeout(()=>{
+    items.forEach(p=>{
+      const c = document.getElementById('pcanvas'+p.id);
+      if(c) buildProductScene(c, p.model, p.colors);
+    });
+  }, 80);
+
+  // Bind events
+  bindProductEvents();
+}
+
+function bindProductEvents(){
+  // Feature toggles
+  document.querySelectorAll('.features-toggle').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const list = document.getElementById('fl'+id);
+      const isOpen = list.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.features-list').forEach(l=>l.classList.remove('open'));
+      document.querySelectorAll('.features-toggle').forEach(b=>b.classList.remove('open'));
+      if(!isOpen){ list.classList.add('open'); btn.classList.add('open'); }
+    });
+  });
+
+  // Buy buttons on tiles
+  document.querySelectorAll('.buy-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const id = +btn.dataset.id;
+      const p = PRODUCTS.find(x=>x.id===id);
+      addToCart(p, btn);
+    });
+    btn.addEventListener('mouseenter',()=>document.body.classList.add('hover-buy'));
+    btn.addEventListener('mouseleave',()=>document.body.classList.remove('hover-buy'));
+  });
+
+  // Product tile click → modal
+  document.querySelectorAll('.prod-tile').forEach(tile=>{
+    tile.addEventListener('click', e=>{
+      if(e.target.closest('.buy-btn')||e.target.closest('.features-toggle')) return;
+      const id = +tile.dataset.id;
+      openModal(id);
+    });
+    tile.addEventListener('mouseenter',()=>document.body.classList.add('hover-card'));
+    tile.addEventListener('mouseleave',()=>document.body.classList.remove('hover-card'));
+  });
+
+  // Cursor on all interactive
+  document.querySelectorAll('a,button,input,select,.prod-tile,.nav-cart').forEach(el=>{
+    el.addEventListener('mouseenter',()=>curEl.classList.add ? undefined : undefined);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CART
+// ═══════════════════════════════════════════════════════════════
+function addToCart(p, btn) {
+  cart++;
+  document.getElementById('cartBubble').textContent = cart;
+  if(btn){ btn.textContent='✓ Added'; btn.classList.add('bought'); setTimeout(()=>{btn.textContent='Buy Now'; btn.classList.remove('bought');}, 2000); }
+  showToast(`${p.emoji} ${p.name} added to cart`);
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════
+let modalRenderer = null;
+
+function openModal(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('modalCat').textContent   = p.cat_label;
+  document.getElementById('modalName').textContent  = p.name;
+  document.getElementById('modalDesc').textContent  = p.desc;
+  document.getElementById('modalEmoji').textContent = p.emoji;
+  document.getElementById('modalOld').textContent   = p.oldPrice ? '$'+p.oldPrice : '';
+  document.getElementById('modalPrice').innerHTML   = `<sup>$</sup>${p.price}`;
+  document.getElementById('modalFeaturesList').innerHTML = p.features.map(f=>`<li>${f}</li>`).join('');
+
+  const buyBtn = document.getElementById('modalBuyBtn');
+  buyBtn.textContent = 'Add to Cart';
+  buyBtn.onclick = ()=>{ addToCart(p, buyBtn); closeModal(); };
+
+  // Init modal canvas
+  const mc = document.getElementById('modalCanvas');
+  mc._init = false;
+  buildProductScene(mc, p.model, p.colors);
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modal').addEventListener('click', e=>{
+  if(e.target === document.getElementById('modal')) closeModal();
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+// ═══════════════════════════════════════════════════════════════
+// CATEGORY FILTER
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.cat-pill').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = btn.dataset.cat;
+    renderProducts(currentCat);
+  });
+  btn.addEventListener('mouseenter',()=>document.body.classList.add('hover-card'));
+  btn.addEventListener('mouseleave',()=>document.body.classList.remove('hover-card'));
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+renderProducts('all');
+</script>
+</body>
+</html>
