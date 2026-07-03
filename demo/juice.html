@@ -1,450 +1,460 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZEST — Cold Pressed Juice</title>
+<title>مداد — تعلّم بايثون بالعربية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-:root{--sun:#FFD600;--orange:#FF5C00;--pink:#FF3CAC;--lime:#7BFF00;--sky:#00C2FF;--mint:#00FFB2;--white:#FFFEF7;--ink:#1A0A00;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--white);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden;cursor:none;}
-#cursor{position:fixed;width:18px;height:18px;background:var(--orange);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s;mix-blend-mode:multiply;}
-#cursor.big{width:50px;height:50px;}
-#threebg{position:fixed;top:0;left:0;z-index:0;pointer-events:none;}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.4rem 4rem;background:rgba(255,254,247,.92);backdrop-filter:blur(12px);border-bottom:2.5px solid var(--ink);}
-.logo{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;color:var(--orange);letter-spacing:-2px;}
-nav ul{list-style:none;display:flex;gap:2.5rem;}
-nav a{color:var(--ink);text-decoration:none;font-weight:600;font-size:.85rem;letter-spacing:.5px;text-transform:uppercase;}
-.nav-cta{background:var(--orange);color:var(--white)!important;padding:.65rem 1.8rem;border-radius:100px;border:2px solid var(--ink);}
-#hero{position:relative;z-index:10;min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;padding:8rem 4rem 5rem;gap:5rem;background:linear-gradient(125deg,#FFF5A0 0%,#FFE5C0 35%,#FFD0E8 65%,#C0F0FF 100%);}
-.pill{display:inline-flex;align-items:center;gap:.5rem;background:var(--orange);color:var(--white);padding:.45rem 1.3rem;border-radius:100px;font-size:.75rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2rem;border:2px solid var(--ink);}
-.dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:blink 1s infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-h1{font-family:'Fraunces',serif;font-size:clamp(4rem,7vw,6.5rem);font-weight:900;line-height:.92;letter-spacing:-3px;margin-bottom:1.5rem;}
-h1 .splash{color:var(--orange);font-style:italic;}
-.sub{font-size:1.1rem;line-height:1.75;color:rgba(26,10,0,.65);max-width:420px;margin-bottom:3rem;}
-.hero-btns{display:flex;gap:1rem;}
-.btn-dark{display:inline-flex;align-items:center;gap:.75rem;background:var(--ink);color:var(--white);padding:1rem 2.5rem;border-radius:100px;font-weight:700;font-size:.95rem;text-decoration:none;transition:transform .3s,box-shadow .3s;border:2px solid var(--ink);}
-.btn-dark:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(26,10,0,.25);}
-.btn-outline{display:inline-flex;align-items:center;gap:.75rem;background:transparent;color:var(--ink);padding:1rem 2.5rem;border-radius:100px;font-weight:700;font-size:.95rem;border:2px solid var(--ink);text-decoration:none;transition:background .25s;}
-.btn-outline:hover{background:var(--ink);color:var(--white);}
+  :root{
+    --ink:#1B1B2F;
+    --ink-2:#242440;
+    --parchment:#F7F3E9;
+    --parchment-dim:#E8E3D3;
+    --gold:#D4A574;
+    --gold-bright:#E6BE8A;
+    --teal:#4A7C7C;
+    --teal-bright:#5F9E9E;
+    --danger:#C97064;
+    --radius:10px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--parchment);
+    font-family:'Tajawal',sans-serif;
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  code, pre, .mono{
+    font-family:'JetBrains Mono',monospace;
+    direction:ltr;
+    text-align:left;
+    unicode-bidi:isolate;
+  }
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--gold);color:var(--ink);}
 
-/* BOTTLE VIEWER */
-.bottle-viewer{position:relative;height:520px;border-radius:28px;overflow:hidden;border:2.5px solid var(--ink);background:linear-gradient(135deg,#FFF8D0,#FFE8F4,#D0F0FF);}
-#bottleCanvas{width:100%;height:100%;display:block;}
-.bottle-btns{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);display:flex;gap:.7rem;z-index:10;}
-.bbtn{border:2px solid var(--ink);border-radius:100px;padding:.45rem 1.2rem;font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s,color .2s;}
-.bbtn.active{background:var(--orange);color:#fff;}
-.bbtn:not(.active){background:rgba(255,255,255,.7);color:var(--ink);}
-.drag-hint{position:absolute;top:1.2rem;right:1.2rem;font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(26,10,0,.3);}
+  /* ---------- utility ---------- */
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+  .gold-rule{
+    width:56px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-bright));
+    border-radius:2px;margin:14px 0;
+  }
+  .eyebrow{
+    color:var(--gold);font-family:'JetBrains Mono',monospace;direction:ltr;
+    font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:inline-block;
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:14px 28px;border-radius:8px;font-weight:700;font-size:16px;
+    border:none;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
+    font-family:'Tajawal',sans-serif;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-bright));color:var(--ink);box-shadow:0 8px 24px -8px rgba(212,165,116,.5);}
+  .btn-ghost{background:transparent;color:var(--parchment);border:1.5px solid rgba(247,243,233,.25);}
+  .btn-ghost:hover{border-color:var(--gold);}
 
-.ticker{position:relative;z-index:10;background:var(--ink);padding:.85rem 0;overflow:hidden;}
-.ticker-track{display:flex;gap:0;white-space:nowrap;animation:tick 18s linear infinite;}
-.ticker-item{padding:0 2.5rem;font-size:.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sun);}
-.ticker-item span{color:rgba(255,255,255,.3);margin-left:2.5rem;}
-@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(27,27,47,.85);backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(247,243,233,.08);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;}
+  .logo-mark{
+    width:34px;height:34px;border-radius:8px;
+    background:linear-gradient(135deg,var(--gold),var(--teal));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;color:var(--ink);font-weight:700;font-size:16px;
+  }
+  .nav-links{display:flex;gap:32px;align-items:center;}
+  .nav-links a{font-size:15px;color:var(--parchment-dim);transition:color .15s;}
+  .nav-links a:hover{color:var(--gold);}
 
-#flavors{position:relative;z-index:10;padding:8rem 4rem;background:var(--white);}
-.sh{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;}
-.stag{font-size:.7rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--orange);margin-bottom:.5rem;}
-.stitle{font-family:'Fraunces',serif;font-size:clamp(2.5rem,4vw,3.8rem);font-weight:900;letter-spacing:-2px;line-height:1.05;}
-.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;}
-.fc{border-radius:28px;overflow:hidden;border:2.5px solid var(--ink);transition:transform .4s,box-shadow .4s;cursor:none;}
-.fc:hover{transform:translateY(-10px);box-shadow:6px 10px 0 var(--ink);}
-.ft{padding:3rem 2rem 2rem;text-align:center;}
-.fc:nth-child(1) .ft{background:linear-gradient(145deg,#FFD600,#FF8C00);}
-.fc:nth-child(2) .ft{background:linear-gradient(145deg,#00FFB2,#00C2FF);}
-.fc:nth-child(3) .ft{background:linear-gradient(145deg,#FF3CAC,#FF8C00);}
-.fc:nth-child(4) .ft{background:linear-gradient(145deg,#7BFF00,#FFD600);}
-.fc:nth-child(5) .ft{background:linear-gradient(145deg,#00C2FF,#7BFF00);}
-.fc:nth-child(6) .ft{background:linear-gradient(145deg,#FF5C00,#FF3CAC);}
-.fi2{font-size:4rem;display:block;margin-bottom:.5rem;animation:float 3s ease-in-out infinite;}
-.fc:nth-child(2) .fi2{animation-delay:-.5s;}
-.fc:nth-child(3) .fi2{animation-delay:-1s;}
-.fc:nth-child(4) .fi2{animation-delay:-1.5s;}
-.fc:nth-child(5) .fi2{animation-delay:-2s;}
-.fc:nth-child(6) .fi2{animation-delay:-2.5s;}
-@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-.fb{padding:1.5rem 2rem;background:#fff;}
-.fn{font-family:'Fraunces',serif;font-size:1.25rem;font-weight:900;margin-bottom:.3rem;}
-.fd{font-size:.8rem;color:rgba(26,10,0,.5);line-height:1.5;margin-bottom:1rem;}
-.ff{display:flex;justify-content:space-between;align-items:center;}
-.fp{font-weight:700;font-size:1.1rem;}
-.ab{background:var(--ink);color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:1.4rem;cursor:none;display:flex;align-items:center;justify-content:center;transition:background .2s;line-height:1;}
-.ab:hover{background:var(--orange);}
+  /* ---------- hero ---------- */
+  .hero{padding:88px 0 96px;position:relative;}
+  .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
+  .hero h1{
+    font-size:52px;font-weight:900;line-height:1.25;margin:18px 0 20px;
+  }
+  .hero h1 span{color:var(--gold);}
+  .hero p.lead{font-size:18px;color:var(--parchment-dim);max-width:480px;margin-bottom:32px;}
+  .hero-cta{display:flex;gap:14px;}
 
-#process{position:relative;z-index:10;background:linear-gradient(135deg,#FFF5A0,#C0FFF0);padding:7rem 4rem;border-top:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);}
-.proc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-top:4rem;}
-.proc-step{background:#fff;border-radius:24px;padding:2.5rem 2rem;border:2px solid var(--ink);text-align:center;transition:transform .3s;}
-.proc-step:hover{transform:translateY(-6px);}
-.step-icon{font-size:2.5rem;margin-bottom:1rem;display:block;}
-.step-n{font-size:.65rem;font-weight:700;letter-spacing:3px;color:var(--orange);margin-bottom:.5rem;text-transform:uppercase;}
-.proc-step h4{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:900;margin-bottom:.5rem;}
-.proc-step p{font-size:.85rem;color:rgba(26,10,0,.55);line-height:1.6;}
+  .editor-card{
+    background:var(--ink-2);border-radius:var(--radius);
+    border:1px solid rgba(247,243,233,.1);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.6);
+    overflow:hidden;
+  }
+  .editor-titlebar{
+    display:flex;align-items:center;gap:8px;padding:12px 16px;
+    background:rgba(0,0,0,.2);border-bottom:1px solid rgba(247,243,233,.08);
+  }
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .dot-r{background:#e0645a;} .dot-y{background:#e0b84a;} .dot-g{background:#5ec26a;}
+  .editor-filename{margin-inline-start:10px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--parchment-dim);}
+  #hero-code{
+    width:100%;min-height:210px;background:transparent;color:var(--parchment);
+    border:none;outline:none;resize:vertical;padding:18px;font-size:14.5px;line-height:1.65;
+  }
+  .editor-actions{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 16px;border-top:1px solid rgba(247,243,233,.08);background:rgba(0,0,0,.15);
+  }
+  .run-btn{
+    background:var(--teal);color:var(--parchment);border:none;padding:9px 18px;
+    border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+    cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s;
+  }
+  .run-btn:hover{background:var(--teal-bright);}
+  .run-btn:disabled{opacity:.5;cursor:wait;}
+  .pyodide-status{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--parchment-dim);}
+  .output-pane{
+    background:#131322;padding:14px 18px;font-family:'JetBrains Mono',monospace;
+    font-size:13.5px;color:#a8e6b8;min-height:64px;max-height:180px;overflow:auto;
+    border-top:1px solid rgba(247,243,233,.08);white-space:pre-wrap;
+  }
+  .output-pane.err{color:#e88b82;}
+  .output-pane .placeholder{color:rgba(247,243,233,.3);}
 
-#sstats{position:relative;z-index:10;background:var(--orange);padding:5rem 4rem;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;border-top:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);}
-.sbox{text-align:center;padding:2rem;background:rgba(255,255,255,.15);border-radius:20px;border:2px solid rgba(255,255,255,.25);}
-.snum{font-family:'Fraunces',serif;font-size:3.5rem;font-weight:900;color:#fff;line-height:1;}
-.slbl{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-top:.5rem;}
+  /* ---------- sections shared ---------- */
+  section{padding:96px 0;}
+  .section-head{max-width:640px;margin-bottom:56px;}
+  .section-head h2{font-size:34px;font-weight:900;margin-top:10px;}
+  .section-head p{color:var(--parchment-dim);font-size:16.5px;margin-top:14px;}
 
-#cta{position:relative;z-index:10;background:linear-gradient(135deg,var(--lime),var(--sky));padding:8rem 4rem;text-align:center;border-top:2.5px solid var(--ink);}
-#cta h2{font-family:'Fraunces',serif;font-size:clamp(3rem,6vw,5.5rem);font-weight:900;letter-spacing:-3px;color:var(--ink);margin-bottom:1.5rem;line-height:1.05;}
-#cta p{font-size:1.1rem;color:rgba(26,10,0,.6);margin-bottom:3rem;max-width:420px;margin-left:auto;margin-right:auto;}
-footer{position:relative;z-index:10;background:var(--ink);color:#fff;padding:2.5rem 4rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}
+  /* ---------- why cards ---------- */
+  .why{background:var(--ink-2);}
+  .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .why-card{
+    background:var(--ink);border:1px solid rgba(247,243,233,.08);border-radius:var(--radius);
+    padding:28px;transition:border-color .2s, transform .2s;
+  }
+  .why-card:hover{border-color:var(--gold);transform:translateY(-4px);}
+  .why-icon{
+    width:44px;height:44px;border-radius:9px;background:rgba(212,165,116,.12);
+    display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;
+  }
+  .why-card h3{font-size:18px;font-weight:700;margin-bottom:8px;}
+  .why-card p{color:var(--parchment-dim);font-size:14.5px;}
 
-.fade-up{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease;}
-.fade-up.vis{opacity:1;transform:translateY(0);}
+  /* ---------- course path (horizontal RTL trail) ---------- */
+  .path-scroll{
+    display:flex;gap:20px;overflow-x:auto;padding:8px 4px 20px;
+    scroll-snap-type:x mandatory;
+  }
+  .path-scroll::-webkit-scrollbar{height:6px;}
+  .path-scroll::-webkit-scrollbar-thumb{background:rgba(247,243,233,.15);border-radius:3px;}
+  .path-card{
+    scroll-snap-align:start;
+    min-width:240px;flex:0 0 240px;
+    background:var(--ink-2);border:1px solid rgba(247,243,233,.08);
+    border-radius:var(--radius);padding:22px;position:relative;
+    transition:border-color .2s;
+  }
+  .path-card.locked{opacity:.55;}
+  .path-card:not(.locked):hover{border-color:var(--teal);}
+  .path-step-label{
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal-bright);
+    direction:ltr;text-align:right;
+  }
+  .path-card h4{font-size:17px;font-weight:700;margin:10px 0 8px;}
+  .path-card p{font-size:13.5px;color:var(--parchment-dim);margin-bottom:14px;}
+  .path-status{
+    font-size:12px;font-family:'JetBrains Mono',monospace;
+    display:inline-flex;align-items:center;gap:6px;color:var(--gold);
+  }
+  .path-status.locked-status{color:rgba(247,243,233,.4);}
 
-@media(max-width:900px){
-  nav{padding:1.2rem 2rem;}nav ul{gap:1.5rem;}
-  #hero{grid-template-columns:1fr;padding:7rem 2rem 4rem;gap:3rem;}
-  .fg{grid-template-columns:1fr 1fr;}.proc-grid{grid-template-columns:1fr 1fr;}
-  #sstats{grid-template-columns:1fr 1fr;padding:4rem 2rem;}
-  #cta{padding:6rem 2rem;}footer{flex-direction:column;gap:.75rem;text-align:center;padding:2rem;}
-}
-@media(max-width:600px){
-  #cursor{display:none;}body{cursor:auto;}nav{padding:1rem 1.2rem;}nav ul{display:none;}.nav-cta{display:none;}
-  #hero{padding:5.5rem 1.2rem 3rem;gap:2rem;}
-  .hero-btns{flex-direction:column;}.btn-dark,.btn-outline{width:100%;justify-content:center;}
-  #flavors{padding:5rem 1.2rem;}.fg{grid-template-columns:1fr 1fr;gap:1rem;}
-  #process{padding:5rem 1.2rem;}.proc-grid{grid-template-columns:1fr 1fr;gap:1rem;}
-  #sstats{grid-template-columns:1fr 1fr;padding:3rem 1.2rem;gap:1rem;}
-  #cta{padding:5rem 1.2rem;}footer{padding:1.5rem 1.2rem;}
-}
+  /* ---------- lesson section ---------- */
+  .lesson{background:var(--ink-2);}
+  .lesson-shell{
+    display:grid;grid-template-columns:340px 1fr;gap:0;
+    border:1px solid rgba(247,243,233,.1);border-radius:14px;overflow:hidden;
+    box-shadow:0 30px 70px -30px rgba(0,0,0,.6);
+  }
+  .lesson-instructions{
+    background:var(--ink);padding:36px 30px;border-inline-end:1px solid rgba(247,243,233,.08);
+  }
+  .lesson-step-tag{
+    display:inline-block;background:rgba(212,165,116,.14);color:var(--gold);
+    font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 10px;border-radius:5px;
+    margin-bottom:14px;direction:ltr;
+  }
+  .lesson-instructions h3{font-size:22px;font-weight:700;margin-bottom:14px;}
+  .lesson-instructions p{color:var(--parchment-dim);font-size:15px;margin-bottom:14px;}
+  .lesson-instructions ul{margin:0 0 18px 0;padding-inline-start:20px;color:var(--parchment-dim);font-size:14.5px;}
+  .lesson-instructions li{margin-bottom:8px;}
+  .hint-box{
+    background:rgba(74,124,124,.12);border:1px solid rgba(74,124,124,.35);
+    border-radius:8px;padding:14px 16px;font-size:13.5px;color:var(--teal-bright);margin-top:10px;
+  }
+  .lesson-editor-area{display:flex;flex-direction:column;background:var(--ink-2);}
+  .lesson-editor-area #lesson-code{
+    flex:1;min-height:260px;background:#15152a;color:var(--parchment);
+    border:none;outline:none;resize:none;padding:22px;font-size:14.5px;line-height:1.7;
+  }
+  .check-result{
+    padding:12px 18px;font-family:'JetBrains Mono',monospace;font-size:13px;
+    border-top:1px solid rgba(247,243,233,.08);
+  }
+  .check-result.pass{background:rgba(94,194,106,.1);color:#8fd89b;}
+  .check-result.fail{background:rgba(224,100,90,.1);color:#e69a92;}
+  .check-result.idle{background:transparent;color:var(--parchment-dim);}
+
+  /* ---------- footer ---------- */
+  footer{padding:48px 0;border-top:1px solid rgba(247,243,233,.08);}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  footer p{color:var(--parchment-dim);font-size:13.5px;}
+
+  @media (max-width:880px){
+    .hero-grid{grid-template-columns:1fr;}
+    .why-grid{grid-template-columns:1fr;}
+    .lesson-shell{grid-template-columns:1fr;}
+    .lesson-instructions{border-inline-end:none;border-bottom:1px solid rgba(247,243,233,.08);}
+    .hero h1{font-size:38px;}
+  }
 </style>
 </head>
 <body>
-<div id="cursor"></div>
-<canvas id="threebg"></canvas>
 
 <nav>
-  <div class="logo">ZEST</div>
-  <ul>
-    <li><a href="#flavors">Flavors</a></li>
-    <li><a href="#process">Process</a></li>
-    <li><a href="#">Story</a></li>
-    <li><a href="#" class="nav-cta">Order Now</a></li>
-  </ul>
+  <div class="wrap">
+    <div class="logo"><span class="logo-mark">م</span> مداد</div>
+    <div class="nav-links">
+      <a href="#why">لماذا بايثون</a>
+      <a href="#path">المسار</a>
+      <a href="#lesson">جرّب درسًا</a>
+      <a href="#" class="btn btn-primary" style="padding:9px 20px;font-size:14px;">ابدأ مجانًا</a>
+    </div>
+  </div>
 </nav>
 
-<section id="hero">
-  <div>
-    <div class="pill"><div class="dot"></div>100% Organic</div>
-    <h1>Life is<br><span class="splash">Sweeter</span><br>juiced.</h1>
-    <p class="sub">Cold-pressed juices bursting with colour, flavour, and nutrients. No added sugar. No nonsense. Pure fruit magic, bottled daily.</p>
-    <div class="hero-btns">
-      <a href="#flavors" class="btn-dark">Shop All Juices →</a>
-      <a href="#" class="btn-outline">Start a Cleanse</a>
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">LEARN PYTHON — IN ARABIC</span>
+      <h1>تعلّم البرمجة <span>بلغتك</span>، بدءًا من أول سطر كود</h1>
+      <p class="lead">دروس تفاعلية بلغة بايثون، بشرح عربي واضح خطوة بخطوة، ومحرر كود حقيقي يعمل مباشرة من متصفحك — بدون تثبيت أي برنامج.</p>
+      <div class="hero-cta">
+        <a href="#lesson" class="btn btn-primary">جرّب أول درس مجانًا</a>
+        <a href="#path" class="btn btn-ghost">استعرض المسار</a>
+      </div>
+    </div>
+
+    <div class="editor-card">
+      <div class="editor-titlebar">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="editor-filename">hello.py</span>
+      </div>
+      <textarea id="hero-code" class="mono" spellcheck="false"># Try editing this, then press Run
+name = "World"
+print(f"Hello, {name}!")
+
+for i in range(3):
+    print("Learning Python:", i + 1)</textarea>
+      <div class="editor-actions">
+        <button id="hero-run" class="run-btn" disabled>
+          <span id="hero-run-icon">▶</span> <span id="hero-run-label">تحميل المُفسّر...</span>
+        </button>
+        <span class="pyodide-status" id="hero-status">Pyodide: loading…</span>
+      </div>
+      <div class="output-pane" id="hero-output"><span class="placeholder">سيظهر ناتج الكود هنا بعد الضغط على Run</span></div>
     </div>
   </div>
-  <div class="bottle-viewer">
-    <canvas id="bottleCanvas"></canvas>
-    <div class="bottle-btns">
-      <button class="bbtn active" data-idx="0">Solar 🍊</button>
-      <button class="bbtn" data-idx="1">Greens 🥬</button>
-      <button class="bbtn" data-idx="2">Berry 🍇</button>
+</header>
+
+<section class="why" id="why">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">WHY PYTHON</span>
+      <h2>لماذا نبدأ ببايثون؟</h2>
+      <p>بايثون هي أنسب لغة لأول تجربة برمجية: صياغتها قريبة من اللغة الطبيعية، ومستخدمة فعليًا في الذكاء الاصطناعي وتحليل البيانات وتطوير الويب.</p>
     </div>
-    <div class="drag-hint">✦ Drag to rotate</div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">🪶</div>
+        <h3>صياغة بسيطة وواضحة</h3>
+        <p>أقرب لغات البرمجة للقراءة الطبيعية، ما يجعل التركيز على المنطق لا على تعقيد الرموز.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">⚙️</div>
+        <h3>تُستخدم في كل مكان</h3>
+        <p>من الذكاء الاصطناعي إلى الأتمتة وتحليل البيانات وتطوير الويب — مهارة واحدة، استخدامات لا تنتهي.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">💻</div>
+        <h3>تشغيل فوري من المتصفح</h3>
+        <p>كل دروسنا تعمل مباشرة في متصفحك عبر محرك بايثون حقيقي — بدون تثبيت أي شيء.</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<div class="ticker"><div class="ticker-track" id="tt"></div></div>
-
-<section id="flavors">
-  <div class="sh">
-    <div><p class="stag">// Our Collection</p><h2 class="stitle">Pick Your<br>Colour.</h2></div>
-  </div>
-  <div class="fg">
-    <div class="fc fade-up"><div class="ft"><em class="fi2">🍊</em></div><div class="fb"><h3 class="fn">Solar Burst</h3><p class="fd">Orange · Carrot · Ginger · Turmeric</p><div class="ff"><span class="fp">$9.50</span><button class="ab">+</button></div></div></div>
-    <div class="fc fade-up"><div class="ft"><em class="fi2">🥬</em></div><div class="fb"><h3 class="fn">Deep Green</h3><p class="fd">Cucumber · Spinach · Apple · Mint</p><div class="ff"><span class="fp">$10.00</span><button class="ab">+</button></div></div></div>
-    <div class="fc fade-up"><div class="ft"><em class="fi2">🍇</em></div><div class="fb"><h3 class="fn">Berry Bomb</h3><p class="fd">Blueberry · Raspberry · Acai · Lemon</p><div class="ff"><span class="fp">$10.50</span><button class="ab">+</button></div></div></div>
-    <div class="fc fade-up"><div class="ft"><em class="fi2">🍍</em></div><div class="fb"><h3 class="fn">Tropic High</h3><p class="fd">Pineapple · Mango · Coconut · Lime</p><div class="ff"><span class="fp">$9.50</span><button class="ab">+</button></div></div></div>
-    <div class="fc fade-up"><div class="ft"><em class="fi2">🍏</em></div><div class="fb"><h3 class="fn">Apple Clarity</h3><p class="fd">Green Apple · Celery · Ginger · Parsley</p><div class="ff"><span class="fp">$9.00</span><button class="ab">+</button></div></div></div>
-    <div class="fc fade-up"><div class="ft"><em class="fi2">🍓</em></div><div class="fb"><h3 class="fn">Pink Glow</h3><p class="fd">Strawberry · Watermelon · Rose · Hibiscus</p><div class="ff"><span class="fp">$10.50</span><button class="ab">+</button></div></div></div>
+<section id="path">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">THE PATH</span>
+      <h2>مسار المبتدئين في بايثون</h2>
+      <p>تسلسل من الدروس القصيرة، كل درس يبني على سابقه.</p>
+    </div>
+    <div class="path-scroll">
+      <div class="path-card">
+        <span class="path-step-label">STEP 01</span>
+        <h4>المتغيرات والطباعة</h4>
+        <p>تخزين القيم وعرضها باستخدام print()</p>
+        <span class="path-status">● متاح الآن</span>
+      </div>
+      <div class="path-card locked">
+        <span class="path-step-label">STEP 02</span>
+        <h4>الشروط If / Else</h4>
+        <p>اتخاذ قرارات داخل الكود بناءً على شروط</p>
+        <span class="path-status locked-status">🔒 يُفتح بعد الدرس السابق</span>
+      </div>
+      <div class="path-card locked">
+        <span class="path-step-label">STEP 03</span>
+        <h4>الحلقات التكرارية</h4>
+        <p>تكرار تنفيذ الكود باستخدام for و while</p>
+        <span class="path-status locked-status">🔒 يُفتح بعد الدرس السابق</span>
+      </div>
+      <div class="path-card locked">
+        <span class="path-step-label">STEP 04</span>
+        <h4>القوائم Lists</h4>
+        <p>تخزين مجموعة من القيم والتعامل معها</p>
+        <span class="path-status locked-status">🔒 يُفتح بعد الدرس السابق</span>
+      </div>
+      <div class="path-card locked">
+        <span class="path-step-label">STEP 05</span>
+        <h4>الدوال Functions</h4>
+        <p>كتابة كود قابل لإعادة الاستخدام</p>
+        <span class="path-status locked-status">🔒 يُفتح بعد الدرس السابق</span>
+      </div>
+    </div>
   </div>
 </section>
 
-<section id="process">
-  <div style="text-align:center;">
-    <p class="stag" style="display:block;margin-bottom:.5rem;">// How We Do It</p>
-    <h2 class="stitle">Farm to<br>Your Door.</h2>
-  </div>
-  <div class="proc-grid">
-    <div class="proc-step fade-up"><span class="step-icon">🌾</span><p class="step-n">Step 01</p><h4>Source</h4><p>Organic farms within 200 miles. Seasonal, traceable, real.</p></div>
-    <div class="proc-step fade-up"><span class="step-icon">⚡</span><p class="step-n">Step 02</p><h4>Cold Press</h4><p>10,000 PSI extracts maximum nutrition with zero heat damage.</p></div>
-    <div class="proc-step fade-up"><span class="step-icon">🍾</span><p class="step-n">Step 03</p><h4>Bottle</h4><p>Glass bottles, sealed within 30 minutes. No air, no additives.</p></div>
-    <div class="proc-step fade-up"><span class="step-icon">🚚</span><p class="step-n">Step 04</p><h4>Deliver</h4><p>On ice to your door within 24 hours of pressing. Peak freshness.</p></div>
-  </div>
-</section>
+<section class="lesson" id="lesson">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">TRY IT — STEP 01</span>
+      <h2>جرّب أول درس: المتغيرات</h2>
+      <p>نفّذ التمرين في المحرر على اليمين، ثم اضغط "تحقق من الحل".</p>
+    </div>
 
-<section id="sstats">
-  <div class="sbox"><div class="snum" data-target="50000">0</div><div class="slbl">Happy Customers</div></div>
-  <div class="sbox"><div class="snum">12</div><div class="slbl">Fresh Flavors</div></div>
-  <div class="sbox"><div class="snum">24h</div><div class="slbl">Farm to Bottle</div></div>
-  <div class="sbox"><div class="snum">0%</div><div class="slbl">Added Sugar</div></div>
-</section>
+    <div class="lesson-shell">
+      <div class="lesson-instructions">
+        <span class="lesson-step-tag">STEP 1 / 5</span>
+        <h3>إنشاء متغير</h3>
+        <p>المتغيّر هو اسم يُستخدم لتخزين قيمة يمكن استعمالها لاحقًا في الكود.</p>
+        <p>في بايثون، لا تحتاج لتحديد نوع المتغير — فقط اكتب اسمه، ثم علامة =، ثم القيمة.</p>
+        <ul>
+          <li>أنشئ متغيرًا اسمه <code class="mono">age</code> وأعطه القيمة <code class="mono">25</code></li>
+          <li>اطبع المتغير باستخدام <code class="mono">print(age)</code></li>
+        </ul>
+        <div class="hint-box">💡 تلميح: الأسماء في بايثون لا تحتوي مسافات، استخدم شرطة سفلية بدلاً من ذلك مثل <code class="mono">my_age</code>.</div>
+      </div>
 
-<section id="cta">
-  <h2 class="fade-up">Ready to glow<br>from the inside?</h2>
-  <p class="fade-up">First subscription box ships free. Cancel anytime. Your cells will thank you.</p>
-  <a href="#" class="btn-dark fade-up" style="font-size:1rem;padding:1.2rem 3rem;margin:0 auto;display:inline-flex;">Get My First Box Free 🎁</a>
+      <div class="lesson-editor-area">
+        <textarea id="lesson-code" class="mono" spellcheck="false"># Write your code below
+
+</textarea>
+        <div class="editor-actions">
+          <button id="lesson-run" class="run-btn" disabled>
+            <span id="lesson-run-icon">▶</span> <span id="lesson-run-label">تحميل المُفسّر...</span>
+          </button>
+          <button id="lesson-check" class="btn btn-ghost" style="padding:9px 18px;font-size:13px;" disabled>تحقق من الحل</button>
+        </div>
+        <div class="output-pane" id="lesson-output"><span class="placeholder">سيظهر ناتج الكود هنا بعد الضغط على Run</span></div>
+        <div class="check-result idle" id="lesson-check-result">لم يتم التحقق بعد — نفّذ الكود ثم اضغط "تحقق من الحل".</div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <footer>
-  <span><b>ZEST</b> — Cold Pressed Juice Co.</span>
-  <span>© 2025 · hello@zestjuice.co</span>
+  <div class="wrap">
+    <div class="logo" style="font-size:18px;"><span class="logo-mark" style="width:28px;height:28px;font-size:13px;">م</span> مداد</div>
+    <p>مداد — منصة تعليمية لتعلّم البرمجة بالعربية. نسخة أولية (Python فقط).</p>
+  </div>
 </footer>
 
-<!-- Three.js loads FIRST, then all 3D code runs -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
 <script>
-/* ─────────────────────────────────────────
-   BOTTLE SCENE — runs after Three.js loads
-───────────────────────────────────────── */
-(function initBottles(){
-  var bc  = document.getElementById('bottleCanvas');
-  var br  = new THREE.WebGLRenderer({ canvas:bc, antialias:true, alpha:true });
-  br.setPixelRatio(Math.min(devicePixelRatio, 2));
-  br.toneMapping = THREE.ACESFilmicToneMapping;
-  br.toneMappingExposure = 1.3;
-  br.shadowMap.enabled = true;
+let pyodide = null;
+let pyodideReady = false;
 
-  var bsc  = new THREE.Scene();
-  var bcam = new THREE.PerspectiveCamera(36, 1, 0.1, 50);
-  bcam.position.set(0, 0.8, 6);
-  bcam.lookAt(0, 0, 0);
-
-  bsc.add(new THREE.AmbientLight(0xffffff, 0.8));
-  var bk = new THREE.SpotLight(0xffffff, 3, 18, Math.PI/5, 0.4);
-  bk.position.set(4, 8, 5); bk.castShadow = true; bsc.add(bk);
-  var bf = new THREE.DirectionalLight(0xFFF0D0, 1.2);
-  bf.position.set(-4, 4, 4); bsc.add(bf);
-  var br2 = new THREE.DirectionalLight(0xD0E8FF, 0.6);
-  br2.position.set(2, -2, -5); bsc.add(br2);
-
-  /* Build a bottle from cylinders */
-  function makeBottle(bodyHex, capHex, labelHex) {
-    var g = new THREE.Group();
-
-    function smat(hex, rough, metal) {
-      return new THREE.MeshStandardMaterial({
-        color: new THREE.Color(hex),
-        roughness: rough || 0.25,
-        metalness: metal || 0.04,
-        transparent: true, opacity: 0.9
-      });
-    }
-    function omat(hex, rough, metal) {
-      return new THREE.MeshStandardMaterial({
-        color: new THREE.Color(hex),
-        roughness: rough || 0.2,
-        metalness: metal || 0.08
-      });
-    }
-
-    /* Bottom flat disk */
-    var botDisk = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.05, 32), omat(capHex, 0.6, 0.05));
-    botDisk.position.y = -1.25; botDisk.castShadow = true; g.add(botDisk);
-
-    /* Main body */
-    var body = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.42, 2.5, 32), smat(bodyHex));
-    body.castShadow = true; g.add(body);
-
-    /* Body inner (glass thickness illusion) */
-    var inner = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.37, 2.4, 32),
-      new THREE.MeshStandardMaterial({ color: new THREE.Color(bodyHex).lerp(new THREE.Color(0xffffff), 0.35),
-        roughness: 0.1, metalness: 0, transparent: true, opacity: 0.35 }));
-    g.add(inner);
-
-    /* Label band */
-    var lbl = new THREE.Mesh(new THREE.CylinderGeometry(0.385, 0.385, 0.95, 32), omat(labelHex, 0.55, 0.02));
-    lbl.position.y = 0.1; g.add(lbl);
-
-    /* Label stripe lines */
-    [-.3, 0, .3].forEach(function(y){
-      var stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.39, 0.39, 0.03, 32),
-        new THREE.MeshStandardMaterial({ color: new THREE.Color(bodyHex), roughness: 0.7 }));
-      stripe.position.y = 0.1 + y; g.add(stripe);
-    });
-
-    /* Shoulder taper */
-    var shoulder = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.38, 0.5, 32), smat(bodyHex));
-    shoulder.position.y = 1.5; g.add(shoulder);
-
-    /* Neck */
-    var neck = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.5, 24), smat(bodyHex));
-    neck.position.y = 1.98; g.add(neck);
-
-    /* Cap */
-    var cap = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.21, 0.28, 24), omat(capHex, 0.35, 0.12));
-    cap.position.y = 2.37; cap.castShadow = true; g.add(cap);
-
-    /* Cap dome top */
-    var capTop = new THREE.Mesh(new THREE.SphereGeometry(0.21, 24, 12, 0, Math.PI*2, 0, Math.PI/2),
-      omat(capHex, 0.3, 0.12));
-    capTop.position.y = 2.51; g.add(capTop);
-
-    /* Glass highlight strip */
-    var hl = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.06, 2.2),
-      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18, side: THREE.DoubleSide })
-    );
-    hl.position.set(0.34, 0.1, 0.16); hl.rotation.y = -0.25; g.add(hl);
-
-    /* Second highlight */
-    var hl2 = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.03, 1.5),
-      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.08, side: THREE.DoubleSide })
-    );
-    hl2.position.set(-0.3, 0.2, 0.25); hl2.rotation.y = 0.3; g.add(hl2);
-
-    g.traverse(function(m){ if(m.isMesh){ m.castShadow=true; m.receiveShadow=true; } });
-    return g;
-  }
-
-  var BOTTLE_DEFS = [
-    { body:'#E87A00', cap:'#1A0A00', label:'#FFD600' },   // Solar orange
-    { body:'#00A850', cap:'#0A1800', label:'#AAFFD0' },   // Greens
-    { body:'#BB1177', cap:'#1A0018', label:'#FFAADD' }    // Berry pink
-  ];
-
-  var bottles = BOTTLE_DEFS.map(function(d){ return makeBottle(d.body, d.cap, d.label); });
-  var curBottle = 0;
-  bottles.forEach(function(b, i){ b.visible = (i === 0); bsc.add(b); });
-
-  /* ── Drag to rotate ── */
-  var bDrag = false, bLastX = 0, bTargetY = 0, bRotY = 0;
-  bc.addEventListener('mousedown', function(e){ bDrag=true; bLastX=e.clientX; });
-  window.addEventListener('mousemove', function(e){ if(bDrag){ bTargetY += (e.clientX-bLastX)*0.016; bLastX=e.clientX; } });
-  window.addEventListener('mouseup', function(){ bDrag=false; });
-  bc.addEventListener('touchstart', function(e){ bDrag=true; bLastX=e.touches[0].clientX; }, {passive:true});
-  bc.addEventListener('touchmove', function(e){ if(bDrag){ bTargetY += (e.touches[0].clientX-bLastX)*0.018; bLastX=e.touches[0].clientX; } }, {passive:true});
-  bc.addEventListener('touchend', function(){ bDrag=false; });
-
-  /* ── Resize ── */
-  function resizeBottleCanvas(){
-    var w = bc.parentElement.offsetWidth || 400;
-    var h = bc.parentElement.offsetHeight || 500;
-    br.setSize(w, h);
-    bcam.aspect = w / h;
-    bcam.updateProjectionMatrix();
-  }
-  resizeBottleCanvas();
-  window.addEventListener('resize', resizeBottleCanvas);
-
-  /* ── Button clicks ── */
-  document.querySelectorAll('.bbtn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var idx = parseInt(btn.dataset.idx);
-      bottles[curBottle].visible = false;
-      curBottle = idx;
-      bottles[curBottle].visible = true;
-      document.querySelectorAll('.bbtn').forEach(function(b){ b.classList.remove('active'); });
-      btn.classList.add('active');
-    });
-  });
-
-  /* ── Animation loop ── */
-  var bt = 0;
-  (function bloop(){
-    requestAnimationFrame(bloop);
-    bt += 0.008;
-    bRotY += (bTargetY - bRotY) * 0.07;
-    bTargetY += 0.008;  /* auto-rotate */
-    bottles.forEach(function(b){
-      b.rotation.y = bRotY;
-      b.position.y = Math.sin(bt * 0.8) * 0.1;
-    });
-    br.render(bsc, bcam);
-  })();
-})();
-
-/* ─────────────────────────────────────────
-   BACKGROUND ORB PARTICLES
-───────────────────────────────────────── */
-var bgCanvas = document.getElementById('threebg');
-var bgR = new THREE.WebGLRenderer({ canvas:bgCanvas, antialias:true, alpha:true });
-bgR.setSize(innerWidth, innerHeight);
-bgR.setPixelRatio(Math.min(devicePixelRatio, 2));
-var bgSc = new THREE.Scene();
-var bgCam = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
-bgCam.position.z = 6;
-var orbColors = [0xFFD600,0xFF5C00,0xFF3CAC,0x7BFF00,0x00C2FF,0x00FFB2,0xFF8C00,0xFF9FE1];
-var orbs = [];
-for(var i=0;i<45;i++){
-  var og = new THREE.SphereGeometry(Math.random()*.22+.05, 8, 8);
-  var om = new THREE.MeshBasicMaterial({ color:orbColors[i%orbColors.length], transparent:true, opacity:Math.random()*.25+.08 });
-  var omesh = new THREE.Mesh(og, om);
-  omesh.position.set((Math.random()-.5)*22, (Math.random()-.5)*16, (Math.random()-.5)*8-3);
-  omesh.userData = { vx:(Math.random()-.5)*.018+.003, vy:(Math.random()-.5)*.015 };
-  bgSc.add(omesh); orbs.push(omesh);
+async function initPyodide(){
+  pyodide = await loadPyodide();
+  pyodideReady = true;
+  document.querySelectorAll('.run-btn').forEach(btn => btn.disabled = false);
+  document.getElementById('hero-run-label').textContent = 'تشغيل Run';
+  document.getElementById('lesson-run-label').textContent = 'تشغيل Run';
+  document.getElementById('hero-status').textContent = 'Pyodide: ready';
+  document.getElementById('lesson-check').disabled = false;
 }
-var mx=0, my=0;
-document.addEventListener('mousemove', function(e){ mx=(e.clientX/innerWidth-.5)*2; my=-(e.clientY/innerHeight-.5)*2; });
-(function bgLoop(){
-  requestAnimationFrame(bgLoop);
-  orbs.forEach(function(o){
-    o.position.x += o.userData.vx; o.position.y += o.userData.vy;
-    if(o.position.x>13||o.position.x<-13) o.userData.vx*=-1;
-    if(o.position.y>10||o.position.y<-10) o.userData.vy*=-1;
-    o.rotation.x+=.012; o.rotation.y+=.008;
-  });
-  bgCam.position.x += (mx*.4 - bgCam.position.x)*.04;
-  bgCam.position.y += (my*.4 - bgCam.position.y)*.04;
-  bgR.render(bgSc, bgCam);
-})();
-window.addEventListener('resize', function(){
-  bgCam.aspect = innerWidth/innerHeight; bgCam.updateProjectionMatrix();
-  bgR.setSize(innerWidth, innerHeight);
+initPyodide();
+
+async function runCode(codeElId, outputElId, statusElId){
+  if(!pyodideReady) return;
+  const code = document.getElementById(codeElId).value;
+  const outEl = document.getElementById(outputElId);
+  outEl.classList.remove('err');
+  outEl.textContent = '...جارٍ التنفيذ';
+  try{
+    let capturedOut = [];
+    pyodide.setStdout({ batched: (s) => capturedOut.push(s) });
+    pyodide.setStderr({ batched: (s) => capturedOut.push(s) });
+    await pyodide.runPythonAsync(code);
+    outEl.textContent = capturedOut.length ? capturedOut.join('\n') : '(لا يوجد ناتج مطبوع)';
+  }catch(err){
+    outEl.classList.add('err');
+    outEl.textContent = err.message || String(err);
+  }
+  if(statusElId){
+    document.getElementById(statusElId).textContent = 'Pyodide: ready';
+  }
+}
+
+document.getElementById('hero-run').addEventListener('click', () => {
+  runCode('hero-code','hero-output','hero-status');
 });
 
-/* ─────────────────────────────────────────
-   CURSOR
-───────────────────────────────────────── */
-var cur = document.getElementById('cursor');
-var curX=0, curY=0, ctx=0, cty=0;
-document.addEventListener('mousemove', function(e){ ctx=e.clientX; cty=e.clientY; });
-(function moveCur(){ curX+=(ctx-curX)*.2; curY+=(cty-curY)*.2; cur.style.left=curX+'px'; cur.style.top=curY+'px'; requestAnimationFrame(moveCur); })();
-document.querySelectorAll('a,button,.fc,.bbtn').forEach(function(el){
-  el.addEventListener('mouseenter', function(){ cur.classList.add('big'); });
-  el.addEventListener('mouseleave', function(){ cur.classList.remove('big'); });
+document.getElementById('lesson-run').addEventListener('click', () => {
+  runCode('lesson-code','lesson-output', null);
 });
 
-/* ─────────────────────────────────────────
-   TICKER
-───────────────────────────────────────── */
-var items=['🍋 Cold Pressed','🌿 100% Organic','🚚 Free Delivery Over $40','❄️ Pressed Daily','💚 Zero Additives','🍊 12 Flavors','🧃 Glass Bottled'];
-var tt = document.getElementById('tt');
-tt.innerHTML = [...items,...items].map(function(t){ return '<span class="ticker-item">'+t+'<span>·</span></span>'; }).join('');
-
-/* ─────────────────────────────────────────
-   SCROLL REVEALS
-───────────────────────────────────────── */
-var revObs = new IntersectionObserver(function(entries){
-  entries.forEach(function(e,i){
-    if(e.isIntersecting) setTimeout(function(){ e.target.classList.add('vis'); }, i*80);
-  });
-}, { threshold:0.1 });
-document.querySelectorAll('.fade-up').forEach(function(el){ revObs.observe(el); });
-
-/* ─────────────────────────────────────────
-   COUNTER ANIMATION
-───────────────────────────────────────── */
-var ctObs = new IntersectionObserver(function(entries){
-  entries.forEach(function(e){
-    if(e.isIntersecting && e.target.dataset.target){
-      var target = +e.target.dataset.target;
-      var current = 0; var step = target/60;
-      var it = setInterval(function(){
-        current = Math.min(current+step, target);
-        e.target.textContent = current >= 1000 ? (current/1000).toFixed(0)+'K+' : Math.floor(current);
-        if(current >= target) clearInterval(it);
-      }, 25);
+document.getElementById('lesson-check').addEventListener('click', async () => {
+  if(!pyodideReady) return;
+  const code = document.getElementById('lesson-code').value;
+  const resultEl = document.getElementById('lesson-check-result');
+  try{
+    let capturedOut = [];
+    pyodide.setStdout({ batched: (s) => capturedOut.push(s) });
+    pyodide.setStderr({ batched: (s) => capturedOut.push(s) });
+    await pyodide.runPythonAsync(code);
+    const printed = capturedOut.join('\n').trim();
+    const hasVar = /\bage\s*=\s*25\b/.test(code);
+    const printedCorrect = printed === '25';
+    if(hasVar && printedCorrect){
+      resultEl.className = 'check-result pass';
+      resultEl.textContent = '✓ ممتاز! أنشأت المتغير وطبعته بشكل صحيح.';
+    } else {
+      resultEl.className = 'check-result fail';
+      resultEl.textContent = '✗ لم يكتمل الحل بعد — تأكد من إنشاء age = 25 وطباعته بـ print(age).';
     }
-  });
-}, { threshold:0.5 });
-document.querySelectorAll('.snum[data-target]').forEach(function(el){ ctObs.observe(el); });
+  }catch(err){
+    resultEl.className = 'check-result fail';
+    resultEl.textContent = '✗ يوجد خطأ في الكود: ' + (err.message || String(err));
+  }
+});
 </script>
+
 </body>
 </html>
