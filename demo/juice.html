@@ -2,1190 +2,809 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<title>سلسلة نصائح البرمجة</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceCode — تعلّم البرمجة بالعربية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Tajawal:wght@500;600;700;800;900&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --code-font:'JetBrains Mono',monospace;
-  --ui-font:'Tajawal',sans-serif;
-  /* VS Code Dark+ inspired palette */
-  --bg-editor:#1e1e1e;
-  --bg-panel:#252526;
-  --bg-titlebar:#323233;
-  --border-col:#3c3c3c;
-  --line-num:#5a5a5a;
-  --tok-key:#c586c0;
-  --tok-fn:#dcdcaa;
-  --tok-str:#ce9178;
-  --tok-num:#b5cea8;
-  --tok-com:#6a9955;
-  --tok-var:#9cdcfe;
-  --tok-type:#4ec9b0;
-  --tok-punc:#d4d4d4;
-  --tok-op:#d4d4d4;
-  --py-accent:#3776ab;
-  --py-accent2:#ffd43b;
-  --js-accent:#f7df1e;
-  --js-accent2:#323330;
-}
-html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0c;direction:rtl;}
-.ltr-block{direction:ltr;text-align:left;unicode-bidi:isolate;}
+  :root{
+    --space:#080B14; --space-2:#0D1220; --space-3:#131A2E;
+    --panel:#101828;
+    --cyan:#4CE0D2; --cyan-bright:#7BF5E8;
+    --magenta:#E24CC7;
+    --amber:#F2B84B;
+    --text:#DCE6F5; --text-dim:#8695B5;
+    --danger:#FF6B6B; --success:#4CE08A;
+    --radius:12px;
+    --glow-cyan: 0 0 24px rgba(76,224,210,.35);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--space);
+    color:var(--text);
+    font-family:'Tajawal',sans-serif;
+    line-height:1.7;
+    position:relative;
+  }
+  code, pre, .mono, textarea{font-family:'JetBrains Mono',monospace;direction:ltr;text-align:left;unicode-bidi:isolate;}
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--cyan);color:var(--space);}
+  .hidden{display:none !important;}
 
-#bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
-#vig{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,transparent 35%,rgba(0,0,0,0.55) 100%);}
+  /* starfield background */
+  #starfield{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .star{position:absolute;background:#fff;border-radius:50%;opacity:.6;animation:twinkle 4s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.2;}50%{opacity:.9;}}
+  body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(ellipse at 20% 0%, rgba(76,224,210,.08), transparent 50%),
+               radial-gradient(ellipse at 80% 100%, rgba(226,76,199,.07), transparent 50%);
+  }
+  .wrap{max-width:1140px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
 
-#ui{
-  position:fixed;inset:0;z-index:10;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:0 6vw;gap:2.6vw;
-}
+  .eyebrow{color:var(--cyan);font-family:'JetBrains Mono',monospace;direction:ltr;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:'';width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);}
 
-/* Top label: language pill */
-#label{
-  position:fixed;top:0;left:0;right:0;
-  display:flex;flex-direction:column;align-items:center;
-  padding:7vw 6vw 2vw;z-index:11;
-  opacity:0;transform:translateY(-16px);
-  transition:opacity .5s ease,transform .5s ease;
-}
-#lang-pill{
-  display:flex;align-items:center;gap:2vw;
-  padding:1.8vw 4.2vw;
-  border-radius:999px;
-  background:rgba(30,30,30,0.72);
-  border:1px solid rgba(255,255,255,0.14);
-  backdrop-filter:blur(6px);
-}
-#lang-dot{width:2.2vw;height:2.2vw;max-width:11px;max-height:11px;border-radius:50%;flex-shrink:0;}
-#lang-eyebrow{
-  font-family:var(--ui-font);font-weight:800;
-  font-size:clamp(0.72rem,3.2vw,0.95rem);
-  letter-spacing:0.18em;text-transform:uppercase;
-  color:#f0f0f0;
-}
-#tip-badge{
-  margin-top:2.4vw;
-  font-family:var(--ui-font);font-weight:600;
-  font-size:clamp(0.62rem,2.7vw,0.8rem);
-  letter-spacing:0.24em;text-transform:uppercase;
-  color:rgba(255,255,255,0.5);
-  opacity:0;transform:translateY(-8px);
-  transition:opacity .45s ease,transform .45s ease;
-}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:8px;font-weight:700;font-size:15px;border:none;cursor:pointer;transition:.15s;font-family:'Tajawal',sans-serif;}
+  .btn:hover{transform:translateY(-2px);}
+  .btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+  .btn-primary{background:linear-gradient(135deg,var(--cyan),var(--cyan-bright));color:#04231f;box-shadow:0 0 30px -6px rgba(76,224,210,.6);}
+  .btn-ghost{background:rgba(255,255,255,.03);color:var(--text);border:1.5px solid rgba(220,230,245,.18);}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+  .btn-sm{padding:9px 18px;font-size:13.5px;}
 
-/* Title + explanation block */
-#content-wrap{display:flex;flex-direction:column;align-items:center;gap:2.2vw;width:100%;max-width:640px;}
-.qtitle{
-  font-family:var(--ui-font);font-weight:900;
-  font-size:clamp(1.5rem,7vw,2.3rem);
-  color:#fff;text-align:center;line-height:1.24;
-  opacity:0;transform:translateY(26px);
-  transition:opacity .55s ease,transform .6s cubic-bezier(.16,1,.3,1);
-  text-shadow:0 3px 18px rgba(0,0,0,0.5);
-  max-width:100%;
-}
-.qtitle.in{opacity:1;transform:translateY(0);}
-.qexplain{
-  font-family:var(--ui-font);font-weight:500;
-  font-size:clamp(0.92rem,4vw,1.15rem);
-  color:rgba(255,255,255,0.82);text-align:center;line-height:1.5;
-  opacity:0;transform:translateY(18px);
-  transition:opacity .5s ease,transform .55s cubic-bezier(.16,1,.3,1);
-  max-width:92%;
-}
-.qexplain.in{opacity:1;transform:translateY(0);}
+  /* ---- nav / tabs ---- */
+  nav{position:sticky;top:0;z-index:50;background:rgba(8,11,20,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(76,224,210,.12);}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:19px;cursor:pointer;font-family:'JetBrains Mono',monospace;direction:ltr;}
+  .logo-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--magenta));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 18px rgba(76,224,210,.4);}
+  .tabs{display:flex;gap:4px;background:rgba(255,255,255,.03);padding:4px;border-radius:10px;border:1px solid rgba(255,255,255,.06);}
+  .tab-btn{background:none;border:none;color:var(--text-dim);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;padding:9px 18px;border-radius:7px;cursor:pointer;transition:.15s;}
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{background:var(--panel);color:var(--cyan);box-shadow:inset 0 0 0 1px rgba(76,224,210,.3);}
+  .nav-progress{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);}
+  .nav-progress-bar{width:100px;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+  .nav-progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--magenta));border-radius:3px;transition:width .3s;}
+  @media (max-width:760px){ .tabs{display:none;} }
 
-/* Code block, styled like a VS Code editor pane */
-#code-panel{
-  direction:ltr;text-align:left;
-  width:100%;max-width:600px;
-  border-radius:12px;
-  background:var(--bg-editor);
-  border:1px solid var(--border-col);
-  box-shadow:0 20px 60px rgba(0,0,0,0.55),0 2px 0 rgba(255,255,255,0.03) inset;
-  overflow:hidden;
-  opacity:0;transform:translateY(24px) scale(0.97);
-  transition:opacity .5s ease,transform .55s cubic-bezier(.16,1,.3,1);
-}
-#code-panel.in{opacity:1;transform:translateY(0) scale(1);}
-#code-titlebar{
-  direction:ltr;
-  display:flex;align-items:center;gap:2vw;
-  padding:2.4vw 3.6vw;
-  background:var(--bg-titlebar);
-  border-bottom:1px solid var(--border-col);
-}
-.tl-dot{width:2.6vw;height:2.6vw;max-width:12px;max-height:12px;border-radius:50%;}
-#code-filename{
-  margin-left:1.5vw;
-  font-family:var(--code-font);font-weight:500;
-  font-size:clamp(0.62rem,2.7vw,0.78rem);
-  color:rgba(255,255,255,0.55);
-}
-#code-body{
-  padding:3.4vw 3.8vw;
-  font-family:var(--code-font);
-  font-size:clamp(0.78rem,3.5vw,1rem);
-  line-height:1.65;
-  overflow-x:hidden;
-  white-space:pre;
-}
-.code-line{direction:ltr;display:flex;gap:3.2vw;opacity:0;transform:translateX(-10px);transition:opacity .35s ease,transform .4s ease;}
-.code-line.in{opacity:1;transform:translateX(0);}
-.ln-num{color:var(--line-num);min-width:5.5vw;text-align:right;user-select:none;flex-shrink:0;}
-.ln-code{white-space:pre-wrap;word-break:break-word;flex:1;}
+  /* ---- mascot ---- */
+  .droid{
+    width:64px;height:64px;flex-shrink:0;position:relative;
+  }
+  .droid svg{width:100%;height:100%;filter:drop-shadow(0 0 12px rgba(76,224,210,.5));}
+  .droid.small{width:40px;height:40px;}
+  .speech-bubble{
+    background:var(--panel);border:1px solid rgba(76,224,210,.3);border-radius:12px;
+    padding:14px 18px;position:relative;font-size:14px;color:var(--text);flex:1;
+  }
+  .droid-row{display:flex;gap:14px;align-items:flex-start;}
 
-/* token colors */
-.tok-key{color:var(--tok-key);}
-.tok-fn{color:var(--tok-fn);}
-.tok-str{color:var(--tok-str);}
-.tok-num{color:var(--tok-num);}
-.tok-com{color:var(--tok-com);font-style:italic;}
-.tok-var{color:var(--tok-var);}
-.tok-type{color:var(--tok-type);}
-.tok-punc{color:var(--tok-punc);}
-.tok-def{color:var(--tok-fn);}
+  /* ==================== HOME ==================== */
+  .hero{padding:70px 0 90px;}
+  .hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:50px;align-items:start;}
+  .hero h1{font-size:44px;font-weight:900;line-height:1.3;margin:16px 0 16px;}
+  .hero h1 span{color:var(--cyan);text-shadow:0 0 24px rgba(76,224,210,.4);}
+  .hero p.lead{font-size:16.5px;color:var(--text-dim);max-width:480px;margin-bottom:26px;}
+  .hero-cta{display:flex;gap:14px;margin-bottom:34px;flex-wrap:wrap;}
+  .trust-row{display:flex;gap:22px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);}
+  .trust-row b{color:var(--cyan);}
 
-/* Output / terminal panel, sits directly under the code panel */
-#output-panel{
-  direction:ltr;text-align:left;
-  width:100%;max-width:600px;
-  border-radius:12px;
-  background:#0c0c0e;
-  border:1px solid var(--border-col);
-  box-shadow:0 16px 44px rgba(0,0,0,0.5);
-  overflow:hidden;
-  margin-top:1.6vw;
-  opacity:0;transform:translateY(18px) scale(0.97);
-  transition:opacity .45s ease,transform .5s cubic-bezier(.16,1,.3,1);
-}
-#output-panel.in{opacity:1;transform:translateY(0) scale(1);}
-#output-titlebar{
-  direction:ltr;
-  display:flex;align-items:center;gap:2vw;
-  padding:1.8vw 3.6vw;
-  background:#151517;
-  border-bottom:1px solid var(--border-col);
-}
-#output-label{
-  font-family:var(--ui-font);font-weight:700;
-  font-size:clamp(0.62rem,2.7vw,0.78rem);
-  letter-spacing:0.02em;
-  color:#6fcf7d;
-  display:flex;align-items:center;gap:1.6vw;
-  direction:rtl;
-}
-#output-label::before{
-  content:'▶';font-size:0.85em;color:#6fcf7d;
-}
-#output-body{
-  padding:2.8vw 3.8vw 3.2vw;
-  font-family:var(--code-font);
-  font-size:clamp(0.74rem,3.3vw,0.94rem);
-  line-height:1.6;
-  color:#d4d4d4;
-}
-.output-line{direction:ltr;display:flex;gap:1.6vw;opacity:0;transform:translateX(-8px);transition:opacity .3s ease,transform .35s ease;}
-.output-line.in{opacity:1;transform:translateX(0);}
-.output-line::before{content:'›';color:#6fcf7d;flex-shrink:0;}
+  .terminal-card{background:var(--panel);border-radius:var(--radius);border:1px solid rgba(76,224,210,.2);box-shadow:0 0 50px -12px rgba(76,224,210,.15), 0 30px 60px -20px rgba(0,0,0,.6);overflow:hidden;}
+  .terminal-titlebar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:rgba(0,0,0,.25);border-bottom:1px solid rgba(76,224,210,.15);}
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .dot-r{background:#ff6b6b;} .dot-y{background:#f2b84b;} .dot-g{background:#4ce08a;}
+  .terminal-filename{margin-inline-start:10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);}
+  .demo-instructions{padding:16px 18px 4px;font-size:13.5px;color:var(--text-dim);border-bottom:1px dashed rgba(76,224,210,.15);margin-bottom:2px;}
+  .demo-instructions b{color:var(--cyan);}
+  #hero-code{width:100%;min-height:170px;background:transparent;color:var(--text);border:none;outline:none;resize:vertical;padding:16px 18px;font-size:13.5px;line-height:1.7;}
+  .editor-actions{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid rgba(76,224,210,.1);background:rgba(0,0,0,.2);}
+  .run-btn{background:linear-gradient(135deg,var(--cyan),var(--cyan-bright));color:#04231f;border:none;padding:9px 20px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;}
+  .run-btn:hover{box-shadow:0 0 20px rgba(76,224,210,.5);}
+  .run-btn:disabled{opacity:.4;cursor:wait;box-shadow:none;}
+  .pyodide-status{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);}
+  .output-pane{background:#050810;padding:13px 18px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--success);min-height:56px;max-height:160px;overflow:auto;border-top:1px solid rgba(76,224,210,.1);white-space:pre-wrap;}
+  .output-pane.err{color:var(--danger);}
+  .output-pane .placeholder{color:rgba(220,230,245,.25);}
 
-/* Bottom CTA */
-#bottom{
-  position:fixed;bottom:0;left:0;right:0;
-  display:flex;flex-direction:column;align-items:center;
-  padding:3vw 6vw 8vw;z-index:11;
-  opacity:0;transform:translateY(12px);
-  transition:opacity .6s ease,transform .6s ease;
-}
-#cta{
-  font-family:var(--ui-font);font-weight:700;
-  font-size:clamp(0.68rem,3vw,0.88rem);
-  letter-spacing:0.12em;text-transform:uppercase;
-  color:rgba(255,255,255,0.55);
-}
+  section{padding:80px 0;position:relative;z-index:1;}
+  .section-head{max-width:640px;margin-bottom:44px;}
+  .section-head h2{font-size:30px;font-weight:900;margin-top:12px;}
+  .section-head p{color:var(--text-dim);font-size:15.5px;margin-top:12px;}
 
-/* ───────── theme accent classes ───────── */
-.s-python #lang-dot{background:linear-gradient(135deg,#3776ab,#ffd43b);}
-.s-python #lang-pill{border-color:rgba(55,118,171,0.4);}
-.s-python .qexplain{color:rgba(210,230,255,0.85);}
-.s-python #code-panel{box-shadow:0 20px 60px rgba(55,118,171,0.25),0 2px 0 rgba(255,255,255,0.03) inset;}
+  .why{background:linear-gradient(180deg,transparent,rgba(76,224,210,.03),transparent);}
+  .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .why-card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:24px;transition:.2s;}
+  .why-card:hover{border-color:var(--cyan);transform:translateY(-4px);box-shadow:var(--glow-cyan);}
+  .why-icon{width:42px;height:42px;border-radius:9px;background:rgba(76,224,210,.1);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:14px;}
+  .why-card h3{font-size:16.5px;font-weight:700;margin-bottom:7px;}
+  .why-card p{color:var(--text-dim);font-size:13.5px;}
 
-.s-javascript #lang-dot{background:linear-gradient(135deg,#f7df1e,#f0db4f);}
-.s-javascript #lang-pill{border-color:rgba(247,223,30,0.4);}
-.s-javascript .qexplain{color:rgba(255,246,210,0.85);}
-.s-javascript #code-panel{box-shadow:0 20px 60px rgba(247,223,30,0.18),0 2px 0 rgba(255,255,255,0.03) inset;}
+  /* course grid */
+  .course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .lesson-card{background:var(--panel);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:20px;cursor:pointer;transition:.2s;position:relative;}
+  .lesson-card:not(.locked):hover{border-color:var(--cyan);transform:translateY(-3px);box-shadow:var(--glow-cyan);}
+  .lesson-card.locked{opacity:.4;cursor:not-allowed;}
+  .lesson-card.done{border-color:var(--amber);}
+  .lesson-num{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--magenta);direction:ltr;}
+  .lesson-card.done .lesson-num{color:var(--amber);}
+  .lesson-card h4{font-size:16px;font-weight:700;margin:9px 0 7px;}
+  .lesson-card p{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .lesson-status{font-size:11px;font-family:'JetBrains Mono',monospace;display:inline-flex;align-items:center;gap:6px;color:var(--cyan);}
+  .lesson-status.done-status{color:var(--amber);}
+  .lesson-status.locked-status{color:rgba(220,230,245,.3);}
+  .lesson-steps-count{position:absolute;top:18px;left:20px;font-size:10.5px;color:rgba(220,230,245,.3);font-family:'JetBrains Mono',monospace;}
 
-/* Legibility scrim behind text zone */
-#text-scrim{
-  position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  width:96vw;max-width:700px;height:56vh;
-  border-radius:32px;
-  opacity:0;
-  transition:opacity .5s ease;
-  pointer-events:none;
-  filter:blur(1px);
-  z-index:-1;
-  background:radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.28) 50%, rgba(0,0,0,0) 78%);
-}
+  /* next-step / affiliate section */
+  .next-step-section{background:linear-gradient(135deg,rgba(226,76,199,.08),rgba(76,224,210,.08));border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);}
+  .next-step-box{background:var(--panel);border:1px solid rgba(242,184,75,.3);border-radius:var(--radius);padding:36px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+  .next-step-box .content{flex:1;min-width:260px;}
+  .next-step-box h3{font-size:20px;margin-bottom:10px;}
+  .next-step-box p{color:var(--text-dim);font-size:14.5px;}
+  .badge-honest{display:inline-block;background:rgba(242,184,75,.14);color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:5px;margin-bottom:12px;}
+
+  footer{padding:40px 0;border-top:1px solid rgba(255,255,255,.06);position:relative;z-index:1;}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  footer p{color:var(--text-dim);font-size:12.5px;}
+
+  /* ==================== ABOUT VIEW ==================== */
+  .about-content{padding:70px 0;max-width:760px;margin:0 auto;}
+  .about-content h2{font-size:32px;margin-bottom:18px;}
+  .about-content p{color:var(--text-dim);font-size:15.5px;margin-bottom:18px;}
+  .about-content .droid-row{margin:30px 0;}
+
+  /* ==================== LESSON PLAYER ==================== */
+  #view-lesson{padding:32px 0 80px;}
+  .lesson-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:14px;}
+  .lesson-header-left h2{font-size:23px;font-weight:800;}
+  .lesson-header-left .eyebrow{margin-bottom:6px;}
+  .step-dots{display:flex;gap:7px;}
+  .step-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.1);transition:.2s;}
+  .step-dot.active{background:var(--cyan);width:22px;border-radius:5px;box-shadow:0 0 8px var(--cyan);}
+  .step-dot.completed{background:var(--amber);}
+
+  .lesson-shell{display:grid;grid-template-columns:380px 1fr;gap:0;border:1px solid rgba(76,224,210,.15);border-radius:14px;overflow:hidden;box-shadow:0 30px 70px -30px rgba(0,0,0,.7);min-height:520px;}
+  .lesson-instructions{background:var(--panel);padding:30px 26px;border-inline-end:1px solid rgba(76,224,210,.1);overflow-y:auto;}
+  .lesson-step-tag{display:inline-block;background:rgba(76,224,210,.12);color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:5px;margin-bottom:14px;direction:ltr;}
+  .lesson-instructions h3{font-size:20px;font-weight:700;margin-bottom:14px;}
+  .lesson-instructions p{color:var(--text-dim);font-size:14px;margin-bottom:14px;}
+  .lesson-instructions ul{margin:0 0 16px 0;padding-inline-start:20px;color:var(--text-dim);font-size:13.5px;}
+  .lesson-instructions li{margin-bottom:7px;}
+  .lesson-instructions code{background:rgba(76,224,210,.1);color:var(--cyan-bright);padding:1px 6px;border-radius:4px;font-size:12.5px;}
+  .hint-toggle{background:none;border:1px solid rgba(226,76,199,.4);color:var(--magenta);border-radius:7px;padding:8px 14px;font-size:13px;cursor:pointer;margin-top:6px;font-family:'Tajawal',sans-serif;}
+  .hint-toggle:hover{background:rgba(226,76,199,.1);}
+  .hint-box{background:rgba(226,76,199,.08);border:1px solid rgba(226,76,199,.3);border-radius:8px;padding:13px 15px;font-size:13px;color:#f0a8e2;margin-top:10px;}
+
+  .lesson-editor-area{display:flex;flex-direction:column;background:#0A0E1A;}
+  .lesson-editor-area textarea{flex:1;min-height:240px;background:#0A0E1A;color:var(--text);border:none;outline:none;resize:none;padding:22px;font-size:13.5px;line-height:1.7;}
+  .check-result{padding:12px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;border-top:1px solid rgba(76,224,210,.1);}
+  .check-result.pass{background:rgba(76,224,138,.08);color:var(--success);}
+  .check-result.fail{background:rgba(255,107,107,.08);color:var(--danger);}
+  .check-result.idle{background:transparent;color:var(--text-dim);}
+
+  .lesson-nav-buttons{display:flex;justify-content:space-between;margin-top:20px;}
+
+  .completion-banner{background:linear-gradient(135deg,rgba(242,184,75,.1),rgba(76,224,210,.1));border:1px solid var(--amber);border-radius:14px;padding:36px;text-align:center;margin-top:20px;}
+  .completion-banner h3{font-size:22px;margin-bottom:10px;}
+  .completion-banner p{color:var(--text-dim);margin-bottom:20px;}
+
+  @media (max-width:880px){
+    .hero-grid{grid-template-columns:1fr;}
+    .why-grid{grid-template-columns:1fr;}
+    .course-grid{grid-template-columns:1fr 1fr;}
+    .lesson-shell{grid-template-columns:1fr;}
+    .lesson-instructions{border-inline-end:none;border-bottom:1px solid rgba(76,224,210,.1);}
+    .hero h1{font-size:32px;}
+  }
+  @media (max-width:560px){ .course-grid{grid-template-columns:1fr;} }
 </style>
 </head>
-<body class="s-python">
-<canvas id="bgCanvas"></canvas>
-<div id="vig"></div>
+<body>
 
-<div id="label">
-  <div id="lang-pill">
-    <div id="lang-dot"></div>
-    <div id="lang-eyebrow">بايثون</div>
-  </div>
-  <div id="tip-badge">نصيحة للمبتدئين</div>
-</div>
+<div id="starfield"></div>
 
-<div id="ui">
-  <div id="text-scrim"></div>
-  <div id="content-wrap">
-    <div class="qtitle" id="q-title"></div>
-    <div class="qexplain" id="q-explain"></div>
-    <div id="code-panel">
-      <div id="code-titlebar">
-        <div class="tl-dot" style="background:#ff5f57;"></div>
-        <div class="tl-dot" style="background:#febc2e;"></div>
-        <div class="tl-dot" style="background:#28c840;"></div>
-        <div id="code-filename"></div>
-      </div>
-      <div id="code-body"></div>
+<nav>
+  <div class="wrap">
+    <div class="logo" onclick="showTab('home')"><span class="logo-mark">🛰️</span>SpaceCode</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="home" onclick="showTab('home')">الرئيسية</button>
+      <button class="tab-btn" data-tab="course" onclick="showTab('course')">المسار</button>
+      <button class="tab-btn" data-tab="about" onclick="showTab('about')">من نحن</button>
     </div>
-    <div id="output-panel">
-      <div id="output-titlebar">
-        <div id="output-label">النتيجة</div>
-      </div>
-      <div id="output-body"></div>
+    <div class="nav-progress">
+      <span id="nav-progress-text">0 / 18</span>
+      <div class="nav-progress-bar"><div class="nav-progress-fill" id="nav-progress-fill" style="width:0%"></div></div>
     </div>
   </div>
+</nav>
+
+<!-- ==================== HOME VIEW ==================== -->
+<div id="view-home">
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">MISSION CONTROL — FIRST LAUNCH</span>
+        <h1>لا تقرأ عن البرمجة... <span>اكتبها الآن</span></h1>
+        <p class="lead">بعد 30 ثانية من الآن، ستكون قد كتبت أول برنامج فعلي بلغة بايثون. لا تسجيل، لا تثبيت — فقط جرّب في الأسفل.</p>
+        <div class="hero-cta">
+          <a href="#try" class="btn btn-primary" onclick="scrollToTry(event)">🚀 جرّب الآن مجانًا</a>
+          <button class="btn btn-ghost" onclick="showTab('course')">استعرض المسار الكامل</button>
+        </div>
+        <div class="trust-row">
+          <span>🧑‍🚀 <b>+ مجاني</b> بالكامل</span>
+          <span>⚡ <b>بدون تثبيت</b> أي برنامج</span>
+          <span>🌍 <b>بالعربية</b> بالكامل</span>
+        </div>
+
+        <div class="droid-row" style="margin-top:36px;">
+          <div class="droid">
+            <svg viewBox="0 0 100 100"><g id="droid-face-hero"></g></svg>
+          </div>
+          <div class="speech-bubble">
+            أنا <b style="color:var(--cyan)">زُبيّ</b> 👋، رفيقك في هذه الرحلة. مهمتي إرشادك خطوة بخطوة حتى تكتب أول كود حقيقي بنفسك. جاهز؟
+          </div>
+        </div>
+      </div>
+
+      <div class="terminal-card" id="try">
+        <div class="terminal-titlebar">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="terminal-filename">mission_01.py</span>
+        </div>
+        <div class="demo-instructions">
+          🎯 <b>مهمتك:</b> اكتب اسمك مكان <code style="background:rgba(76,224,210,.1);padding:1px 5px;border-radius:4px;">"YOUR NAME"</code> في السطر الأول، ثم اضغط <b>Run</b> لترى الرسالة.
+        </div>
+        <textarea id="hero-code" spellcheck="false">name = "YOUR NAME"
+
+print(f"🚀 Welcome aboard, Commander {name}!")
+print("Your coding mission starts now.")</textarea>
+        <div class="editor-actions">
+          <button id="hero-run" class="run-btn" disabled><span>▶</span> <span id="hero-run-label">تحميل المُفسّر...</span></button>
+          <span class="pyodide-status" id="hero-status">Pyodide: loading…</span>
+        </div>
+        <div class="output-pane" id="hero-output"><span class="placeholder">سيظهر ناتج الكود هنا بعد الضغط على Run</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="why" id="why">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">WHY PYTHON</span>
+        <h2>لماذا بايثون أول محطة؟</h2>
+        <p>بايثون هي أنسب لغة لأول تجربة برمجية: صياغتها قريبة من اللغة الطبيعية، ومستخدمة فعليًا في الذكاء الاصطناعي وتحليل البيانات وتطوير الويب.</p>
+      </div>
+      <div class="why-grid">
+        <div class="why-card"><div class="why-icon">🪐</div><h3>صياغة بسيطة وواضحة</h3><p>أقرب لغات البرمجة للقراءة الطبيعية، ما يجعل التركيز على المنطق لا على تعقيد الرموز.</p></div>
+        <div class="why-card"><div class="why-icon">⚙️</div><h3>تُستخدم في كل مكان</h3><p>من الذكاء الاصطناعي إلى الأتمتة وتحليل البيانات وتطوير الويب — مهارة واحدة، استخدامات لا تنتهي.</p></div>
+        <div class="why-card"><div class="why-icon">💻</div><h3>تشغيل فوري من المتصفح</h3><p>كل دروسنا تعمل مباشرة في متصفحك عبر محرك بايثون حقيقي — بدون تثبيت أي شيء.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="course-preview">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">THE MISSION PATH</span>
+        <h2>18 مهمة تفصلك عن الأساسيات</h2>
+        <p>مسار متسلسل يبني معرفتك خطوة بخطوة. كل مهمة تُفتح بعد إتمام التي قبلها.</p>
+      </div>
+      <div class="course-grid" id="course-grid-preview"></div>
+      <div style="text-align:center;margin-top:28px;">
+        <button class="btn btn-ghost" onclick="showTab('course')">عرض كل المسار ←</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="next-step-section">
+    <div class="wrap">
+      <div class="next-step-box">
+        <div class="droid small-droid" style="width:56px;height:56px;flex-shrink:0;">
+          <svg viewBox="0 0 100 100"><g id="droid-face-cta"></g></svg>
+        </div>
+        <div class="content">
+          <span class="badge-honest">بصراحة تامة</span>
+          <h3>هذا المسار نقطة انطلاق، وليس كل شيء</h3>
+          <p>مهمتنا هنا أن نجعلك مرتاحًا بما يكفي مع أساسيات بايثون لتبدأ رحلتك الحقيقية. بعد إتمام المسار، ننصحك بالانتقال إلى دورة شاملة ومتعمقة لاحتراف اللغة.</p>
+        </div>
+        <a href="#" class="btn btn-primary" id="affiliate-cta-home">استكشف الدورة المتقدمة ←</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="logo" style="font-size:16px;"><span class="logo-mark" style="width:26px;height:26px;font-size:13px;">🛰️</span>SpaceCode</div>
+      <p>SpaceCode — منصة تعليمية لتعلّم أساسيات البرمجة بالعربية.</p>
+    </div>
+  </footer>
 </div>
 
-<div id="bottom"><div id="cta">احفظ هذا للرجوع إليه لاحقاً</div></div>
+<!-- ==================== COURSE (FULL PATH) VIEW ==================== -->
+<div id="view-course" class="hidden">
+  <section style="padding-top:56px;">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">THE MISSION PATH</span>
+        <h2>المسار الكامل</h2>
+        <p>18 مهمة، من أول متغيّر حتى مقدمة في الأصناف. أكمل كل مهمة لتفتح التي تليها.</p>
+      </div>
+      <div class="course-grid" id="course-grid-full"></div>
+    </div>
+  </section>
+  <section class="next-step-section" style="margin-top:20px;">
+    <div class="wrap">
+      <div class="next-step-box">
+        <div class="droid small-droid" style="width:56px;height:56px;flex-shrink:0;">
+          <svg viewBox="0 0 100 100"><g id="droid-face-cta2"></g></svg>
+        </div>
+        <div class="content">
+          <span class="badge-honest">بصراحة تامة</span>
+          <h3>أنهيت المسار؟ هذه هي الخطوة التالية</h3>
+          <p>نحن نبني الأساس فقط. لإتقان بايثون فعليًا (مشاريع حقيقية، مكتبات متقدمة، وممارسة عميقة)، ننصح بدورة متخصصة وشاملة.</p>
+        </div>
+        <a href="#" class="btn btn-primary">استكشف الدورة المتقدمة ←</a>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap">
+      <div class="logo" style="font-size:16px;"><span class="logo-mark" style="width:26px;height:26px;font-size:13px;">🛰️</span>SpaceCode</div>
+      <p>SpaceCode — منصة تعليمية لتعلّم أساسيات البرمجة بالعربية.</p>
+    </div>
+  </footer>
+</div>
 
+<!-- ==================== ABOUT VIEW ==================== -->
+<div id="view-about" class="hidden">
+  <div class="wrap about-content">
+    <span class="eyebrow">ABOUT SPACECODE</span>
+    <h2>من نحن؟</h2>
+    <p>SpaceCode منصة تعليمية بُنيت لفكرة بسيطة: تعلّم البرمجة يجب ألا يبدأ بحاجز اللغة. نقدّم لك أولى خطواتك في بايثون بشرح عربي واضح، وتمارين حقيقية تُنفَّذ في متصفحك مباشرة.</p>
+    <p>نحن لسنا بديلاً عن دورة احترافية شاملة — بل نقطة انطلاق صادقة. هدفنا أن نأخذ بيدك من الصفر حتى تصبح مرتاحًا بما يكفي لتكمل رحلتك في مصادر أعمق.</p>
+    <div class="droid-row">
+      <div class="droid"><svg viewBox="0 0 100 100"><g id="droid-face-about"></g></svg></div>
+      <div class="speech-bubble">أنا زُبيّ، الدرويد المرافق لك في كل مهمة. سأعطيك تلميحات عندما تحتاجها، وأحتفل معك بكل مهمة تُنجزها 🎉</div>
+    </div>
+    <p style="margin-top:30px;">نبدأ ببايثون فقط حاليًا، وسنضيف لغات ومسارات أخرى تدريجيًا بناءً على ما يحتاجه متعلمونا.</p>
+  </div>
+  <footer>
+    <div class="wrap">
+      <div class="logo" style="font-size:16px;"><span class="logo-mark" style="width:26px;height:26px;font-size:13px;">🛰️</span>SpaceCode</div>
+      <p>SpaceCode — منصة تعليمية لتعلّم أساسيات البرمجة بالعربية.</p>
+    </div>
+  </footer>
+</div>
+
+<!-- ==================== LESSON PLAYER VIEW ==================== -->
+<div id="view-lesson" class="hidden">
+  <div class="wrap">
+    <div class="lesson-header">
+      <div class="lesson-header-left">
+        <span class="eyebrow" id="lesson-eyebrow">MISSION 1</span>
+        <h2 id="lesson-title">عنوان المهمة</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="step-dots" id="step-dots"></div>
+        <button class="btn btn-ghost btn-sm" onclick="showTab('course')">→ العودة للمسار</button>
+      </div>
+    </div>
+
+    <div id="lesson-active-content">
+      <div class="droid-row" style="margin-bottom:16px;" id="droid-instruction-row">
+        <div class="droid small"><svg viewBox="0 0 100 100"><g id="droid-face-lesson"></g></svg></div>
+        <div class="speech-bubble" id="droid-speech">لنبدأ هذه المهمة!</div>
+      </div>
+      <div class="lesson-shell">
+        <div class="lesson-instructions" id="lesson-instructions"></div>
+        <div class="lesson-editor-area">
+          <textarea id="lesson-code" spellcheck="false"></textarea>
+          <div class="editor-actions">
+            <button id="lesson-run" class="run-btn" disabled><span>▶</span> <span id="lesson-run-label">تحميل المُفسّر...</span></button>
+            <button id="lesson-check" class="btn btn-ghost btn-sm" disabled>تحقق من الحل</button>
+          </div>
+          <div class="output-pane" id="lesson-output"><span class="placeholder">سيظهر ناتج الكود هنا بعد الضغط على Run</span></div>
+          <div class="check-result idle" id="lesson-check-result">لم يتم التحقق بعد — نفّذ الكود ثم اضغط "تحقق من الحل".</div>
+        </div>
+      </div>
+      <div class="lesson-nav-buttons">
+        <button class="btn btn-ghost" id="prev-step-btn" onclick="prevStep()">→ السابق</button>
+        <button class="btn btn-primary" id="next-step-btn" onclick="nextStep()" disabled>التالي ←</button>
+      </div>
+    </div>
+
+    <div id="lesson-complete-banner" class="completion-banner hidden">
+      <h3>🎉 مهمة مُنجزة!</h3>
+      <p id="next-lesson-preview"></p>
+      <button class="btn btn-primary" onclick="goToNextLesson()">المهمة التالية ←</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
 <script>
-(()=>{
-'use strict';
+/* ============================================================
+   DROID MASCOT (inline SVG, big-eyed robot, simple expressions)
+   ============================================================ */
+function droidSVG(expression){
+  // expression: 'idle' | 'happy' | 'thinking' | 'sad'
+  const eyeColor = 'var(--cyan-bright)';
+  let mouth = '';
+  if(expression==='happy') mouth = `<path d="M38 66 Q50 76 62 66" stroke="#04231f" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  else if(expression==='sad') mouth = `<path d="M38 70 Q50 62 62 70" stroke="#04231f" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  else if(expression==='thinking') mouth = `<circle cx="50" cy="68" r="3" fill="#04231f"/>`;
+  else mouth = `<line x1="40" y1="67" x2="60" y2="67" stroke="#04231f" stroke-width="4" stroke-linecap="round"/>`;
 
-function safeR(v){return Math.max(0.01,isFinite(v)?v:0.01);}
-function easeOutCubic(x){return 1-Math.pow(1-x,3);}
+  return `
+    <rect x="18" y="18" width="64" height="58" rx="18" fill="url(#droidGrad)"/>
+    <rect x="42" y="4" width="16" height="16" rx="4" fill="url(#droidGrad)"/>
+    <circle cx="50" cy="8" r="4" fill="var(--magenta)"/>
+    <circle cx="35" cy="42" r="12" fill="#04231f"/>
+    <circle cx="65" cy="42" r="12" fill="#04231f"/>
+    <circle cx="35" cy="42" r="7" fill="${eyeColor}"/>
+    <circle cx="65" cy="42" r="7" fill="${eyeColor}"/>
+    <circle cx="37" cy="39" r="2.4" fill="#fff"/>
+    <circle cx="67" cy="39" r="2.4" fill="#fff"/>
+    ${mouth}
+    <defs>
+      <linearGradient id="droidGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#4CE0D2"/>
+        <stop offset="100%" stop-color="#2B9E93"/>
+      </linearGradient>
+    </defs>
+  `;
+}
+function setDroidExpression(elId, expr){
+  const el=document.getElementById(elId);
+  if(el) el.innerHTML = droidSVG(expr);
+}
+function initAllDroids(){
+  ['droid-face-hero','droid-face-cta','droid-face-cta2','droid-face-about','droid-face-lesson'].forEach(id=>{
+    if(document.getElementById(id)) setDroidExpression(id,'idle');
+  });
+}
 
-// ── CANVAS SETUP ──────────────────────────────────────────
-const bgC=document.getElementById('bgCanvas');
-const bgCtx=bgC.getContext('2d');
-let W=window.innerWidth,H=window.innerHeight;
-bgC.width=W;bgC.height=H;
+/* ============================================================
+   STARFIELD
+   ============================================================ */
+function initStarfield(){
+  const field=document.getElementById('starfield');
+  const count = 80;
+  for(let i=0;i<count;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const size = Math.random()*2+1;
+    s.style.width=size+'px';
+    s.style.height=size+'px';
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*4)+'s';
+    field.appendChild(s);
+  }
+}
 
-let _t=0,_sceneStart=0,_styleIdx=0;
-
-// ══════════════════════════════════════════════════════════
-// CONTENT — alternating Python / JavaScript beginner tips.
-// Each entry: title, short explanation, filename, and code lines.
-// Code lines are plain strings; a lightweight tokenizer below
-// applies syntax highlighting per-language at render time.
-// ══════════════════════════════════════════════════════════
-const CONTENT = [
-  // ───────────── PYTHON ─────────────
-  {lang:'python',file:'main.py',title:'المتغيرات لا تحتاج نوعاً محدداً',
-   explain:'تتعرّف بايثون على نوع القيمة تلقائياً، يكفي أن تسند القيمة وتبدأ العمل.',
-   code:['name = "Ada"','age = 36','is_coder = True','print(name, age, is_coder)'],
-   output:['Ada 36 True']},
-  {lang:'python',file:'loop.py',title:'حلقة for-in',
-   explain:'يمكن المرور مباشرة على عناصر القائمة دون الحاجة إلى عدّاد.',
-   code:['fruits = ["apple", "kiwi", "fig"]','for fruit in fruits:','    print(fruit)'],
-   output:['apple','kiwi','fig']},
-  {lang:'python',file:'fstring.py',title:'التنسيق باستخدام f-strings',
-   explain:'أضف الحرف f قبل علامتي الاقتباس لتضمين المتغيرات داخل النص مباشرة.',
-   code:['name = "Sam"','score = 92','print(f"{name} scored {score}%")'],
-   output:['Sam scored 92%']},
-  {lang:'python',file:'listcomp.py',title:'list comprehensions',
-   explain:'يمكن بناء قائمة جديدة في سطر واحد بدلاً من حلقة متعددة الأسطر.',
-   code:['nums = [1, 2, 3, 4, 5]','squares = [n * n for n in nums]','print(squares)'],
-   output:['[1, 4, 9, 16, 25]']},
-  {lang:'python',file:'dict.py',title:'القواميس تخزّن أزواج المفتاح والقيمة',
-   explain:'تخيّل القاموس كصندوق موسوم؛ يمكن الوصول إلى القيمة عبر مفتاحها.',
-   code:['user = {"name": "Lee", "age": 24}','print(user["name"])'],
-   output:['Lee']},
-  {lang:'python',file:'default.py',title:'القيم الافتراضية لمعاملات الدالة',
-   explain:'أعطِ المعامل قيمة افتراضية ليتمكن المستدعي من تجاهله عند الحاجة.',
-   code:['def greet(name, greeting="Hello"):','    print(f"{greeting}, {name}!")','','greet("Mia")'],
-   output:['Hello, Mia!']},
-  {lang:'python',file:'slice.py',title:'تقطيع القوائم والنصوص',
-   explain:'استخدم [start:end] لاستخراج جزء محدد دون كتابة حلقة تكرار.',
-   code:['word = "Python"','print(word[0:3])','print(word[-3:])'],
-   output:['Pyt','hon']},
-  {lang:'python',file:'unpack.py',title:'فك القيم المتعددة',
-   explain:'يمكن إسناد عدة متغيرات دفعة واحدة من قائمة أو صف واحد.',
-   code:['point = (4, 7)','x, y = point','print(x, y)'],
-   output:['4 7']},
-  {lang:'python',file:'ternary.py',title:'جملة الشرط في سطر واحد',
-   explain:'يتيح التعبير الشرطي اختيار قيمة معينة ضمن سطر برمجي واحد فقط.',
-   code:['age = 15','status = "adult" if age >= 18 else "minor"','print(status)'],
-   output:['minor']},
-  {lang:'python',file:'enumerate.py',title:'الدالة enumerate() تمنحك الفهرس',
-   explain:'تغني enumerate عن العداد اليدوي، فهي تمنحك الفهرس والعنصر معاً.',
-   code:['colors = ["red", "green", "blue"]','for i, c in enumerate(colors):','    print(i, c)'],
-   output:['0 red','1 green','2 blue']},
-  {lang:'python',file:'trycatch.py',title:'معالجة الأخطاء باستخدام try/except',
-   explain:'ضع الكود المحفوف بالمخاطر داخل try، والتقط الخطأ بدلاً من توقف البرنامج.',
-   code:['try:','    result = 10 / 0','except ZeroDivisionError:','    print("Cannot divide by zero")'],
-   output:['Cannot divide by zero']},
-  {lang:'python',file:'class.py',title:'صنف بسيط في بايثون',
-   explain:'تُنفَّذ الدالة __init__ عند إنشاء الكائن، وتشير self إلى الكائن نفسه.',
-   code:['class Dog:','    def __init__(self, name):','        self.name = name','','rex = Dog("Rex")','print(rex.name)'],
-   output:['Rex']},
-  {lang:'python',file:'lambda.py',title:'lambda: دوال مصغّرة بلا اسم',
-   explain:'مفيدة للدوال القصيرة ذات الاستخدام الواحد، وغالباً ما تُستخدم مع الفرز أو التصفية.',
-   code:['nums = [4, 1, 3, 2]','nums.sort(key=lambda n: -n)','print(nums)'],
-   output:['[4, 3, 2, 1]']},
-  {lang:'python',file:'walrus.py',title:'عامل الفظ walrus operator :=',
-   explain:'يتيح إسناد قيمة واستخدامها ضمن التعبير نفسه في آن واحد.',
-   code:['data = [1, 2, 3]','if (n := len(data)) > 2:','    print(f"List has {n} items")'],
-   output:['List has 3 items']},
-  {lang:'python',file:'zip.py',title:'الدالة zip() تدمج قائمتين',
-   explain:'تتيح المرور على عدة قوائم في آن واحد، عنصراً مقابل عنصر.',
-   code:['names = ["Al", "Bo"]','scores = [90, 85]','for n, s in zip(names, scores):','    print(n, s)'],
-   output:['Al 90','Bo 85']},
-
-  // ───────────── JAVASCRIPT ─────────────
-  {lang:'javascript',file:'main.js',title:'استخدم let وconst بدلاً من var',
-   explain:'استخدم const للقيم التي لا تتغيّر، وlet للقيم القابلة للتغيير.',
-   code:['const name = "Ada";','let age = 36;','age = 37;','console.log(name, age);'],
-   output:['Ada 37']},
-  {lang:'javascript',file:'arrow.js',title:'الدوال السهمية Arrow Functions',
-   explain:'طريقة مختصرة لكتابة الدوال، مفيدة بشكل خاص للدوال المكوّنة من سطر واحد.',
-   code:['const square = (n) => n * n;','console.log(square(5));'],
-   output:['25']},
-  {lang:'javascript',file:'template.js',title:'القوالب النصية Template Literals',
-   explain:'تتيح علامات الاقتباس الخلفية تضمين المتغيرات عبر ${} بدلاً من عملية الجمع.',
-   code:['const name = "Sam";','const score = 92;','console.log(`${name} scored ${score}%`);'],
-   output:['Sam scored 92%']},
-  {lang:'javascript',file:'map.js',title:'الدالة Array.map() تحوّل القائمة',
-   explain:'تعيد map مصفوفة جديدة دون التأثير على المصفوفة الأصلية إطلاقاً.',
-   code:['const nums = [1, 2, 3, 4];','const doubled = nums.map(n => n * 2);','console.log(doubled);'],
-   output:['[ 2, 4, 6, 8 ]']},
-  {lang:'javascript',file:'destructure.js',title:'تفكيك الكائنات Destructuring',
-   explain:'يمكن استخراج خصائص الكائن مباشرة إلى متغيرات مستقلة.',
-   code:['const user = { name: "Lee", age: 24 };','const { name, age } = user;','console.log(name);'],
-   output:['Lee']},
-  {lang:'javascript',file:'default.js',title:'القيم الافتراضية للمعاملات',
-   explain:'أعطِ الدالة قيمة افتراضية ليتمكن المستدعي من حذف أحد المعاملات.',
-   code:['function greet(name, greeting = "Hello") {','  console.log(`${greeting}, ${name}!`);','}','greet("Mia");'],
-   output:['Hello, Mia!']},
-  {lang:'javascript',file:'ternary.js',title:'العامل الشرطي المختصر',
-   explain:'صيغة مختصرة من if/else تعيد قيمة واحدة ضمن تعبير واحد.',
-   code:['const age = 15;','const status = age >= 18 ? "adult" : "minor";','console.log(status);'],
-   output:['minor']},
-  {lang:'javascript',file:'spread.js',title:'عامل النشر Spread Operator ...',
-   explain:'يوسّع عناصر مصفوفة أو كائن إلى عناصر مستقلة.',
-   code:['const a = [1, 2];','const b = [...a, 3, 4];','console.log(b);'],
-   output:['[ 1, 2, 3, 4 ]']},
-  {lang:'javascript',file:'filter.js',title:'الدالة Array.filter() تنتقي العناصر',
-   explain:'تحتفظ filter فقط بالعناصر التي تُعيد الدالة من أجلها القيمة true.',
-   code:['const nums = [1, 2, 3, 4, 5];','const evens = nums.filter(n => n % 2 === 0);','console.log(evens);'],
-   output:['[ 2, 4 ]']},
-  {lang:'javascript',file:'trycatch.js',title:'معالجة الأخطاء باستخدام try/catch',
-   explain:'التقط الخطأ المرمي بدلاً من السماح له بإيقاف البرنامج فجأة.',
-   code:['try {','  JSON.parse("not valid json");','} catch (err) {','  console.log("Parsing failed");','}'],
-   output:['Parsing failed']},
-  {lang:'javascript',file:'sort.js',title:'الدالة Array.sort() تحتاج دالة مقارنة',
-   explain:'من دونها تقارن sort الأرقام كنصوص، لذا استخدم دائماً (a, b) => a - b.',
-   code:['const nums = [10, 1, 21, 2];','nums.sort((a, b) => a - b);','console.log(nums);'],
-   output:['[ 1, 2, 10, 21 ]']},
-  {lang:'javascript',file:'class.js',title:'صنف بسيط في جافاسكريبت',
-   explain:'يُنفَّذ الباني constructor عند الإنشاء، وتشير this إلى الكائن نفسه.',
-   code:['class Dog {','  constructor(name) {','    this.name = name;','  }','}','const rex = new Dog("Rex");','console.log(rex.name);'],
-   output:['Rex']},
-  {lang:'javascript',file:'optional.js',title:'التسلسل الاختياري ?.',
-   explain:'يتيح الوصول الآمن إلى خاصية متداخلة دون توقف البرنامج إن كانت مفقودة.',
-   code:['const user = { profile: null };','console.log(user.profile?.name);'],
-   output:['undefined']},
-  {lang:'javascript',file:'nullish.js',title:'الدمج عند القيمة الفارغة ??',
-   explain:'يعود إلى القيمة البديلة فقط عند null أو undefined، خلافاً لـ || التي تشمل القيمة صفر أيضاً.',
-   code:['const count = 0;','const shown = count ?? 10;','console.log(shown);'],
-   output:['0']},
-  {lang:'javascript',file:'reduce.js',title:'الدالة Array.reduce() تجمع القائمة',
-   explain:'تختصر reduce عناصر المصفوفة إلى قيمة تراكمية واحدة.',
-   code:['const prices = [10, 20, 30];','const total = prices.reduce((sum, p) => sum + p, 0);','console.log(total);'],
-   output:['60']},
+/* ============================================================
+   LESSON DATA
+   ============================================================ */
+const LESSONS = [
+{
+  id:1, title:"المتغيرات والطباعة", summary:"تخزين القيم وعرضها باستخدام print()",
+  steps:[
+    { tag:"STEP 1 / 2", title:"إنشاء أول متغير",
+      body:`<p>المتغيّر هو اسم يُستخدم لتخزين قيمة يمكن استعمالها لاحقًا في الكود.</p>
+            <p>في بايثون، لا تحتاج لتحديد نوع المتغير — فقط اكتب اسمه، ثم علامة =، ثم القيمة.</p>
+            <ul><li>أنشئ متغيرًا اسمه <code>age</code> وأعطه القيمة <code>25</code></li>
+                <li>اطبع المتغير باستخدام <code>print(age)</code></li></ul>`,
+      starter:`# Write your code below\n`,
+      hint:"الأسماء في بايثون لا تحتوي مسافات، استخدم شرطة سفلية بدلاً من ذلك مثل my_age.",
+      speech:"لنبدأ بأبسط شيء: صندوق يخزّن قيمة. هذا هو المتغيّر!",
+      check:(code,out)=> /\bage\s*=\s*25\b/.test(code) && out.trim()==='25'
+    },
+    { tag:"STEP 2 / 2", title:"متغيرات نصية",
+      body:`<p>يمكن للمتغيرات تخزين نصوص أيضًا، بوضعها بين علامتي اقتباس.</p>
+            <ul><li>أنشئ متغيرًا اسمه <code>name</code> وضع فيه اسمك بين علامتي اقتباس</li>
+                <li>اطبعه باستخدام <code>print(name)</code></li></ul>`,
+      starter:`# Write your code below\n`,
+      hint:'مثال: name = "Sara"',
+      speech:"ممتاز! الآن جرّب تخزين نص بدلاً من رقم.",
+      check:(code,out)=> /\bname\s*=\s*["'].+["']/.test(code) && out.trim().length>0
+    }
+  ]
+},
+{
+  id:2, title:"الأرقام والعمليات الحسابية", summary:"الجمع والطرح والضرب والقسمة في بايثون",
+  steps:[
+    { tag:"STEP 1 / 2", title:"العمليات الأساسية",
+      body:`<p>تدعم بايثون العمليات الحسابية المعتادة: <code>+ - * /</code></p>
+            <ul><li>أنشئ متغيرًا اسمه <code>result</code> يساوي ناتج <code>7 * 6</code></li>
+                <li>اطبعه</li></ul>`,
+      starter:`# Write your code below\n`,
+      hint:"result = 7 * 6 ثم print(result)",
+      speech:"بايثون آلة حاسبة قوية أيضًا! جرّب ضرب رقمين.",
+      check:(code,out)=> /result\s*=\s*7\s*\*\s*6/.test(code) && out.trim()==='42'
+    },
+    { tag:"STEP 2 / 2", title:"القسمة الصحيحة والباقي",
+      body:`<p>الرمز <code>//</code> يعطي القسمة الصحيحة (بدون كسور)، والرمز <code>%</code> يعطي باقي القسمة.</p>
+            <ul><li>اطبع ناتج <code>17 // 5</code></li>
+                <li>اطبع ناتج <code>17 % 5</code></li></ul>`,
+      starter:`# Write your code below\n`,
+      hint:"print(17 // 5) ثم print(17 % 5)",
+      speech:"هناك عمليتان خاصتان بالقسمة في بايثون، لنتعرف عليهما.",
+      check:(code,out)=>{ const lines=out.trim().split('\n').map(s=>s.trim()); return lines.includes('3') && lines.includes('2'); }
+    }
+  ]
+},
+{
+  id:3, title:"النصوص (Strings)", summary:"التعامل مع النصوص، الطول، والدمج",
+  steps:[
+    { tag:"STEP 1 / 2", title:"دمج النصوص",
+      body:`<p>يمكن دمج نصين باستخدام <code>+</code>.</p>
+            <ul><li>أنشئ متغيرين <code>first</code> و<code>last</code> بأي اسمين</li>
+                <li>اطبع دمجهما مع مسافة بينهما</li></ul>`,
+      starter:`first = "Ahmad"\nlast = "Ali"\n# print the full name below\n`,
+      hint:'print(first + " " + last)',
+      speech:"يمكننا لصق النصوص ببعضها، تمامًا مثل قطع الليغو!",
+      check:(code,out)=> /print\(/.test(code) && out.trim().split(' ').length>=2
+    },
+    { tag:"STEP 2 / 2", title:"طول النص",
+      body:`<p>الدالة <code>len()</code> تعطيك عدد الأحرف في النص.</p>
+            <ul><li>اطبع طول الكلمة <code>"Python"</code> باستخدام <code>len()</code></li></ul>`,
+      starter:`# Write your code below\n`,
+      hint:'print(len("Python"))',
+      speech:"كم حرفًا في هذه الكلمة؟ دع بايثون تحسبها لك.",
+      check:(code,out)=> out.trim()==='6'
+    }
+  ]
+}
 ];
 
-// ── LIGHTWEIGHT SYNTAX HIGHLIGHTER ──────────────────────────
-const PY_KEYWORDS=new Set(['def','return','if','elif','else','for','while','in','import','from','as','class','try','except','finally','with','pass','break','continue','and','or','not','is','None','True','False','lambda','yield','global','nonlocal','assert','del','raise']);
-const JS_KEYWORDS=new Set(['const','let','var','function','return','if','else','for','while','in','of','class','constructor','try','catch','finally','throw','new','this','async','await','import','export','from','default','break','continue','typeof','instanceof','null','undefined','true','false']);
-
-function tokenizeLine(line,lang){
-  const kw = lang==='python' ? PY_KEYWORDS : JS_KEYWORDS;
-  let out='';
-  let i=0;
-  const n=line.length;
-  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-  while(i<n){
-    const c=line[i];
-
-    // comments
-    if(lang==='python' && c==='#'){
-      out+=`<span class="tok-com">${esc(line.slice(i))}</span>`;break;
-    }
-    if(lang==='javascript' && c==='/' && line[i+1]==='/'){
-      out+=`<span class="tok-com">${esc(line.slice(i))}</span>`;break;
-    }
-
-    // strings
-    if(c==='"'||c==="'"||c==='`'){
-      const quote=c;let j=i+1;
-      while(j<n && line[j]!==quote){ if(line[j]==='\\')j++; j++; }
-      j=Math.min(j+1,n);
-      out+=`<span class="tok-str">${esc(line.slice(i,j))}</span>`;
-      i=j;continue;
-    }
-
-    // numbers
-    if(/[0-9]/.test(c) && !/[A-Za-z_]/.test(line[i-1]||'')){
-      let j=i;while(j<n && /[0-9.]/.test(line[j]))j++;
-      out+=`<span class="tok-num">${esc(line.slice(i,j))}</span>`;
-      i=j;continue;
-    }
-
-    // identifiers / keywords
-    if(/[A-Za-z_$]/.test(c)){
-      let j=i;while(j<n && /[A-Za-z0-9_$]/.test(line[j]))j++;
-      const word=line.slice(i,j);
-      const nextNonSpace=line.slice(j).match(/^\s*\(/);
-      if(kw.has(word)){
-        out+=`<span class="tok-key">${esc(word)}</span>`;
-      }else if(nextNonSpace){
-        out+=`<span class="tok-fn">${esc(word)}</span>`;
-      }else if(/^[A-Z]/.test(word) && lang==='python'){
-        out+=`<span class="tok-type">${esc(word)}</span>`;
-      }else{
-        out+=`<span class="tok-var">${esc(word)}</span>`;
-      }
-      i=j;continue;
-    }
-
-    // punctuation/operators
-    out+=`<span class="tok-punc">${esc(c)}</span>`;
-    i++;
-  }
-  return out;
-}
-
-// ── shared point-star helper (unused visually but kept minimal) ──
-function star(ctx,cx,cy,outerR,points,innerRatio){
-  points=points||5; innerRatio=innerRatio||0.382;
-  const innerR=outerR*innerRatio;
-  ctx.beginPath();
-  for(let k=0;k<points*2;k++){
-    const ang=(Math.PI/points)*k - Math.PI/2;
-    const rad=(k%2===0)?outerR:innerR;
-    const x=cx+Math.cos(ang)*rad,y=cy+Math.sin(ang)*rad;
-    if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
-  }
-  ctx.closePath();ctx.fill();
-}
-
-// ════════════════════════════════════════════════════════
-// PYTHON background — deep blue/navy editor glow, faint grid,
-// drifting "python-blue/yellow" orbs, soft code-line ghosting
-// ════════════════════════════════════════════════════════
-const PY_PARTICLES=[];
-function initPython(w,h){
-  PY_PARTICLES.length=0;
-  for(let i=0;i<26;i++){
-    PY_PARTICLES.push({
-      x:Math.random()*w,y:Math.random()*h,
-      r:1+Math.random()*2,
-      vy:0.15+Math.random()*0.25,
-      drift:(Math.random()-0.5)*0.3,
-      hue:Math.random()<0.5?0:1, // 0 blue, 1 yellow
-      tw:Math.random()*Math.PI*2,
-    });
-  }
-}
-function drawPython(ctx,t,w,h,st){
-  const g=ctx.createLinearGradient(0,0,0,h);
-  g.addColorStop(0,'#0a1626');g.addColorStop(0.55,'#0d2038');g.addColorStop(1,'#060d18');
-  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-
-  if(!PY_PARTICLES.length)initPython(w,h);
-  const p=easeOutCubic(Math.min(1,st/1.0));
-
-  // soft glow center
-  const gx=w*0.5,gy=h*0.38;
-  const rg=ctx.createRadialGradient(gx,gy,0,gx,gy,safeR(Math.max(w,h)*0.55));
-  rg.addColorStop(0,'rgba(55,118,171,0.22)');rg.addColorStop(1,'rgba(55,118,171,0)');
-  ctx.save();ctx.fillStyle=rg;ctx.fillRect(0,0,w,h);ctx.restore();
-
-  // faint dot-grid, editor-minimap feel
-  ctx.save();ctx.globalAlpha=0.05;ctx.fillStyle='#8fc8ff';
-  const step=Math.max(24,w/18);
-  for(let y=step*0.5;y<h;y+=step){
-    for(let x=step*0.5;x<w;x+=step){
-      ctx.beginPath();ctx.arc(x,y,1.1,0,Math.PI*2);ctx.fill();
-    }
-  }
-  ctx.restore();
-
-  // floating "falling code" particles — blue and gold accents
-  PY_PARTICLES.forEach(pt=>{
-    pt.y+=pt.vy;pt.x+=Math.sin(t*0.6+pt.tw)*pt.drift;
-    if(pt.y>h+10){pt.y=-10;pt.x=Math.random()*w;}
-    const tw=0.5+Math.sin(t*1.4+pt.tw)*0.5;
-    ctx.save();ctx.globalAlpha=tw*0.55*p;
-    ctx.fillStyle=pt.hue===0?'#5aa9e6':'#ffd43b';
-    ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=6;
-    ctx.beginPath();ctx.arc(pt.x,pt.y,pt.r,0,Math.PI*2);ctx.fill();
-    ctx.restore();
-  });
-
-  // two large soft intertwined arcs, evoking the python logo motif abstractly
-  ctx.save();ctx.globalAlpha=0.14*p;
-  ctx.strokeStyle='#3776ab';ctx.lineWidth=Math.max(18,w*0.045);ctx.lineCap='round';
-  ctx.beginPath();ctx.arc(w*0.36,h*0.28,Math.min(w,h)*0.24,0.6*Math.PI,1.7*Math.PI);ctx.stroke();
-  ctx.strokeStyle='#ffd43b';
-  ctx.beginPath();ctx.arc(w*0.64,h*0.5,Math.min(w,h)*0.24,1.6*Math.PI,2.7*Math.PI);ctx.stroke();
-  ctx.restore();
-
-  // scanline texture
-  ctx.save();ctx.globalAlpha=0.04;ctx.fillStyle='#000';
-  for(let y=0;y<h;y+=3){ctx.fillRect(0,y,w,1);}
-  ctx.restore();
-}
-
-// ════════════════════════════════════════════════════════
-// JAVASCRIPT background — warm charcoal/yellow editor glow,
-// drifting brace/bracket glyphs, JS-yellow accent arcs
-// ════════════════════════════════════════════════════════
-const JS_GLYPHS=['{','}','(',')','=>','[',']',';'];
-const JS_PARTICLES=[];
-function initJavascript(w,h){
-  JS_PARTICLES.length=0;
-  for(let i=0;i<20;i++){
-    JS_PARTICLES.push({
-      x:Math.random()*w,y:Math.random()*h,
-      glyph:JS_GLYPHS[Math.floor(Math.random()*JS_GLYPHS.length)],
-      size:Math.min(w,h)*(0.02+Math.random()*0.02),
-      vy:0.12+Math.random()*0.22,
-      drift:(Math.random()-0.5)*0.25,
-      tw:Math.random()*Math.PI*2,
-      rot:(Math.random()-0.5)*0.4,
-    });
-  }
-}
-function drawJavascript(ctx,t,w,h,st){
-  const g=ctx.createLinearGradient(0,0,0,h);
-  g.addColorStop(0,'#1c1a06');g.addColorStop(0.55,'#211f0a');g.addColorStop(1,'#0e0d04');
-  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-
-  if(!JS_PARTICLES.length)initJavascript(w,h);
-  const p=easeOutCubic(Math.min(1,st/1.0));
-
-  const gx=w*0.5,gy=h*0.4;
-  const rg=ctx.createRadialGradient(gx,gy,0,gx,gy,safeR(Math.max(w,h)*0.55));
-  rg.addColorStop(0,'rgba(247,223,30,0.16)');rg.addColorStop(1,'rgba(247,223,30,0)');
-  ctx.save();ctx.fillStyle=rg;ctx.fillRect(0,0,w,h);ctx.restore();
-
-  // faint grid
-  ctx.save();ctx.globalAlpha=0.05;ctx.strokeStyle='#f7df1e';ctx.lineWidth=1;
-  const step=Math.max(28,w/14);
-  for(let x=0;x<w;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
-  ctx.restore();
-
-  // floating JS syntax glyphs drifting upward
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  JS_PARTICLES.forEach(pt=>{
-    pt.y-=pt.vy;pt.x+=Math.sin(t*0.5+pt.tw)*pt.drift;
-    if(pt.y<-20){pt.y=h+20;pt.x=Math.random()*w;}
-    const tw=0.4+Math.sin(t*1.3+pt.tw)*0.4;
-    ctx.save();ctx.globalAlpha=tw*0.4*p;ctx.fillStyle='#f7df1e';
-    ctx.font=`700 ${pt.size}px 'JetBrains Mono',monospace`;
-    ctx.translate(pt.x,pt.y);ctx.rotate(Math.sin(t*0.4+pt.tw)*pt.rot);
-    ctx.fillText(pt.glyph,0,0);
-    ctx.restore();
-  });
-
-  // soft angled accent bar, like an editor sidebar highlight
-  ctx.save();ctx.globalAlpha=0.1*p;ctx.fillStyle='#f7df1e';
-  ctx.beginPath();
-  ctx.moveTo(0,h*0.15);ctx.lineTo(w*0.08,h*0.15);ctx.lineTo(w*0.02,h*0.85);ctx.lineTo(0,h*0.85);
-  ctx.closePath();ctx.fill();
-  ctx.restore();
-
-  ctx.save();ctx.globalAlpha=0.04;ctx.fillStyle='#000';
-  for(let y=0;y<h;y+=3){ctx.fillRect(0,y,w,1);}
-  ctx.restore();
-}
-
-// ── STYLES REGISTRY ─────────────────────────────────────
-const STYLES=[
-  {id:'python',category:'python',bodyClass:'s-python',weight:1,onScene(w,h){initPython(w,h);}, draw:drawPython},
-  {id:'javascript',category:'javascript',bodyClass:'s-javascript',weight:1,onScene(w,h){initJavascript(w,h);}, draw:drawJavascript},
+const REMAINING_TITLES = [
+  ["صياغة النصوص بـ f-strings","دمج المتغيرات داخل النصوص بسهولة"],
+  ["المقارنات والقيم المنطقية","Booleans و comparisons"],
+  ["الشروط If / Else","اتخاذ قرارات داخل الكود"],
+  ["القوائم Lists","تخزين مجموعة من القيم"],
+  ["أساليب القوائم والتقطيع","List methods و slicing"],
+  ["حلقة for","تكرار تنفيذ الكود"],
+  ["حلقة while","التكرار الشرطي"],
+  ["القواميس Dictionaries","تخزين أزواج مفتاح-قيمة"],
+  ["الدوال Functions","كتابة كود قابل لإعادة الاستخدام"],
+  ["الدوال والقيم المُرجعة","استخدام return"],
+  ["المعاملات الافتراضية","Default و keyword arguments"],
+  ["Tuples و Sets","أنواع بيانات إضافية"],
+  ["الأخطاء والاستثناءات","try / except"],
+  ["مقدمة في الأصناف (Classes)","أساسيات البرمجة الكائنية"],
+  ["مهمة التخرج", "تطبيق شامل على كل ما تعلمته"]
 ];
-
-// ── PER-STYLE TEXT COLOUR CONFIG (used when baking the recorded video) ──
-const STYLE_TEXT={
-  python:{titleFill:'#ffffff',titleStroke:'rgba(6,12,24,0.6)',explainFill:'rgba(210,230,255,0.88)',pillFill:'#f0f0f0'},
-  javascript:{titleFill:'#ffffff',titleStroke:'rgba(20,18,4,0.6)',explainFill:'rgba(255,246,210,0.88)',pillFill:'#f0f0f0'},
-};
-function getStyleText(id){return STYLE_TEXT[id]||STYLE_TEXT.python;}
-
-// ── AUDIO ─────────────────────────────────────────────────
-const AC=new (window.AudioContext||window.webkitAudioContext)();
-const master=AC.createGain();master.gain.value=0.85;master.connect(AC.destination);
-let _recDest=null,_audioOn=false;
-function unlockAC(){if(_audioOn)return;AC.resume().then(()=>{_audioOn=true;startPad();});}
-
-let _pads=[];
-function startPad(){
-  stopPad();
-  try{
-    [261.63,329.63,392.00,466.16].forEach((f,i)=>{
-      const o=AC.createOscillator(),g=AC.createGain(),lfo=AC.createOscillator(),lg2=AC.createGain();
-      o.type='sine';o.frequency.value=f;lfo.type='sine';lfo.frequency.value=0.06+i*0.02;lg2.gain.value=1.1;
-      lfo.connect(lg2);lg2.connect(o.frequency);
-      const t=AC.currentTime;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.022-i*0.002,t+2.2);
-      o.connect(g);g.connect(master);o.start(t);lfo.start(t);_pads.push({o,g,lfo});
-    });
-  }catch(e){}
-}
-function stopPad(){
-  _pads.forEach(p=>{try{p.g.gain.setTargetAtTime(0,AC.currentTime,0.35);setTimeout(()=>{try{p.o.stop();p.lfo.stop();}catch(e){}},900);}catch(e){}});_pads=[];
-}
-function sfxChime(){
-  if(!_audioOn)return;
-  try{
-    const o=AC.createOscillator(),g=AC.createGain();
-    o.type='sine';o.frequency.setValueAtTime(523.25,AC.currentTime);
-    o.frequency.exponentialRampToValueAtTime(698.46,AC.currentTime+0.12);
-    g.gain.setValueAtTime(0.05,AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001,AC.currentTime+0.7);
-    o.connect(g);g.connect(master);o.start();o.stop(AC.currentTime+0.8);
-  }catch(e){}
-}
-function sfxKey(){
-  if(!_audioOn)return;
-  try{
-    const o=AC.createOscillator(),g=AC.createGain();
-    o.type='square';o.frequency.setValueAtTime(1000+Math.random()*400,AC.currentTime);
-    g.gain.setValueAtTime(0.018,AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001,AC.currentTime+0.05);
-    o.connect(g);g.connect(master);o.start();o.stop(AC.currentTime+0.06);
-  }catch(e){}
-}
-function sfxSoft(){
-  if(!_audioOn)return;
-  try{
-    const o=AC.createOscillator(),g=AC.createGain();
-    o.type='sine';o.frequency.setValueAtTime(392,AC.currentTime);
-    o.frequency.exponentialRampToValueAtTime(311.13,AC.currentTime+0.18);
-    g.gain.setValueAtTime(0.035,AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001,AC.currentTime+0.6);
-    o.connect(g);g.connect(master);o.start();o.stop(AC.currentTime+0.65);
-  }catch(e){}
-}
-function sfxWhoosh(){
-  if(!_audioOn)return;
-  try{
-    const o=AC.createOscillator(),g=AC.createGain();
-    o.type='sine';o.frequency.setValueAtTime(900,AC.currentTime);
-    o.frequency.exponentialRampToValueAtTime(260,AC.currentTime+0.28);
-    g.gain.setValueAtTime(0.032,AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001,AC.currentTime+0.4);
-    o.connect(g);g.connect(master);o.start();o.stop(AC.currentTime+0.45);
-  }catch(e){}
-}
-
-// ── SCENE ─────────────────────────────────────────────────
-// Single pool, shuffled, alternating python/javascript entries already
-// baked into content order via strict alternation enforcement below.
-let _pool=[],_pidx=0;
-function buildAlternatingPool(){
-  const py=CONTENT.filter(c=>c.lang==='python').sort(()=>Math.random()-0.5);
-  const js=CONTENT.filter(c=>c.lang==='javascript').sort(()=>Math.random()-0.5);
-  const out=[];
-  const n=Math.max(py.length,js.length);
-  // randomize which language starts, then strictly alternate
-  const first=Math.random()<0.5?py:js, second=first===py?js:py;
-  for(let i=0;i<n;i++){
-    if(first[i])out.push(first[i]);
-    if(second[i])out.push(second[i]);
-  }
-  return out;
-}
-function nextC(){
-  if(!_pool.length||_pidx>=_pool.length){_pool=buildAlternatingPool();_pidx=0;}
-  return _pool[_pidx++];
-}
-
-let _timers=[];
-function clearT(){_timers.forEach(clearTimeout);_timers=[];}
-
-function styleIdxForLang(lang){
-  return STYLES.findIndex(s=>s.category===lang);
-}
-
-function showScene(){
-  clearT();
-  unlockAC();
-
-  const C=nextC();
-  _styleIdx=styleIdxForLang(C.lang);
-  const style=STYLES[_styleIdx];
-  document.body.className=style.bodyClass;
-  window._lastCategory=style.category;
-
-  _sceneStart=_t;
-  style.onScene(W,H);
-
-  // label
-  const langEyebrow=document.getElementById('lang-eyebrow');
-  langEyebrow.textContent=C.lang==='python'?'بايثون':'جافاسكريبت';
-
-  // title + explain
-  const titleEl=document.getElementById('q-title');
-  const explainEl=document.getElementById('q-explain');
-  titleEl.textContent=C.title;
-  explainEl.textContent=C.explain;
-  titleEl.classList.remove('in');explainEl.classList.remove('in');
-
-  // code panel
-  const panel=document.getElementById('code-panel');
-  const filenameEl=document.getElementById('code-filename');
-  const bodyEl=document.getElementById('code-body');
-  filenameEl.textContent=C.file;
-  bodyEl.innerHTML='';
-  panel.classList.remove('in');
-
-  const lineEls=[];
-  C.code.forEach((lineText,idx)=>{
-    const row=document.createElement('div');
-    row.className='code-line';
-    const numSpan=document.createElement('span');
-    numSpan.className='ln-num';numSpan.textContent=String(idx+1);
-    const codeSpan=document.createElement('span');
-    codeSpan.className='ln-code';
-    codeSpan.innerHTML=lineText.length?tokenizeLine(lineText,C.lang):'&nbsp;';
-    row.appendChild(numSpan);row.appendChild(codeSpan);
-    bodyEl.appendChild(row);
-    lineEls.push(row);
+REMAINING_TITLES.forEach((t,i)=>{
+  const id = LESSONS.length+1;
+  LESSONS.push({
+    id, title:t[0], summary:t[1],
+    steps:[{
+      tag:"STEP 1 / 1", title:t[0],
+      body:`<p>هذه المهمة قيد الإعداد ضمن المحتوى الكامل. ستتضمن شرحًا خطوة بخطوة وتمارين تفاعلية مثل المهام الثلاث الأولى.</p>
+            <ul><li>جرّب أي كود بايثون في المحرر للتدرّب بحرية</li></ul>`,
+      starter:`# Free practice — try anything!\nprint("Hello from mission ${id}")\n`,
+      hint:"هذه المهمة نموذج مؤقت — المحتوى الكامل قادم قريبًا.",
+      speech:"هذه المهمة قادمة قريبًا — جرّب أي كود تريده هنا في هذه الأثناء!",
+      check:(code,out)=> out.trim().length>0
+    }]
   });
+});
 
-  // output panel
-  const outputPanel=document.getElementById('output-panel');
-  const outputBody=document.getElementById('output-body');
-  outputBody.innerHTML='';
-  outputPanel.classList.remove('in');
-  const outputLineEls=[];
-  (C.output||[]).forEach(line=>{
-    const row=document.createElement('div');
-    row.className='output-line';
-    row.textContent=line;
-    outputBody.appendChild(row);
-    outputLineEls.push(row);
+/* ============================================================
+   PROGRESS
+   ============================================================ */
+const STORAGE_KEY='spacecode_progress_v1';
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {completedLessons:[]}; } catch(e){ return {completedLessons:[]}; } }
+function saveProgress(p){ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+let progress = loadProgress();
+let currentLessonIdx=0, currentStepIdx=0, stepPassed=[];
+function isLessonUnlocked(idx){ return idx===0 || progress.completedLessons.includes(LESSONS[idx-1].id); }
+function isLessonDone(id){ return progress.completedLessons.includes(id); }
+
+/* ============================================================
+   PYODIDE
+   ============================================================ */
+let pyodide=null, pyodideReady=false;
+async function initPyodide(){
+  pyodide = await loadPyodide();
+  pyodideReady = true;
+  document.querySelectorAll('.run-btn').forEach(btn=>btn.disabled=false);
+  document.getElementById('hero-run-label').textContent='تشغيل Run';
+  const lrl=document.getElementById('lesson-run-label'); if(lrl) lrl.textContent='تشغيل Run';
+  document.getElementById('hero-status').textContent='Pyodide: ready';
+  const checkBtn=document.getElementById('lesson-check'); if(checkBtn) checkBtn.disabled=false;
+}
+initPyodide();
+
+async function execPython(code){
+  let capturedOut=[];
+  pyodide.setStdout({batched:(s)=>capturedOut.push(s)});
+  pyodide.setStderr({batched:(s)=>capturedOut.push(s)});
+  let errMsg=null;
+  try{ await pyodide.runPythonAsync(code); } catch(err){ errMsg = err.message || String(err); }
+  return { output: capturedOut.join('\n'), error: errMsg };
+}
+async function runCode(codeElId,outputElId,statusElId){
+  if(!pyodideReady) return;
+  const code=document.getElementById(codeElId).value;
+  const outEl=document.getElementById(outputElId);
+  outEl.classList.remove('err');
+  outEl.textContent='...جارٍ التنفيذ';
+  const {output,error} = await execPython(code);
+  if(error){ outEl.classList.add('err'); outEl.textContent=error; }
+  else{ outEl.textContent = output.length? output : '(لا يوجد ناتج مطبوع)'; }
+  if(statusElId) document.getElementById(statusElId).textContent='Pyodide: ready';
+  return {output,error};
+}
+document.getElementById('hero-run').addEventListener('click',()=>runCode('hero-code','hero-output','hero-status'));
+
+/* ============================================================
+   TAB NAVIGATION
+   ============================================================ */
+function showTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.getElementById('view-home').classList.toggle('hidden', tab!=='home');
+  document.getElementById('view-course').classList.toggle('hidden', tab!=='course');
+  document.getElementById('view-about').classList.toggle('hidden', tab!=='about');
+  document.getElementById('view-lesson').classList.add('hidden');
+  if(tab==='home') renderCourseGrid('course-grid-preview', true);
+  if(tab==='course') renderCourseGrid('course-grid-full', false);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function scrollToTry(e){ e.preventDefault(); document.getElementById('try').scrollIntoView({behavior:'smooth'}); }
+
+/* ============================================================
+   COURSE GRID RENDERING
+   ============================================================ */
+function renderCourseGrid(targetId, previewOnly){
+  const grid=document.getElementById(targetId);
+  if(!grid) return;
+  grid.innerHTML='';
+  const list = previewOnly ? LESSONS.slice(0,6) : LESSONS;
+  list.forEach((lesson)=>{
+    const idx = LESSONS.findIndex(l=>l.id===lesson.id);
+    const unlocked=isLessonUnlocked(idx);
+    const done=isLessonDone(lesson.id);
+    const card=document.createElement('div');
+    card.className='lesson-card'+(unlocked?'':' locked')+(done?' done':'');
+    card.innerHTML=`
+      <span class="lesson-steps-count">${lesson.steps.length} خطوات</span>
+      <span class="lesson-num">MISSION ${String(lesson.id).padStart(2,'0')}</span>
+      <h4>${lesson.title}</h4>
+      <p>${lesson.summary}</p>
+      <span class="lesson-status ${done?'done-status':(unlocked?'':'locked-status')}">
+        ${done?'✓ مكتملة':(unlocked?'● متاحة الآن':'🔒 تُفتح بعد المهمة السابقة')}
+      </span>`;
+    if(unlocked){ card.addEventListener('click',()=>openLesson(idx)); }
+    grid.appendChild(card);
   });
-
-  const label=document.getElementById('label');
-  const tipBadge=document.getElementById('tip-badge');
-  const bottom=document.getElementById('bottom');
-  const scrim=document.getElementById('text-scrim');
-  label.style.opacity='0';label.style.transform='translateY(-16px)';
-  tipBadge.style.opacity='0';tipBadge.style.transform='translateY(-8px)';
-  bottom.style.opacity='0';bottom.style.transform='translateY(12px)';
-  scrim.style.opacity='0';
-  outputPanel.style.opacity='';outputPanel.style.transform='';
-
-  sfxChime();
-
-  _timers.push(setTimeout(()=>{
-    label.style.opacity='1';label.style.transform='translateY(0)';
-  },200));
-  _timers.push(setTimeout(()=>{
-    tipBadge.style.opacity='1';tipBadge.style.transform='translateY(0)';
-  },340));
-  _timers.push(setTimeout(()=>{
-    scrim.style.opacity='1';
-  },380));
-  _timers.push(setTimeout(()=>{
-    titleEl.classList.add('in');sfxChime();
-  },520));
-  _timers.push(setTimeout(()=>{
-    explainEl.classList.add('in');sfxSoft();
-  },900));
-  _timers.push(setTimeout(()=>{
-    panel.classList.add('in');sfxSoft();
-  },1300));
-
-  let lineDelay=1600;
-  lineEls.forEach((row)=>{
-    _timers.push(setTimeout(()=>{
-      row.classList.add('in');sfxKey();
-    },lineDelay));
-    lineDelay+=180;
-  });
-
-  _timers.push(setTimeout(()=>{
-    outputPanel.classList.add('in');sfxSoft();
-  },lineDelay+280));
-
-  let outDelay=lineDelay+520;
-  outputLineEls.forEach((row)=>{
-    _timers.push(setTimeout(()=>{
-      row.classList.add('in');sfxKey();
-    },outDelay));
-    outDelay+=150;
-  });
-
-  _timers.push(setTimeout(()=>{
-    bottom.style.opacity='1';bottom.style.transform='translateY(0)';
-    sfxWhoosh();
-  },outDelay+380));
+  updateNavProgress();
+}
+function updateNavProgress(){
+  const total=LESSONS.length, done=progress.completedLessons.length;
+  document.getElementById('nav-progress-text').textContent=`${done} / ${total}`;
+  document.getElementById('nav-progress-fill').style.width=(total? (done/total*100):0)+'%';
 }
 
-// ── RECORDING ─────────────────────────────────────────────
-let _compC=null,_compCtx=null;
-window._recActive=false;
-window._recordingDone=false;
-window._recordingBlob=null;
-let _recChunks=[],_recorder=null;
-
-function drawOutlinedText(ctx,text,x,y,fillColor,strokeColor,strokeWidth){
-  ctx.lineJoin='round';
-  ctx.miterLimit=2;
-  if(strokeWidth>0){
-    ctx.lineWidth=strokeWidth;
-    ctx.strokeStyle=strokeColor;
-    ctx.strokeText(text,x,y);
-  }
-  ctx.fillStyle=fillColor;
-  ctx.fillText(text,x,y);
+/* ============================================================
+   LESSON PLAYER
+   ============================================================ */
+function openLesson(idx){
+  currentLessonIdx=idx; currentStepIdx=0;
+  const lesson=LESSONS[idx];
+  stepPassed = lesson.steps.map(()=>false);
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-home').classList.add('hidden');
+  document.getElementById('view-course').classList.add('hidden');
+  document.getElementById('view-about').classList.add('hidden');
+  document.getElementById('view-lesson').classList.remove('hidden');
+  document.getElementById('lesson-complete-banner').classList.add('hidden');
+  document.getElementById('lesson-active-content').classList.remove('hidden');
+  document.getElementById('lesson-eyebrow').textContent=`MISSION ${lesson.id} / ${LESSONS.length}`;
+  document.getElementById('lesson-title').textContent=lesson.title;
+  renderStepDots();
+  renderStep();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderStepDots(){
+  const lesson=LESSONS[currentLessonIdx];
+  const dotsEl=document.getElementById('step-dots');
+  dotsEl.innerHTML='';
+  lesson.steps.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='step-dot'+(i===currentStepIdx?' active':'')+(stepPassed[i]?' completed':'');
+    dotsEl.appendChild(d);
+  });
+}
+function renderStep(){
+  const lesson=LESSONS[currentLessonIdx];
+  const step=lesson.steps[currentStepIdx];
+  document.getElementById('lesson-instructions').innerHTML=`
+    <span class="lesson-step-tag">${step.tag}</span>
+    <h3>${step.title}</h3>
+    ${step.body}
+    <button class="hint-toggle" onclick="toggleHint()">💡 إظهار تلميح</button>
+    <div class="hint-box hidden" id="hint-box">${step.hint}</div>
+  `;
+  document.getElementById('droid-speech').textContent = step.speech || '';
+  setDroidExpression('droid-face-lesson','idle');
+  document.getElementById('lesson-code').value = step.starter;
+  document.getElementById('lesson-output').innerHTML='<span class="placeholder">سيظهر ناتج الكود هنا بعد الضغط على Run</span>';
+  document.getElementById('lesson-output').classList.remove('err');
+  const resultEl=document.getElementById('lesson-check-result');
+  resultEl.className='check-result idle';
+  resultEl.textContent='لم يتم التحقق بعد — نفّذ الكود ثم اضغط "تحقق من الحل".';
+  document.getElementById('prev-step-btn').disabled = currentStepIdx===0;
+  document.getElementById('next-step-btn').disabled = !stepPassed[currentStepIdx];
+  document.getElementById('next-step-btn').textContent = (currentStepIdx===lesson.steps.length-1) ? 'إنهاء المهمة ✓' : 'التالي ←';
+  renderStepDots();
+}
+function toggleHint(){ document.getElementById('hint-box').classList.toggle('hidden'); }
+function prevStep(){ if(currentStepIdx>0){ currentStepIdx--; renderStep(); } }
+function nextStep(){
+  const lesson=LESSONS[currentLessonIdx];
+  if(currentStepIdx < lesson.steps.length-1){ currentStepIdx++; renderStep(); }
+  else{ completeLesson(); }
+}
+function completeLesson(){
+  const lesson=LESSONS[currentLessonIdx];
+  if(!progress.completedLessons.includes(lesson.id)){ progress.completedLessons.push(lesson.id); saveProgress(progress); }
+  document.getElementById('lesson-active-content').classList.add('hidden');
+  const banner=document.getElementById('lesson-complete-banner');
+  banner.classList.remove('hidden');
+  const nextLesson = LESSONS[currentLessonIdx+1];
+  document.getElementById('next-lesson-preview').textContent = nextLesson
+    ? `المهمة التالية: ${nextLesson.title}`
+    : 'أنهيت جميع المهام المتاحة! هذا هو المكان المثالي للانتقال إلى دورة متعمقة 🚀';
+  if(!nextLesson) document.querySelector('#lesson-complete-banner .btn').classList.add('hidden');
+  updateNavProgress();
+}
+function goToNextLesson(){
+  if(currentLessonIdx+1 < LESSONS.length) openLesson(currentLessonIdx+1);
+  else showTab('course');
 }
 
-// simple HTML->plain segments renderer for the code lines composite draw:
-// walks the child spans of a line and draws each with its token color
-function drawCodeLineComposite(ctx,lineCodeEl,baseX,baseY,fontStr){
-  ctx.font=fontStr;
-  ctx.textAlign='left';ctx.textBaseline='middle';
-  let x=baseX;
-  const spans=lineCodeEl.querySelectorAll('span');
-  if(spans.length===0){
-    const txt=lineCodeEl.textContent||'';
-    ctx.fillStyle='#d4d4d4';
-    ctx.fillText(txt,x,baseY);
+document.getElementById('lesson-run')?.addEventListener('click',()=>runCode('lesson-code','lesson-output',null));
+document.getElementById('lesson-check')?.addEventListener('click', async ()=>{
+  if(!pyodideReady) return;
+  const lesson = LESSONS[currentLessonIdx];
+  const step = lesson.steps[currentStepIdx];
+  const code = document.getElementById('lesson-code').value;
+  const resultEl = document.getElementById('lesson-check-result');
+  const {output,error} = await execPython(code);
+  document.getElementById('lesson-output').textContent = error ? error : (output.length?output:'(لا يوجد ناتج مطبوع)');
+  document.getElementById('lesson-output').classList.toggle('err', !!error);
+
+  if(error){
+    resultEl.className='check-result fail';
+    resultEl.textContent='✗ يوجد خطأ في الكود: '+error;
+    setDroidExpression('droid-face-lesson','sad');
     return;
   }
-  spans.forEach(sp=>{
-    const cls=sp.className;
-    let color='#d4d4d4';
-    if(cls.includes('tok-key'))color='#c586c0';
-    else if(cls.includes('tok-fn'))color='#dcdcaa';
-    else if(cls.includes('tok-str'))color='#ce9178';
-    else if(cls.includes('tok-num'))color='#b5cea8';
-    else if(cls.includes('tok-com'))color='#6a9955';
-    else if(cls.includes('tok-var'))color='#9cdcfe';
-    else if(cls.includes('tok-type'))color='#4ec9b0';
-    else if(cls.includes('tok-punc'))color='#d4d4d4';
-    const txt=sp.textContent;
-    ctx.fillStyle=color;
-    if(cls.includes('tok-com'))ctx.font=fontStr.replace('normal','italic');
-    ctx.fillText(txt,x,baseY);
-    ctx.font=fontStr;
-    x+=ctx.measureText(txt).width;
-  });
-}
-
-function _drawComposite(){
-  if(!_compCtx)return;
-  const ctx=_compCtx,cW=_compC.width,cH=_compC.height;
-  ctx.clearRect(0,0,cW,cH);
-
-  try{ctx.drawImage(bgC,0,0,cW,cH);}catch(e){}
-
-  const vg=ctx.createRadialGradient(cW/2,cH*0.46,cH*0.1,cW/2,cH*0.46,safeR(cH*0.8));
-  vg.addColorStop(0,'transparent');vg.addColorStop(1,'rgba(0,0,0,0.45)');
-  ctx.fillStyle=vg;ctx.fillRect(0,0,cW,cH);
-
-  const currentId=STYLES[_styleIdx].id;
-  const textCfg=getStyleText(currentId);
-
-  // scrim
-  const scrimEl=document.getElementById('text-scrim');
-  const scrimOp=parseFloat(window.getComputedStyle(scrimEl).opacity)||0;
-  if(scrimOp>0.01){
-    const sr=scrimEl.getBoundingClientRect();
-    const sgrad=ctx.createRadialGradient(sr.left+sr.width/2,sr.top+sr.height/2,0,sr.left+sr.width/2,sr.top+sr.height/2,safeR(Math.max(sr.width,sr.height)*0.55));
-    sgrad.addColorStop(0,'rgba(0,0,0,0.5)');sgrad.addColorStop(0.5,'rgba(0,0,0,0.28)');sgrad.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.save();ctx.globalAlpha=scrimOp;ctx.fillStyle=sgrad;ctx.fillRect(sr.left,sr.top,sr.width,sr.height);ctx.restore();
+  const passed = step.check(code, output);
+  if(passed){
+    resultEl.className='check-result pass';
+    resultEl.textContent='✓ ممتاز! الحل صحيح.';
+    stepPassed[currentStepIdx]=true;
+    document.getElementById('next-step-btn').disabled=false;
+    renderStepDots();
+    setDroidExpression('droid-face-lesson','happy');
+  } else {
+    resultEl.className='check-result fail';
+    resultEl.textContent='✗ لم يكتمل الحل بعد — راجع التعليمات وحاول مجددًا.';
+    setDroidExpression('droid-face-lesson','thinking');
   }
-
-  // label pill
-  const labelEl=document.getElementById('label');
-  const labelOp=parseFloat(window.getComputedStyle(labelEl).opacity)||0;
-  if(labelOp>0.01){
-    const pillEl=document.getElementById('lang-pill');
-    const pr=pillEl.getBoundingClientRect();
-    ctx.save();ctx.globalAlpha=labelOp;
-    // pill background
-    const radius=pr.height/2;
-    ctx.fillStyle='rgba(30,30,30,0.72)';
-    ctx.strokeStyle='rgba(255,255,255,0.14)';ctx.lineWidth=1;
-    ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(pr.left,pr.top,pr.width,pr.height,radius);else ctx.rect(pr.left,pr.top,pr.width,pr.height);
-    ctx.fill();ctx.stroke();
-    // dot
-    const dotEl=document.getElementById('lang-dot');
-    const dr=dotEl.getBoundingClientRect();
-    const dotGrad=ctx.createLinearGradient(dr.left,dr.top,dr.right,dr.bottom);
-    if(currentId==='python'){dotGrad.addColorStop(0,'#3776ab');dotGrad.addColorStop(1,'#ffd43b');}
-    else{dotGrad.addColorStop(0,'#f7df1e');dotGrad.addColorStop(1,'#f0db4f');}
-    ctx.fillStyle=dotGrad;
-    ctx.beginPath();ctx.arc(dr.left+dr.width/2,dr.top+dr.height/2,dr.width/2,0,Math.PI*2);ctx.fill();
-    // eyebrow text
-    const ebEl=document.getElementById('lang-eyebrow');
-    const ebR=ebEl.getBoundingClientRect();
-    const ebFs=parseFloat(window.getComputedStyle(ebEl).fontSize)||14;
-    ctx.font=`800 ${ebFs}px 'Tajawal',sans-serif`;
-    ctx.textAlign='right';ctx.textBaseline='middle';
-    ctx.fillStyle=textCfg.pillFill;
-    ctx.fillText(ebEl.textContent,ebR.left+ebR.width,ebR.top+ebR.height/2);
-    ctx.restore();
-  }
-
-  // tip badge
-  const tipEl=document.getElementById('tip-badge');
-  const tipOp=parseFloat(window.getComputedStyle(tipEl).opacity)||0;
-  if(tipOp>0.01){
-    const tr=tipEl.getBoundingClientRect();
-    const tfs=parseFloat(window.getComputedStyle(tipEl).fontSize)||12;
-    ctx.save();ctx.globalAlpha=tipOp;
-    ctx.font=`600 ${tfs}px 'Tajawal',sans-serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='rgba(255,255,255,0.5)';
-    ctx.fillText(tipEl.textContent,tr.left+tr.width/2,tr.top+tr.height/2);
-    ctx.restore();
-  }
-
-  // title
-  const titleEl=document.getElementById('q-title');
-  const titleOp=parseFloat(window.getComputedStyle(titleEl).opacity)||0;
-  if(titleOp>0.01){
-    const tr=titleEl.getBoundingClientRect();
-    const tfs=parseFloat(window.getComputedStyle(titleEl).fontSize)||28;
-    ctx.save();ctx.globalAlpha=titleOp;
-    ctx.font=`900 ${tfs}px 'Tajawal',sans-serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=16;
-    drawOutlinedText(ctx,titleEl.textContent,tr.left+tr.width/2,tr.top+tr.height/2,textCfg.titleFill,'',0);
-    ctx.restore();
-  }
-
-  // explain
-  const explainEl=document.getElementById('q-explain');
-  const explainOp=parseFloat(window.getComputedStyle(explainEl).opacity)||0;
-  if(explainOp>0.01){
-    const er=explainEl.getBoundingClientRect();
-    const efs=parseFloat(window.getComputedStyle(explainEl).fontSize)||16;
-    ctx.save();ctx.globalAlpha=explainOp;
-    ctx.font=`500 ${efs}px 'Tajawal',sans-serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle=textCfg.explainFill;
-    // explain may visually wrap; approximate by drawing as-is (single line assumption in composite)
-    ctx.fillText(explainEl.textContent,er.left+er.width/2,er.top+er.height/2,er.width);
-    ctx.restore();
-  }
-
-  // code panel
-  const panelEl=document.getElementById('code-panel');
-  const panelOp=parseFloat(window.getComputedStyle(panelEl).opacity)||0;
-  if(panelOp>0.01){
-    const pr=panelEl.getBoundingClientRect();
-    ctx.save();ctx.globalAlpha=panelOp;
-    // panel bg + border
-    ctx.fillStyle='#1e1e1e';ctx.strokeStyle='#3c3c3c';ctx.lineWidth=1;
-    const rad=12;
-    ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(pr.left,pr.top,pr.width,pr.height,rad);else ctx.rect(pr.left,pr.top,pr.width,pr.height);
-    ctx.fill();ctx.stroke();
-
-    // titlebar
-    const tbEl=document.getElementById('code-titlebar');
-    const tbR=tbEl.getBoundingClientRect();
-    ctx.fillStyle='#323233';
-    ctx.beginPath();ctx.rect(pr.left,pr.top,pr.width,tbR.height);ctx.fill();
-    ctx.strokeStyle='#3c3c3c';ctx.beginPath();ctx.moveTo(pr.left,pr.top+tbR.height);ctx.lineTo(pr.left+pr.width,pr.top+tbR.height);ctx.stroke();
-
-    document.querySelectorAll('.tl-dot').forEach(dot=>{
-      const dr=dot.getBoundingClientRect();
-      ctx.fillStyle=window.getComputedStyle(dot).backgroundColor;
-      ctx.beginPath();ctx.arc(dr.left+dr.width/2,dr.top+dr.height/2,dr.width/2,0,Math.PI*2);ctx.fill();
-    });
-
-    const fnEl=document.getElementById('code-filename');
-    const fnR=fnEl.getBoundingClientRect();
-    const fnFs=parseFloat(window.getComputedStyle(fnEl).fontSize)||12;
-    ctx.font=`500 ${fnFs}px 'JetBrains Mono',monospace`;
-    ctx.textAlign='left';ctx.textBaseline='middle';
-    ctx.fillStyle='rgba(255,255,255,0.55)';
-    ctx.fillText(fnEl.textContent,fnR.left,fnR.top+fnR.height/2);
-
-    // code lines
-    document.querySelectorAll('.code-line').forEach(row=>{
-      const rop=parseFloat(window.getComputedStyle(row).opacity)||0;
-      if(rop<0.01)return;
-      const rr=row.getBoundingClientRect();
-      const numEl=row.querySelector('.ln-num');
-      const codeEl=row.querySelector('.ln-code');
-      const nr=numEl.getBoundingClientRect();
-      const cfs=parseFloat(window.getComputedStyle(codeEl).fontSize)||15;
-      ctx.save();ctx.globalAlpha=rop;
-      ctx.font=`400 ${cfs}px 'JetBrains Mono',monospace`;
-      ctx.textAlign='right';ctx.textBaseline='middle';
-      ctx.fillStyle='#5a5a5a';
-      ctx.fillText(numEl.textContent,nr.left+nr.width,nr.top+nr.height/2);
-      const cr=codeEl.getBoundingClientRect();
-      drawCodeLineComposite(ctx,codeEl,cr.left,cr.top+cr.height/2,`normal 400 ${cfs}px 'JetBrains Mono',monospace`);
-      ctx.restore();
-    });
-    ctx.restore();
-  }
-
-  // output / terminal panel
-  const outPanelEl=document.getElementById('output-panel');
-  const outPanelOp=parseFloat(window.getComputedStyle(outPanelEl).opacity)||0;
-  if(outPanelOp>0.01){
-    const opr=outPanelEl.getBoundingClientRect();
-    ctx.save();ctx.globalAlpha=outPanelOp;
-    ctx.fillStyle='#0c0c0e';ctx.strokeStyle='#3c3c3c';ctx.lineWidth=1;
-    const orad=12;
-    ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(opr.left,opr.top,opr.width,opr.height,orad);else ctx.rect(opr.left,opr.top,opr.width,opr.height);
-    ctx.fill();ctx.stroke();
-
-    const otbEl=document.getElementById('output-titlebar');
-    const otbR=otbEl.getBoundingClientRect();
-    ctx.fillStyle='#151517';
-    ctx.beginPath();ctx.rect(opr.left,opr.top,opr.width,otbR.height);ctx.fill();
-    ctx.strokeStyle='#3c3c3c';ctx.beginPath();ctx.moveTo(opr.left,opr.top+otbR.height);ctx.lineTo(opr.left+opr.width,opr.top+otbR.height);ctx.stroke();
-
-    const olEl=document.getElementById('output-label');
-    const olR=olEl.getBoundingClientRect();
-    const olFs=parseFloat(window.getComputedStyle(olEl).fontSize)||12;
-    ctx.font=`700 ${olFs}px 'Tajawal',sans-serif`;
-    ctx.textAlign='left';ctx.textBaseline='middle';
-    ctx.fillStyle='#6fcf7d';
-    ctx.fillText('▶ '+olEl.textContent,olR.left,olR.top+olR.height/2);
-
-    document.querySelectorAll('.output-line').forEach(row=>{
-      const rop=parseFloat(window.getComputedStyle(row).opacity)||0;
-      if(rop<0.01)return;
-      const rr=row.getBoundingClientRect();
-      const rfs=parseFloat(window.getComputedStyle(row).fontSize)||15;
-      ctx.save();ctx.globalAlpha=rop;
-      ctx.font=`400 ${rfs}px 'JetBrains Mono',monospace`;
-      ctx.textAlign='left';ctx.textBaseline='middle';
-      ctx.fillStyle='#6fcf7d';
-      ctx.fillText('›',rr.left,rr.top+rr.height/2);
-      ctx.fillStyle='#d4d4d4';
-      ctx.fillText(row.textContent,rr.left+rfs*1.3,rr.top+rr.height/2);
-      ctx.restore();
-    });
-    ctx.restore();
-  }
-
-  // bottom cta
-  const botEl=document.getElementById('bottom');
-  const botOp=parseFloat(window.getComputedStyle(botEl).opacity)||0;
-  if(botOp>0.01){
-    const botR=botEl.getBoundingClientRect();
-    ctx.save();ctx.globalAlpha=botOp*0.75;
-    ctx.font=`700 ${Math.max(10,cW*0.021)}px 'Tajawal',sans-serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    drawOutlinedText(ctx,'احفظ هذا للرجوع إليه لاحقاً',cW/2,botR.top+botR.height*0.4,'#ffffff','',0);
-    ctx.restore();
-  }
-}
-
-window.startRecordingFreshScene=function(fps){
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      window.startRecording(fps);
-    });
-  });
-};
-window.startRecording=function(fps){
-  fps=fps||30;
-  try{
-    AC.resume().catch(()=>{});
-    _compC=document.createElement('canvas');
-    _compC.width=W;_compC.height=H;
-    _compCtx=_compC.getContext('2d');
-    window._recActive=true;
-    window._recordingDone=false;
-    _recChunks=[];
-    _drawComposite();
-    _recDest=AC.createMediaStreamDestination();
-    master.connect(_recDest);
-    const vs=_compC.captureStream(fps);
-    const combined=new MediaStream([...vs.getVideoTracks(),..._recDest.stream.getAudioTracks()]);
-    const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(m=>MediaRecorder.isTypeSupported(m))||'video/webm';
-    _recorder=new MediaRecorder(combined,{mimeType:mime,videoBitsPerSecond:8000000,audioBitsPerSecond:192000});
-    _recorder.ondataavailable=e=>{if(e.data&&e.data.size>0)_recChunks.push(e.data);};
-    _recorder.onstop=()=>{
-      window._recActive=false;
-      try{master.disconnect(_recDest);}catch(e){}
-      window._recordingBlob=new Blob(_recChunks,{type:'video/webm'});
-      window._recordingDone=true;
-    };
-    _recorder.start(200);
-    console.log('Recording started');
-  }catch(e){console.error('startRecording error:',e);}
-};
-window.stopRecording=function(){try{if(_recorder&&_recorder.state!=='inactive')_recorder.stop();}catch(e){}};
-window.forceFinalize=function(){
-  window._recActive=false;
-  if(_recChunks.length>0&&!window._recordingDone){
-    window._recordingBlob=new Blob(_recChunks,{type:'video/webm'});
-    window._recordingDone=true;
-  }
-};
-window.getRecordingBase64=function(){
-  return new Promise((resolve,reject)=>{
-    const chk=()=>{
-      if(!window._recordingBlob){setTimeout(chk,100);return;}
-      const r=new FileReader();
-      r.onloadend=()=>resolve(r.result.split(',')[1]);
-      r.onerror=reject;
-      r.readAsDataURL(window._recordingBlob);
-    };chk();
-  });
-};
-
-// ── LOOP ──────────────────────────────────────────────────
-(function loop(){
-  requestAnimationFrame(loop);
-  _t+=0.016;
-  const st=Math.max(0,_t-_sceneStart);
-  STYLES[_styleIdx].draw(bgCtx,_t,W,H,st);
-  if(window._recActive)_drawComposite();
-})();
-
-// ── BOOT ──────────────────────────────────────────────────
-window.addEventListener('resize',()=>{
-  W=window.innerWidth;H=window.innerHeight;
-  bgC.width=W;bgC.height=H;
 });
-document.body.addEventListener('click',showScene);
-document.body.addEventListener('touchend',e=>{e.preventDefault();showScene();},{passive:false});
-showScene();
-})();
+
+/* ============================================================
+   INIT
+   ============================================================ */
+initStarfield();
+initAllDroids();
+renderCourseGrid('course-grid-preview', true);
 </script>
+
 </body>
 </html>
