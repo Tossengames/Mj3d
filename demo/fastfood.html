@@ -3,949 +3,1036 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STACKD — Fast Food</title>
+<title>Orbit — Learn C# for Unity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap');
-:root {
-  --red:#FF2020; --yellow:#FFD000; --orange:#FF6B00; --green:#2ECC40;
-  --cream:#FFF8EE; --brown:#7B3F00; --ink:#1A0800; --white:#FFFFFF;
-  --cheese:#FFB300; --tomato:#E8271A; --sky:#00CFFF;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;}
-body{background:var(--cream);font-family:'Nunito',sans-serif;cursor:none;overflow:hidden;}
+  :root{
+    --bg:#0b0e1a;
+    --panel:#12162a;
+    --panel-2:#171c34;
+    --line:#262c48;
+    --text:#e7ebf7;
+    --text-dim:#8991b3;
+    --blue:#6ea8fe;
+    --green:#4ade80;
+    --amber:#f5a742;
+    --red:#fb7185;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+  }
+  a{color:inherit;}
 
-/* CURSOR */
-#cursor{position:fixed;pointer-events:none;z-index:9999;width:22px;height:22px;border-radius:50%;background:var(--red);transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s;mix-blend-mode:multiply;}
-#cursor.hover{width:55px;height:55px;background:var(--yellow);}
+  /* ---------------- header ---------------- */
+  header{
+    height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 20px;
+    border-bottom:1px solid var(--line);
+    background:var(--panel);
+  }
+  .logo{ display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; }
+  .logo-dot{
+    width:22px; height:22px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #a9c9ff, #6ea8fe 60%, #3a5fc8);
+    box-shadow:0 0 10px rgba(110,168,254,.6);
+  }
+  .progress-wrap{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--text-dim); }
+  .progress-bar{ width:140px; height:6px; background:var(--panel-2); border-radius:4px; overflow:hidden; border:1px solid var(--line); }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,#6ea8fe,#4ade80); border-radius:4px; transition:width .3s; }
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--red);display:flex;justify-content:space-between;align-items:center;padding:.85rem 2.5rem;border-bottom:3px solid var(--ink);box-shadow:0 4px 0 rgba(0,0,0,.15);}
-.nav-logo{font-family:'Bebas Neue',cursive;font-size:2.1rem;letter-spacing:3px;color:var(--yellow);text-shadow:2px 2px 0 var(--ink);}
-.nav-tagline{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);}
-.nav-right{display:flex;align-items:center;gap:1.5rem;}
-.cart-btn{display:flex;align-items:center;gap:.6rem;background:var(--yellow);color:var(--ink);border:2.5px solid var(--ink);padding:.5rem 1.4rem;border-radius:100px;font-weight:800;font-size:.9rem;cursor:none;transition:transform .2s,box-shadow .2s;box-shadow:3px 3px 0 var(--ink);font-family:'Nunito',sans-serif;}
-.cart-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);}
-.cart-count{background:var(--red);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900;border:2px solid var(--ink);}
+  /* ---------------- layout ---------------- */
+  .layout{ display:grid; grid-template-columns:280px 1fr; height:calc(100vh - 56px); }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; height:auto; } }
 
-/* MAIN LAYOUT */
-.app{display:grid;grid-template-columns:1fr 440px;height:100vh;padding-top:66px;}
+  /* ---------------- sidebar ---------------- */
+  .sidebar{
+    background:var(--panel);
+    border-right:1px solid var(--line);
+    overflow-y:auto;
+    padding:14px 0;
+  }
+  .track-title{
+    font-family:'Space Grotesk',sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:1.2px;
+    color:var(--text-dim); padding:6px 18px 12px;
+  }
+  .lesson-item{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 18px; cursor:pointer; font-size:13.5px;
+    border-left:3px solid transparent;
+    color:var(--text-dim);
+  }
+  .lesson-item:hover{ background:var(--panel-2); color:var(--text); }
+  .lesson-item.active{ background:var(--panel-2); border-left-color:var(--blue); color:var(--text); font-weight:600; }
+  .lesson-item.done{ color:var(--text); }
+  .num{
+    width:20px; height:20px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10.5px; font-family:'JetBrains Mono',monospace;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim);
+  }
+  .lesson-item.done .num{ background:var(--green); border-color:var(--green); color:#04170c; }
+  .lesson-item.active .num{ border-color:var(--blue); color:var(--blue); }
+  .section-label{
+    padding:16px 18px 4px; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;
+    border-top:1px solid var(--line); margin-top:6px;
+  }
+  .section-label:first-child{ border-top:none; margin-top:0; }
 
-/* ── LEFT VIEWER ── */
-.viewer{position:relative;background:linear-gradient(145deg,#FFF5D6 0%,#FFE8A0 40%,#FFD880 100%);border-right:3px solid var(--ink);overflow:hidden;display:flex;flex-direction:column;}
+  /* ---------------- main ---------------- */
+  .main{ display:grid; grid-template-columns:1fr 1fr; min-height:0; }
+  @media (max-width:900px){ .main{ grid-template-columns:1fr; } }
 
-/* polka dot bg */
-.viewer::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,160,0,.12) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0;}
+  .lesson-pane{ padding:28px 32px; overflow-y:auto; border-right:1px solid var(--line); }
+  .work-pane{ display:flex; flex-direction:column; min-height:0; }
 
-/* 3D canvas */
-#foodCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;cursor:grab;}
-#foodCanvas:active{cursor:grabbing;}
+  .kicker{ font-size:12px; color:var(--blue); font-family:'JetBrains Mono',monospace; letter-spacing:.5px; margin-bottom:6px; }
+  .lesson-pane h1{ font-family:'Space Grotesk',sans-serif; font-size:24px; margin:0 0 14px; }
+  .lesson-pane p{ font-size:14.5px; line-height:1.7; color:#c7cde3; margin:0 0 14px; }
+  .lesson-pane code{
+    background:rgba(110,168,254,.12); color:#a9c9ff; padding:2px 6px; border-radius:4px;
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+  }
+  .lesson-pane pre{
+    background:#0d1024; border:1px solid var(--line); border-radius:8px; padding:14px 16px;
+    font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.6; color:#dbe6ff;
+    overflow-x:auto; margin:0 0 16px;
+  }
+  .callout{
+    background:rgba(245,167,66,.08); border:1px solid rgba(245,167,66,.3); border-radius:8px;
+    padding:12px 14px; font-size:13.5px; line-height:1.6; margin:0 0 16px; color:#f0d3a8;
+  }
+  .callout b{ color:var(--amber); }
 
-/* Info overlay */
-.food-info{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:1.5rem 2.5rem 2rem;background:linear-gradient(to top,rgba(26,8,0,.92) 0%,rgba(26,8,0,.6) 60%,transparent 100%);}
-.food-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--yellow);color:var(--ink);padding:.3rem .9rem;border-radius:100px;font-size:.65rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:.75rem;border:2px solid var(--ink);}
-.food-name{font-family:'Bebas Neue',cursive;font-size:clamp(2.8rem,5vw,4.2rem);color:#fff;letter-spacing:1px;line-height:1;text-shadow:2px 2px 0 rgba(0,0,0,.4);margin-bottom:.4rem;}
-.food-desc{font-size:.88rem;color:rgba(255,255,255,.7);line-height:1.6;max-width:480px;margin-bottom:1.2rem;}
-.food-bottom{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;}
-.food-price{font-family:'Bebas Neue',cursive;font-size:3rem;color:var(--yellow);letter-spacing:1px;text-shadow:2px 2px 0 rgba(0,0,0,.3);}
-.food-cals{font-size:.78rem;color:rgba(255,255,255,.5);font-weight:600;}
-.add-to-cart{display:flex;align-items:center;gap:.75rem;background:var(--red);color:#fff;border:2.5px solid rgba(255,255,255,.3);padding:.8rem 2rem;border-radius:100px;font-weight:800;font-size:.95rem;cursor:none;transition:transform .2s,box-shadow .2s,background .2s;font-family:'Nunito',sans-serif;}
-.add-to-cart:hover{background:var(--orange);transform:translateY(-3px);box-shadow:0 8px 25px rgba(255,32,32,.4);}
-.add-to-cart.added{background:var(--green);}
+  .nav-buttons{ display:flex; gap:10px; margin-top:22px; }
+  .btn{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13.5px;
+    padding:10px 18px; border-radius:8px; cursor:pointer; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--text);
+  }
+  .btn:hover{ border-color:var(--blue); }
+  .btn.primary{ background:var(--blue); border-color:var(--blue); color:#08101f; }
+  .btn.primary:hover{ background:#84b6ff; }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; }
 
-/* drag hint */
-.drag-hint{position:absolute;top:1.2rem;left:50%;transform:translateX(-50%);z-index:10;background:rgba(26,8,0,.55);backdrop-filter:blur(8px);color:#fff;padding:.4rem 1.1rem;border-radius:100px;font-size:.72rem;font-weight:700;letter-spacing:1.5px;display:flex;align-items:center;gap:.5rem;animation:fadeHint 3s 1.5s forwards;}
-@keyframes fadeHint{0%{opacity:1;}100%{opacity:0;pointer-events:none;}}
+  /* ---------------- editor / output ---------------- */
+  .pane-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel);
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim);
+  }
+  .run-btn{
+    background:var(--green); color:#04170c; border:none; font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:12.5px; padding:7px 14px; border-radius:6px; cursor:pointer;
+  }
+  .run-btn:hover{ filter:brightness(1.08); }
 
-/* category tabs */
-.cat-tabs{position:absolute;top:1.2rem;right:1.5rem;z-index:10;display:flex;flex-direction:column;gap:.5rem;}
-.cat-tab{padding:.45rem 1rem;border-radius:100px;font-size:.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;border:2px solid var(--ink);cursor:none;transition:transform .2s,box-shadow .2s;font-family:'Nunito',sans-serif;}
-.cat-tab:hover{transform:translate(-2px,-2px);}
-.cat-tab.active{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--ink);}
-.cat-tab[data-cat="burgers"]{background:#FF6B00;color:#fff;}
-.cat-tab[data-cat="drinks"]{background:#00CFFF;color:var(--ink);}
-.cat-tab[data-cat="sides"]{background:#FFD000;color:var(--ink);}
-.cat-tab[data-cat="desserts"]{background:#FF69B4;color:#fff;}
+  #editor{
+    flex:1.1; width:100%; resize:none; border:none; outline:none;
+    background:#0d1024; color:#dbe6ff;
+    font-family:'JetBrains Mono',monospace; font-size:13.5px; line-height:1.6;
+    padding:16px; tab-size:4; border-bottom:1px solid var(--line);
+  }
 
-/* ── RIGHT PANEL ── */
-.panel{display:flex;flex-direction:column;background:var(--white);overflow:hidden;}
+  .output-panel{ flex:1; display:flex; flex-direction:column; min-height:0; background:#0b0e1a; }
+  .output-tabs{ display:flex; border-bottom:1px solid var(--line); background:var(--panel); }
+  .output-tab{ padding:9px 16px; font-size:12.5px; color:var(--text-dim); cursor:default; border-bottom:2px solid transparent; }
+  .output-tab.active{ color:var(--text); border-color:var(--blue); }
 
-.panel-header{padding:1.25rem 1.5rem .75rem;border-bottom:2px solid #F0E8DC;}
-.panel-title{font-family:'Bebas Neue',cursive;font-size:1.6rem;letter-spacing:1.5px;color:var(--ink);}
-.panel-sub{font-size:.75rem;color:#888;font-weight:600;margin-top:.1rem;}
+  #consoleOut{
+    flex:1; overflow-y:auto; padding:12px 16px; font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.7;
+  }
+  .out-line{ display:flex; gap:8px; }
+  .out-line .p{ flex-shrink:0; }
+  .p.info{ color:var(--blue); }
+  .p.ok{ color:var(--green); }
+  .p.err{ color:var(--red); }
+  .p.sys{ color:var(--text-dim); }
 
-/* search */
-.search-wrap{padding:.85rem 1.5rem;border-bottom:2px solid #F0E8DC;}
-.search-box{width:100%;padding:.65rem 1.1rem;border:2px solid #E0D8CC;border-radius:100px;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:600;background:#FFF8EE;color:var(--ink);outline:none;transition:border-color .2s;}
-.search-box:focus{border-color:var(--red);}
+  #sceneWrap{ display:none; flex:1; position:relative; }
+  #sceneCanvas{ width:100%; height:100%; display:block; background:radial-gradient(ellipse at 50% 30%, #10163a 0%, #05070f 75%); }
 
-/* food grid */
-.food-grid{flex:1;overflow-y:auto;padding:1rem 1.2rem;display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
-.food-grid::-webkit-scrollbar{width:4px;}
-.food-grid::-webkit-scrollbar-track{background:#FFF8EE;}
-.food-grid::-webkit-scrollbar-thumb{background:var(--red);border-radius:2px;}
+  .result-banner{
+    display:none; padding:10px 16px; font-size:13px; font-weight:600; align-items:center; gap:8px;
+    font-family:'Space Grotesk',sans-serif;
+  }
+  .result-banner.show{ display:flex; }
+  .result-banner.pass{ background:rgba(74,222,128,.12); color:var(--green); border-top:1px solid rgba(74,222,128,.3); }
+  .result-banner.fail{ background:rgba(251,113,133,.1); color:var(--red); border-top:1px solid rgba(251,113,133,.3); }
 
-.grid-item{border-radius:18px;border:2.5px solid var(--ink);overflow:hidden;cursor:none;transition:transform .25s,box-shadow .25s;position:relative;background:#fff;}
-.grid-item:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--ink);}
-.grid-item.selected{border-color:var(--red);transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--red);}
+  /* ---------------- mascot popup ---------------- */
+  #mascotPopup{
+    position:fixed; bottom:26px; right:26px; z-index:50;
+    display:flex; align-items:flex-end; gap:10px;
+    max-width:340px;
+    opacity:0; transform:translateY(16px) scale(.96);
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  #mascotPopup.show{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .mascot-face{
+    width:46px; height:46px; border-radius:50%; flex-shrink:0;
+    background:radial-gradient(circle at 32% 28%, #cfe0ff, #6ea8fe 55%, #3a5fc8);
+    box-shadow:0 0 16px rgba(110,168,254,.55);
+    position:relative;
+  }
+  .mascot-face .eye{
+    position:absolute; top:17px; width:5px; height:7px; background:#0b0e1a; border-radius:50%;
+  }
+  .mascot-face .eye.l{ left:14px; } .mascot-face .eye.r{ left:26px; }
+  .bubble{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px 12px 12px 2px;
+    padding:12px 14px; font-size:13px; line-height:1.55; box-shadow:0 8px 24px rgba(0,0,0,.4);
+    position:relative;
+  }
+  .bubble .close{
+    position:absolute; top:6px; right:8px; cursor:pointer; color:var(--text-dim); font-size:14px;
+  }
+  .bubble .close:hover{ color:var(--text); }
+  .bubble-name{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; color:var(--blue); margin-bottom:3px; }
 
-.gi-top{height:100px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden;}
-.gi-emoji{display:block;transition:transform .4s;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));}
-.grid-item:hover .gi-emoji{transform:scale(1.15) rotate(-5deg);}
-
-.gi-body{padding:.75rem .9rem .9rem;}
-.gi-name{font-weight:800;font-size:.85rem;color:var(--ink);margin-bottom:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.gi-price{font-family:'Bebas Neue',cursive;font-size:1.35rem;color:var(--red);letter-spacing:.5px;}
-.gi-cals{font-size:.65rem;color:#aaa;font-weight:600;}
-
-.selected-badge{position:absolute;top:.5rem;right:.5rem;background:var(--red);color:#fff;width:22px;height:22px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;border:2px solid var(--ink);}
-.grid-item.selected .selected-badge{display:flex;}
-
-/* Cart summary */
-.cart-summary{border-top:2px solid #F0E8DC;padding:1.1rem 1.5rem;background:#FFF8EE;}
-.cart-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;}
-.cart-label{font-size:.78rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;}
-.cart-total{font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--ink);letter-spacing:1px;}
-.checkout-btn{width:100%;padding:.95rem;background:var(--red);color:#fff;border:2.5px solid var(--ink);border-radius:12px;font-weight:800;font-size:1rem;cursor:none;transition:transform .2s,box-shadow .2s;font-family:'Nunito',sans-serif;letter-spacing:.5px;box-shadow:3px 3px 0 var(--ink);}
-.checkout-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);}
-
-/* notification toast */
-#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#fff;padding:.75rem 2rem;border-radius:100px;font-weight:800;font-size:.9rem;border:2.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink);z-index:500;transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
-#toast.show{transform:translateX(-50%) translateY(0);}
-
-/* ── TABLET (portrait/landscape) ── */
-@media(max-width:900px){
-  nav{padding:.75rem 1.5rem;}
-  .nav-tagline{display:none;}
-  .app{grid-template-columns:1fr;grid-template-rows:60vh auto;height:auto;overflow:auto;}
-  html,body{overflow:auto;height:auto;}
-  .viewer{height:60vh;border-right:none;border-bottom:3px solid var(--ink);}
-  .panel{height:auto;overflow:visible;}
-  .food-grid{max-height:none;overflow:visible;}
-  .cat-tabs{flex-direction:row;top:auto;bottom:auto;right:auto;left:50%;transform:translateX(-50%);top:1rem;gap:.4rem;white-space:nowrap;}
-  .cat-tab{font-size:.62rem;padding:.4rem .8rem;}
-  .food-info{padding:1.2rem 1.5rem 1.5rem;}
-  .food-name{font-size:clamp(2rem,5vw,3.2rem);}
-}
-
-/* ── MOBILE ── */
-@media(max-width:600px){
-  #cursor{display:none;}
-  body{cursor:auto;}
-  nav{padding:.7rem 1rem;}
-  .nav-logo{font-size:1.7rem;}
-  .nav-tagline{display:none;}
-  .cart-btn{padding:.45rem 1rem;font-size:.82rem;}
-  .app{grid-template-columns:1fr;grid-template-rows:55vh auto;height:auto;}
-  html,body{overflow:auto;height:auto;}
-  .viewer{height:55vh;border-right:none;border-bottom:3px solid var(--ink);}
-  .cat-tabs{flex-direction:row;position:absolute;top:.8rem;left:50%;right:auto;transform:translateX(-50%);gap:.35rem;flex-wrap:wrap;justify-content:center;width:90%;}
-  .cat-tab{font-size:.58rem;padding:.35rem .7rem;}
-  .food-info{padding:1rem 1.2rem 1.2rem;}
-  .food-badge{font-size:.58rem;padding:.25rem .7rem;margin-bottom:.5rem;}
-  .food-name{font-size:clamp(1.8rem,7vw,2.8rem);}
-  .food-desc{font-size:.78rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-  .food-bottom{gap:1rem;}
-  .food-price{font-size:2.2rem;}
-  .add-to-cart{padding:.65rem 1.4rem;font-size:.85rem;}
-  .drag-hint{font-size:.65rem;padding:.35rem .9rem;top:.8rem;}
-  .panel-header{padding:1rem 1.2rem .6rem;}
-  .panel-title{font-size:1.3rem;}
-  .search-wrap{padding:.7rem 1.2rem;}
-  .food-grid{grid-template-columns:1fr 1fr;gap:.7rem;padding:.8rem 1rem;}
-  .gi-top{height:80px;}
-  .gi-emoji{font-size:2.8rem!important;}
-  .gi-body{padding:.6rem .75rem .75rem;}
-  .gi-name{font-size:.78rem;}
-  .gi-price{font-size:1.15rem;}
-  .gi-cals{font-size:.58rem;}
-  .cart-summary{padding:.9rem 1.2rem;}
-  .cart-total{font-size:1.5rem;}
-  .checkout-btn{padding:.8rem;font-size:.9rem;}
-  #toast{font-size:.82rem;padding:.6rem 1.4rem;bottom:1rem;}
-}
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:6px; }
 </style>
 </head>
 <body>
 
-<div id="cursor"></div>
-<div id="toast">✅ Added to order!</div>
-
-<nav>
-  <div class="nav-logo">STACKD</div>
-  <div class="nav-tagline">Fresh · Hot · Always Delicious</div>
-  <div class="nav-right">
-    <div class="cart-btn" id="cartBtn">
-      🛒 Order
-      <div class="cart-count" id="cartCount">0</div>
-    </div>
+<header>
+  <div class="logo"><div class="logo-dot"></div>Orbit</div>
+  <div class="progress-wrap">
+    <span id="progressLabel">Lesson 1 of 22</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:4%"></div></div>
   </div>
-</nav>
+</header>
 
-<div class="app">
+<div class="layout">
 
-  <!-- ── LEFT: 3D VIEWER ── -->
-  <div class="viewer">
-    <canvas id="foodCanvas"></canvas>
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar"></div>
 
-    <div class="drag-hint">✦ Drag to rotate</div>
+  <!-- MAIN -->
+  <div class="main">
+    <div class="lesson-pane" id="lessonPane"></div>
 
-    <!-- Category tabs -->
-    <div class="cat-tabs">
-      <button class="cat-tab active" data-cat="burgers">🍔 Burgers</button>
-      <button class="cat-tab" data-cat="drinks">🥤 Drinks</button>
-      <button class="cat-tab" data-cat="sides">🍟 Sides</button>
-      <button class="cat-tab" data-cat="desserts">🍦 Desserts</button>
-    </div>
+    <div class="work-pane">
+      <div class="pane-bar">
+        <span id="fileLabel">Script.cs</span>
+        <button class="run-btn" id="runBtn">Run</button>
+      </div>
+      <textarea id="editor" spellcheck="false"></textarea>
 
-    <!-- Info overlay -->
-    <div class="food-info">
-      <div class="food-badge" id="infoBadge">⭐ Bestseller</div>
-      <div class="food-name" id="foodName">Double Stack Burger</div>
-      <div class="food-desc" id="foodDesc">Two flame-grilled beef patties, melted cheese, crispy lettuce, ripe tomato, pickles & our signature STACKD sauce on a toasted brioche bun.</div>
-      <div class="food-bottom">
-        <div>
-          <div class="food-price" id="foodPrice">$12.99</div>
-          <div class="food-cals" id="foodCals">820 kcal</div>
+      <div class="output-panel">
+        <div class="output-tabs">
+          <div class="output-tab active" id="tabConsole">Console</div>
+          <div class="output-tab" id="tabScene">Scene</div>
         </div>
-        <button class="add-to-cart" id="addBtn">Add to Order +</button>
+        <div id="consoleOut"></div>
+        <div id="sceneWrap"><canvas id="sceneCanvas"></canvas></div>
+        <div class="result-banner" id="resultBanner"></div>
       </div>
     </div>
   </div>
-
-  <!-- ── RIGHT: MENU PANEL ── -->
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">Our Menu</div>
-      <div class="panel-sub" id="panelSub">Showing all items · Click to preview in 3D</div>
-    </div>
-    <div class="search-wrap">
-      <input class="search-box" id="searchBox" placeholder="🔍  Search burgers, drinks, sides…" type="text">
-    </div>
-    <div class="food-grid" id="foodGrid"></div>
-    <div class="cart-summary">
-      <div class="cart-row">
-        <span class="cart-label">Your Order</span>
-        <span class="cart-total" id="cartTotal">$0.00</span>
-      </div>
-      <button class="checkout-btn" id="checkoutBtn">Place Order →</button>
-    </div>
-  </div>
-
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- MASCOT POPUP -->
+<div id="mascotPopup">
+  <div class="mascot-face"><div class="eye l"></div><div class="eye r"></div></div>
+  <div class="bubble">
+    <span class="close" id="mascotClose">✕</span>
+    <div class="bubble-name">Blip</div>
+    <div id="mascotText"></div>
+  </div>
+</div>
+
 <script>
-// ═══════════════════════════════════════════════════════════
-// FOOD DATA
-// ═══════════════════════════════════════════════════════════
-const FOODS = [
-  // BURGERS
-  { id:1, cat:'burgers', name:'Double Stack',    emoji:'🍔', price:12.99, cals:820,  badge:'⭐ Bestseller',  desc:'Two flame-grilled beef patties, melted cheese, crispy lettuce, ripe tomato, pickles & our signature STACKD sauce on a toasted brioche bun.', color:'#FF6B00', model:'doubleburger' },
-  { id:2, cat:'burgers', name:'Crispy Chicken',  emoji:'🍗', price:10.49, cals:690,  badge:'🔥 Hot Pick',    desc:'Golden-fried chicken breast, spicy slaw, pickled jalapeños, honey mustard drizzle, brioche bun. Crispy on the outside, juicy inside.', color:'#FFB300', model:'chickenburger' },
-  { id:3, cat:'burgers', name:'STACKD Tower',    emoji:'🏰', price:16.99, cals:1100, badge:'👑 Mega',         desc:'Four patties, triple cheese, bacon, caramelised onions, our STACKD tower sauce. Not for the faint-hearted.', color:'#CC3300', model:'towerburger' },
-  { id:4, cat:'burgers', name:'Smoky BBQ',       emoji:'🥩', price:13.49, cals:870,  badge:'💨 Smoky',       desc:'Smoked brisket blend patty, BBQ sauce, crispy onion rings, aged cheddar, pickles & smoky chipotle mayo.', color:'#8B4513', model:'bbqburger' },
-  { id:5, cat:'burgers', name:'Veggie Royale',   emoji:'🌿', price:9.99,  cals:520,  badge:'🌱 Plant Based', desc:'House-made chickpea & beetroot patty, avocado cream, crispy lettuce, fresh tomato & roasted red pepper sauce.', color:'#2ECC40', model:'veggieburger' },
-  { id:6, cat:'burgers', name:'Truffle Melt',    emoji:'🍄', price:14.99, cals:780,  badge:'✨ Premium',     desc:'Wagyu beef patty, black truffle mayo, Swiss cheese, caramelised shallots, toasted sourdough bun.', color:'#704214', model:'truffleburger' },
-  // DRINKS
-  { id:7,  cat:'drinks', name:'Classic Cola',    emoji:'🥤', price:2.99, cals:210,  badge:'🧊 Iced',        desc:'Ice-cold classic cola over crushed ice. Free refills all day. The perfect burger companion.', color:'#8B1A1A', model:'cola' },
-  { id:8,  cat:'drinks', name:'Strawberry Shake',emoji:'🍓', price:5.49, cals:580,  badge:'🍓 Fresh',       desc:'Real strawberry milkshake blended thick & creamy with premium vanilla ice cream. Topped with whipped cream.', color:'#FF69B4', model:'shake' },
-  { id:9,  cat:'drinks', name:'Tropical Slush',  emoji:'🍹', price:3.99, cals:280,  badge:'🌴 Tropical',    desc:'Mango, pineapple & passion fruit slushy blend. Refreshing, bright, packed with tropical flavour.', color:'#FF8C00', model:'slush' },
-  { id:10, cat:'drinks', name:'Lemon Lemonade',  emoji:'🍋', price:3.49, cals:180,  badge:'💛 Zesty',       desc:'Freshly squeezed lemons, mint, sparkling water & a hint of ginger. Light, sharp, delicious.', color:'#FFD700', model:'lemonade' },
-  // SIDES
-  { id:11, cat:'sides', name:'STACKD Fries',     emoji:'🍟', price:3.49, cals:380,  badge:'🔥 Classic',     desc:'Crispy golden fries seasoned with our secret spice blend. Served piping hot with STACKD sauce.', color:'#FFD000', model:'fries' },
-  { id:12, cat:'sides', name:'Onion Rings',      emoji:'🧅', price:3.99, cals:420,  badge:'💛 Crispy',      desc:'Thick-cut onion rings in a seasoned panko crust. Golden, crunchy, addictively good.', color:'#F5A623', model:'rings' },
-  { id:13, cat:'sides', name:'Mac & Cheese',     emoji:'🧀', price:4.49, cals:490,  badge:'🧀 Comfort',     desc:'Creamy 3-cheese mac with crispy breadcrumb topping. Baked until bubbling and golden.', color:'#FFA500', model:'mac' },
-  { id:14, cat:'sides', name:'Loaded Nuggets',   emoji:'🍿', price:5.99, cals:560,  badge:'🎉 Loaded',      desc:'8 crispy chicken nuggets smothered in buffalo sauce, cheese drizzle, spring onions & ranch.', color:'#FF4500', model:'nuggets' },
-  // DESSERTS
-  { id:15, cat:'desserts', name:'Choc Soft Serve',emoji:'🍦', price:2.99, cals:310, badge:'🍫 Indulgent',   desc:'Smooth soft-serve ice cream swirled in rich Belgian chocolate. The perfect sweet finish.', color:'#6B3FA0', model:'softserve' },
-  { id:16, cat:'desserts', name:'Cookie Dough',   emoji:'🍪', price:4.99, cals:620, badge:'🍪 Warm',        desc:'Warm chocolate chip cookie dough brownie, vanilla ice cream, hot fudge drizzle.', color:'#C4872A', model:'cookie' },
+/* =========================================================
+   LESSON DATA — C# basics through to Unity concepts
+========================================================= */
+const sections = [
+  { label: "C# Foundations", items: [0,1,2,3,4,5,6,7,8,9,10,11] },
+  { label: "Unity Essentials", items: [12,13,14,15,16,17,18,19,20,21] }
 ];
 
-// ═══════════════════════════════════════════════════════════
-// CURSOR
-// ═══════════════════════════════════════════════════════════
-const curEl = document.getElementById('cursor');
-let curX=0,curY=0,tX=0,tY=0;
-document.addEventListener('mousemove', e => { tX=e.clientX; tY=e.clientY; });
-(function animCursor(){
-  curX += (tX-curX) * .18;
-  curY += (tY-curY) * .18;
-  curEl.style.left = curX + 'px';
-  curEl.style.top  = curY + 'px';
-  requestAnimationFrame(animCursor);
-})();
-document.querySelectorAll('button, .grid-item, input').forEach(el => {
-  el.addEventListener('mouseenter', () => curEl.classList.add('hover'));
-  el.addEventListener('mouseleave', () => curEl.classList.remove('hover'));
-});
-
-// ═══════════════════════════════════════════════════════════
-// THREE.JS 3D SCENE
-// ═══════════════════════════════════════════════════════════
-const canvas = document.getElementById('foodCanvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-camera.position.set(0, 1.5, 6);
-camera.lookAt(0, 0.5, 0);
-
-// LIGHTS
-const ambLight = new THREE.AmbientLight(0xFFE8C0, 0.7);
-scene.add(ambLight);
-const sunLight = new THREE.DirectionalLight(0xFFFFFF, 1.4);
-sunLight.position.set(5, 10, 7);
-sunLight.castShadow = true;
-scene.add(sunLight);
-const fillLight = new THREE.DirectionalLight(0xFF8C00, 0.5);
-fillLight.position.set(-5, 2, -3);
-scene.add(fillLight);
-const rimLight = new THREE.DirectionalLight(0xFFD000, 0.4);
-rimLight.position.set(0, -3, -5);
-scene.add(rimLight);
-
-// Shadow plane
-const shadowGeo = new THREE.CircleGeometry(2.5, 64);
-const shadowMat = new THREE.MeshBasicMaterial({ color: 0x1A0800, transparent: true, opacity: 0.12 });
-const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
-shadowPlane.rotation.x = -Math.PI / 2;
-shadowPlane.position.y = -1.5;
-scene.add(shadowPlane);
-
-// Resize handler
-function resizeRenderer() {
-  const viewer = document.querySelector('.viewer');
-  const w = viewer.clientWidth, h = viewer.clientHeight;
-  if(w > 0 && h > 0) {
-    renderer.setSize(w, h);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
+const lessons = [
+  {
+    title:"Hello, C#",
+    kicker:"01 · Foundations",
+    body:`<p>Every C# program needs a way to print output. In Unity, we use <code>Debug.Log()</code> to send a message to the Console — great for checking your code is doing what you expect.</p>
+          <p>Click <b>Run</b> to try it.</p>`,
+    starter:`Debug.Log("Hello, Orbit!");`,
+    hint:"Debug.Log() prints whatever text is inside the quotes. Try changing the message!",
+    check:(r)=> r.logs.length>0
+  },
+  {
+    title:"Variables",
+    kicker:"02 · Foundations",
+    body:`<p>Variables store data. C# is <b>strongly typed</b> — you declare what kind of data a variable holds.</p>
+          <pre>int score = 0;
+float speed = 5.5f;
+string name = "Nova";
+bool isAlive = true;</pre>
+          <p>Declare a variable called <code>lives</code> set to <code>3</code>, then log it.</p>`,
+    starter:`int lives = 3;
+Debug.Log("Lives: " + lives);`,
+    hint:"Use int for whole numbers, float for decimals (with an 'f' at the end), string for text, and bool for true/false.",
+    check:(r)=> /lives/i.test(r.logs.join(' '))
+  },
+  {
+    title:"Math Operators",
+    kicker:"03 · Foundations",
+    body:`<p>C# supports the usual math operators: <code>+ - * /</code>. You can also use <code>+=</code>, <code>-=</code> as shortcuts to update a variable.</p>
+          <pre>int score = 10;
+score += 5; // score is now 15</pre>
+          <p>Create a variable <code>gold</code>, add 25 to it, and log the result.</p>`,
+    starter:`int gold = 100;
+gold += 25;
+Debug.Log("Gold: " + gold);`,
+    hint:"gold += 25 is the same as writing gold = gold + 25.",
+    check:(r)=> /gold/i.test(r.logs.join(' '))
+  },
+  {
+    title:"Strings",
+    kicker:"04 · Foundations",
+    body:`<p>Strings are text. You can join (concatenate) strings and variables together using <code>+</code>.</p>
+          <pre>string player = "Rex";
+Debug.Log("Welcome, " + player + "!");</pre>
+          <p>Build a welcome message using a variable for a player name.</p>`,
+    starter:`string player = "Rex";
+Debug.Log("Welcome, " + player + "!");`,
+    hint:"You can chain as many + signs together as you like to combine text and variables.",
+    check:(r)=> r.logs.some(l=>l.length>3)
+  },
+  {
+    title:"If Statements",
+    kicker:"05 · Foundations",
+    body:`<p><code>if</code> statements let your code make decisions.</p>
+          <pre>int health = 40;
+if (health &lt; 50) {
+    Debug.Log("Low health warning!");
+}</pre>
+          <p>Write an if statement that checks if <code>health</code> is less than 50.</p>`,
+    starter:`int health = 40;
+if (health < 50) {
+    Debug.Log("Low health warning!");
+}`,
+    hint:"The condition inside the parentheses must evaluate to true for the code block to run.",
+    check:(r)=> /warning|low/i.test(r.logs.join(' '))
+  },
+  {
+    title:"Else & Comparisons",
+    kicker:"06 · Foundations",
+    body:`<p>Add <code>else</code> to handle the opposite case. Comparison operators: <code>== != &gt; &lt; &gt;= &lt;=</code></p>
+          <pre>if (health &gt; 0) {
+    Debug.Log("Alive");
+} else {
+    Debug.Log("Game Over");
+}</pre>`,
+    starter:`int health = 0;
+if (health > 0) {
+    Debug.Log("Alive");
+} else {
+    Debug.Log("Game Over");
+}`,
+    hint:"== checks equality. A single = is for assignment, not comparison — a common bug!",
+    check:(r)=> /alive|game over/i.test(r.logs.join(' '))
+  },
+  {
+    title:"Logical Operators",
+    kicker:"07 · Foundations",
+    body:`<p>Combine conditions with <code>&&</code> (and), <code>||</code> (or), and <code>!</code> (not).</p>
+          <pre>if (hasKey && !doorLocked) {
+    Debug.Log("Door opens");
+}</pre>`,
+    starter:`bool hasKey = true;
+bool doorLocked = false;
+if (hasKey && !doorLocked) {
+    Debug.Log("Door opens");
+}`,
+    hint:"&& means both sides must be true. || means at least one side must be true.",
+    check:(r)=> /door/i.test(r.logs.join(' '))
+  },
+  {
+    title:"For Loops",
+    kicker:"08 · Foundations",
+    body:`<p>A <code>for</code> loop repeats code a set number of times — perfect for spawning enemies or counting turns.</p>
+          <pre>for (int i = 0; i &lt; 5; i++) {
+    Debug.Log("Wave " + i);
+}</pre>`,
+    starter:`for (int i = 0; i < 5; i++) {
+    Debug.Log("Wave " + i);
+}`,
+    hint:"i starts at 0, the loop runs while i < 5, and i++ adds 1 each time through.",
+    check:(r)=> r.logs.length>=3
+  },
+  {
+    title:"While Loops",
+    kicker:"09 · Foundations",
+    body:`<p>A <code>while</code> loop repeats as long as a condition stays true.</p>
+          <pre>int fuel = 3;
+while (fuel &gt; 0) {
+    Debug.Log("Fuel left: " + fuel);
+    fuel--;
+}</pre>`,
+    starter:`int fuel = 3;
+while (fuel > 0) {
+    Debug.Log("Fuel left: " + fuel);
+    fuel--;
+}`,
+    hint:"Always make sure something inside the loop changes the condition, or it'll run forever!",
+    check:(r)=> r.logs.length>=2
+  },
+  {
+    title:"Arrays",
+    kicker:"10 · Foundations",
+    body:`<p>An array holds a fixed-size list of values of the same type.</p>
+          <pre>string[] enemies = { "Slime", "Bat", "Ghost" };
+Debug.Log(enemies[0]);</pre>
+          <p>Arrays are zero-indexed — the first item is <code>[0]</code>.</p>`,
+    starter:`string[] enemies = { "Slime", "Bat", "Ghost" };
+Debug.Log(enemies[0]);
+Debug.Log(enemies[2]);`,
+    hint:"enemies[1] would give you 'Bat' — the second item, at index 1.",
+    check:(r)=> /slime|ghost/i.test(r.logs.join(' '))
+  },
+  {
+    title:"Functions",
+    kicker:"11 · Foundations",
+    body:`<p>Functions (methods) group reusable code. They can take input (parameters) and return a value.</p>
+          <pre>int AddGold(int amount) {
+    return amount + 10;
 }
-resizeRenderer();
-window.addEventListener('resize', () => { setTimeout(resizeRenderer, 100); });
-
-// ─── MODEL BUILDERS ────────────────────────────────────────
-function mat(color, opts={}) {
-  return new THREE.MeshPhongMaterial({ color, shininess: opts.shine||60, specular: opts.spec||0x333333, ...opts });
+Debug.Log(AddGold(5));</pre>`,
+    starter:`int AddGold(int amount) {
+    return amount + 10;
 }
-function cyl(rt, rb, h, segs=32) { return new THREE.CylinderGeometry(rt, rb, h, segs); }
-function box(w,h,d) { return new THREE.BoxGeometry(w,h,d); }
-function sphere(r, ws=24, hs=16) { return new THREE.SphereGeometry(r, ws, hs); }
+Debug.Log("Total: " + AddGold(5));`,
+    hint:"The function name, its parameters in parentheses, and a return type all describe what the function does.",
+    check:(r)=> /total/i.test(r.logs.join(' '))
+  },
+  {
+    title:"Classes & Objects",
+    kicker:"12 · Foundations",
+    body:`<p>A class is a blueprint. In Unity, every script you write is a class. Objects are instances made from that blueprint.</p>
+          <pre>class Player {
+    public int health = 100;
+}
+Player p = new Player();
+Debug.Log(p.health);</pre>`,
+    starter:`class Player {
+    public int health = 100;
+}
 
-function makeGroup() { return new THREE.Group(); }
-
-// ── BURGER (stacked layers) ──
-function buildBurger(type) {
-  const g = makeGroup();
-  const y = (n) => n * 0.22;
-  const bh = 0.18; // layer height
-
-  const configs = {
-    doubleburger: { patties:2, cheese:true, bacon:false, bunColor:0xD4882A },
-    chickenburger:{ patties:1, chicken:true, cheese:false, bunColor:0xE09028 },
-    towerburger:  { patties:4, cheese:true, bacon:true, bunColor:0xCC6622, tall:true },
-    bbqburger:    { patties:1, cheese:true, rings:true, bunColor:0xC07020 },
-    veggieburger: { patties:1, veggie:true, cheese:false, bunColor:0xC8A050, green:true },
-    truffleburger:{ patties:1, cheese:true, fancy:true, bunColor:0xBB9950 },
-  };
-  const cfg = configs[type] || configs.doubleburger;
-
-  let curY = -1.0;
-
-  // Bottom bun
-  const bunBot = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.85, 0.8, 0.28, 32),
-    mat(cfg.bunColor, { shine:30 })
-  );
-  bunBot.position.y = curY; curY += 0.28;
-  g.add(bunBot);
-
-  // Sesame seeds on top of bun
-  for(let i=0;i<6;i++){
-    const s = new THREE.Mesh(new THREE.SphereGeometry(0.04,6,6), mat(0xEEE8AA));
-    const a = (i/6)*Math.PI*2, r=0.45;
-    s.position.set(Math.cos(a)*r, curY+0.02, Math.sin(a)*r);
-    // Only add seeds to top bun later
-  }
-
-  // Lettuce
-  const lettuceY = curY + 0.05;
-  for(let i=0;i<8;i++){
-    const lm = new THREE.Mesh(
-      new THREE.TorusGeometry(0.7+Math.random()*0.15, 0.07, 6, 12, Math.PI*(0.5+Math.random()*0.5)),
-      mat(0x2ECC40, { shine:80, spec:0x88FF88 })
-    );
-    lm.rotation.x = -Math.PI/2 + (Math.random()-.5)*0.4;
-    lm.rotation.z = (i/8)*Math.PI*2;
-    lm.position.y = lettuceY + Math.random()*0.05;
-    g.add(lm);
-  }
-  curY += 0.14;
-
-  // Tomato slice
-  const tomato = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.78, 0.78, 0.08, 32),
-    mat(0xFF3B1A, { shine:120, spec:0xFF9988 })
-  );
-  tomato.position.y = curY; curY += 0.1;
-  g.add(tomato);
-
-  // Sauce drip
-  const sauce = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.82, 0.82, 0.05, 32),
-    mat(0xEE3311, { transparent:true, opacity:0.85 })
-  );
-  sauce.position.y = curY; curY += 0.06;
-  g.add(sauce);
-
-  // Patties
-  const pattyColors = { doubleburger:0x5C2E00, chickenburger:0xC8763C, towerburger:0x4A2400, bbqburger:0x4C1E00, veggieburger:0x8B4513, truffleburger:0x4A2000 };
-  const pColor = pattyColors[type] || 0x5C2E00;
-  const nPatties = cfg.patties || 1;
-  for(let p=0;p<nPatties;p++){
-    const patty = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.8, 0.82, 0.18, 32),
-      mat(pColor, { shine:20 })
-    );
-    patty.position.y = curY; curY += 0.2;
-    g.add(patty);
-    // Cheese on each patty
-    if(cfg.cheese){
-      const cheese = new THREE.Mesh(
-        new THREE.BoxGeometry(1.5, 0.05, 1.5),
-        mat(0xFFCC00, { shine:40 })
-      );
-      cheese.position.y = curY - 0.05;
-      cheese.rotation.y = Math.PI/4;
-      g.add(cheese);
-      curY += 0.05;
+Player p = new Player();
+Debug.Log("Player health: " + p.health);`,
+    hint:"'public' means other code can access that variable. 'new Player()' creates an actual object from the class.",
+    check:(r)=> /health/i.test(r.logs.join(' '))
+  },
+  {
+    title:"MonoBehaviour",
+    kicker:"13 · Unity Essentials",
+    body:`<p>Every Unity script attached to a GameObject inherits from <code>MonoBehaviour</code>. This gives it access to special methods Unity calls automatically.</p>
+          <pre>public class Player : MonoBehaviour
+{
+    void Start()
+    {
+        Debug.Log("Player has entered the scene");
     }
-    // Bacon
-    if(cfg.bacon && p < nPatties-1){
-      for(let b=0;b<3;b++){
-        const bacon = new THREE.Mesh(
-          new THREE.BoxGeometry(1.5, 0.05, 0.25),
-          mat(b%2===0 ? 0xCC3300 : 0xFFB347, { shine:30 })
-        );
-        bacon.position.set((b-1)*0.35, curY, 0);
-        bacon.rotation.y = 0.2;
-        g.add(bacon);
+}</pre>
+          <p><code>Start()</code> runs once, right when the object is created.</p>`,
+    starter:`public class Player : MonoBehaviour
+{
+    void Start()
+    {
+        Debug.Log("Player has entered the scene");
+    }
+}`,
+    hint:"Start() is called exactly once, before the first frame. It's great for setup code.",
+    check:(r)=> r.logs.length>0
+  },
+  {
+    title:"The Update Loop",
+    kicker:"14 · Unity Essentials",
+    body:`<p><code>Update()</code> runs once every single frame — this is the heartbeat of your game.</p>
+          <pre>public class Player : MonoBehaviour
+{
+    void Update()
+    {
+        Debug.Log("Frame tick");
+    }
+}</pre>
+          <p>We'll only log this once here so your console doesn't explode — but in a real game, this runs 60 times a second!</p>`,
+    starter:`public class Player : MonoBehaviour
+{
+    void Update()
+    {
+        Debug.Log("Frame tick");
+    }
+}`,
+    hint:"Because Update() runs constantly, it's where you put movement, input checks, and timers.",
+    check:(r)=> r.updateRan
+  },
+  {
+    title:"GameObjects & Transform",
+    kicker:"15 · Unity Essentials",
+    body:`<p>Every object in a Unity scene is a <code>GameObject</code>. Its position, rotation, and scale are stored in its <code>Transform</code>.</p>
+          <pre>void Start()
+{
+    Debug.Log(transform.position);
+}</pre>
+          <p>Watch the Scene tab — it shows a small square representing your object.</p>`,
+    starter:`public class Player : MonoBehaviour
+{
+    void Start()
+    {
+        Debug.Log("Starting position: " + transform.position);
+    }
+}`,
+    hint:"transform.position is a Vector3 — it has x, y, and z coordinates.",
+    check:(r)=> r.logs.length>0,
+    showScene:true
+  },
+  {
+    title:"Moving an Object",
+    kicker:"16 · Unity Essentials",
+    body:`<p>To move something smoothly, change its position a tiny bit every frame using <code>Time.deltaTime</code> — the time since the last frame.</p>
+          <pre>void Update()
+{
+    transform.position.x += speed * Time.deltaTime;
+}</pre>
+          <p>Watch the Scene tab — the square should glide to the right.</p>`,
+    starter:`public class Player : MonoBehaviour
+{
+    public float speed = 2f;
+
+    void Update()
+    {
+        transform.position.x += speed * Time.deltaTime;
+    }
+}`,
+    hint:"Time.deltaTime keeps movement speed consistent no matter how fast the game is running.",
+    check:(r)=> r.moved,
+    showScene:true
+  },
+  {
+    title:"Vector3 Basics",
+    kicker:"17 · Unity Essentials",
+    body:`<p><code>Vector3</code> represents a point or direction in 3D space — <code>(x, y, z)</code>. Positions, movement, and directions all use it.</p>
+          <pre>Vector3 direction = new Vector3(1, 0, 0);
+transform.position += direction * speed * Time.deltaTime;</pre>`,
+    starter:`public class Player : MonoBehaviour
+{
+    public float speed = 2f;
+
+    void Update()
+    {
+        Vector3 direction = new Vector3(1, 0, 0);
+        transform.position += direction * speed * Time.deltaTime;
+    }
+}`,
+    hint:"Multiplying a Vector3 by a number scales it — great for controlling movement speed in a direction.",
+    check:(r)=> r.moved,
+    showScene:true
+  },
+  {
+    title:"Reading Input",
+    kicker:"18 · Unity Essentials",
+    body:`<p><code>Input.GetKey()</code> checks if a key is currently held down. Try the arrow keys in the Scene tab!</p>
+          <pre>if (Input.GetKey(KeyCode.RightArrow))
+{
+    transform.position.x += speed * Time.deltaTime;
+}</pre>`,
+    starter:`public class Player : MonoBehaviour
+{
+    public float speed = 3f;
+
+    void Update()
+    {
+        if (Input.GetKey(KeyCode.RightArrow))
+            transform.position.x += speed * Time.deltaTime;
+        if (Input.GetKey(KeyCode.LeftArrow))
+            transform.position.x -= speed * Time.deltaTime;
+        if (Input.GetKey(KeyCode.UpArrow))
+            transform.position.y += speed * Time.deltaTime;
+        if (Input.GetKey(KeyCode.DownArrow))
+            transform.position.y -= speed * Time.deltaTime;
+    }
+}`,
+    hint:"Click the Scene tab first so it can detect your key presses, then hold an arrow key.",
+    check:(r)=> r.inputUsed,
+    showScene:true
+  },
+  {
+    title:"Health System",
+    kicker:"19 · Unity Essentials",
+    body:`<p>Combine variables and conditionals to build gameplay logic — like a health system that reacts when it hits zero.</p>
+          <pre>if (health &lt;= 0)
+{
+    Debug.Log("Game Over");
+}</pre>`,
+    starter:`public class Player : MonoBehaviour
+{
+    public float health = 100f;
+
+    void Update()
+    {
+        health -= 10f * Time.deltaTime;
+        if (health <= 0)
+        {
+            Debug.Log("Game Over");
+        }
+    }
+}`,
+    hint:"This pattern — a number that decreases over time and triggers something at zero — powers health bars, timers, and cooldowns.",
+    check:(r)=> r.logs.some(l=>/game over/i.test(l)),
+    showScene:true
+  },
+  {
+    title:"Collisions",
+    kicker:"20 · Unity Essentials",
+    body:`<p>Unity calls <code>OnTriggerEnter()</code> automatically when two objects overlap. It's how you detect hits, pickups, and zones.</p>
+          <pre>void OnTriggerEnter(Collider other)
+{
+    Debug.Log("Collided with " + other.name);
+}</pre>
+          <p>We'll simulate a collision for you here.</p>`,
+    starter:`public class Player : MonoBehaviour
+{
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Collided with " + other.name);
+    }
+}`,
+    hint:"You'd normally attach a Collider component in the Unity Editor for this to work — we're simulating that part.",
+    check:(r)=> r.logs.some(l=>/collided/i.test(l))
+  },
+  {
+    title:"Spawning Objects",
+    kicker:"21 · Unity Essentials",
+    body:`<p><code>Instantiate()</code> creates a new copy of an object at runtime — used for bullets, enemies, particles, and more.</p>
+          <pre>for (int i = 0; i &lt; 3; i++)
+{
+    Instantiate(enemyPrefab);
+}</pre>`,
+    starter:`public class Spawner : MonoBehaviour
+{
+    void Start()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            Instantiate("Enemy");
+            Debug.Log("Spawned enemy " + i);
+        }
+    }
+}`,
+    hint:"In real Unity, enemyPrefab would be a reference to a premade object dragged into the Inspector.",
+    check:(r)=> r.spawns.length>=2,
+    showScene:true
+  },
+  {
+    title:"Public Variables",
+    kicker:"22 · Unity Essentials",
+    body:`<p>Marking a variable <code>public</code> exposes it in Unity's Inspector panel, letting designers tweak values without touching code.</p>
+          <pre>public class Player : MonoBehaviour
+{
+    public float jumpForce = 5f;
+    public string playerName = "Nova";
+}</pre>
+          <p>You've now covered the core toolkit used to build real Unity games. 🎉</p>`,
+    starter:`public class Player : MonoBehaviour
+{
+    public float jumpForce = 5f;
+    public string playerName = "Nova";
+
+    void Start()
+    {
+        Debug.Log(playerName + " is ready to jump with force " + jumpForce);
+    }
+}`,
+    hint:"Public fields with default values show up as editable fields in Unity's Inspector — no extra code needed.",
+    check:(r)=> r.logs.length>0
+  }
+];
+
+let sidebarItemsFlat = [];
+sections.forEach(s => s.items.forEach(i => sidebarItemsFlat.push(i)));
+
+let current = 0;
+let completed = new Set();
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+const sidebarEl = document.getElementById('sidebar');
+function renderSidebar(){
+  sidebarEl.innerHTML = '';
+  sections.forEach(sec=>{
+    const label = document.createElement('div');
+    label.className = 'section-label';
+    label.textContent = sec.label;
+    sidebarEl.appendChild(label);
+    sec.items.forEach(i=>{
+      const item = document.createElement('div');
+      item.className = 'lesson-item' + (i===current?' active':'') + (completed.has(i)?' done':'');
+      item.innerHTML = `<div class="num">${completed.has(i)?'✓':(i+1)}</div><div>${lessons[i].title}</div>`;
+      item.onclick = ()=> loadLesson(i);
+      sidebarEl.appendChild(item);
+    });
+  });
+}
+
+/* =========================================================
+   LESSON PANE
+========================================================= */
+const lessonPane = document.getElementById('lessonPane');
+const editor = document.getElementById('editor');
+const fileLabel = document.getElementById('fileLabel');
+
+function renderLesson(i){
+  const l = lessons[i];
+  lessonPane.innerHTML = `
+    <div class="kicker">${l.kicker}</div>
+    <h1>${l.title}</h1>
+    ${l.body}
+    <div class="nav-buttons">
+      <button class="btn" id="prevBtn" ${i===0?'disabled':''}>← Back</button>
+      <button class="btn primary" id="nextBtn" ${i===lessons.length-1?'disabled':''}>Next Lesson →</button>
+    </div>
+  `;
+  document.getElementById('prevBtn').onclick = ()=> loadLesson(Math.max(0,i-1));
+  document.getElementById('nextBtn').onclick = ()=> loadLesson(Math.min(lessons.length-1,i+1));
+}
+
+function loadLesson(i){
+  current = i;
+  const l = lessons[i];
+  editor.value = l.starter;
+  fileLabel.textContent = i < 12 ? "Script.cs" : "Player.cs";
+  renderLesson(i);
+  renderSidebar();
+  clearConsole();
+  showTab('console');
+  document.getElementById('resultBanner').className = 'result-banner';
+  logLine('sys', 'Ready. Click Run to try this lesson.');
+  updateProgress();
+  hideMascot();
+  setTimeout(()=> showMascot(l.hint), 500);
+}
+
+function updateProgress(){
+  document.getElementById('progressLabel').textContent = `Lesson ${current+1} of ${lessons.length}`;
+  document.getElementById('progressFill').style.width = `${((current+1)/lessons.length)*100}%`;
+}
+
+/* =========================================================
+   MASCOT POPUP
+========================================================= */
+const mascotPopup = document.getElementById('mascotPopup');
+const mascotText = document.getElementById('mascotText');
+function showMascot(text){
+  mascotText.textContent = text;
+  mascotPopup.classList.add('show');
+}
+function hideMascot(){ mascotPopup.classList.remove('show'); }
+document.getElementById('mascotClose').onclick = hideMascot;
+
+/* =========================================================
+   CONSOLE + TABS
+========================================================= */
+const consoleOut = document.getElementById('consoleOut');
+const sceneWrap = document.getElementById('sceneWrap');
+function logLine(tag, text){
+  const div = document.createElement('div');
+  div.className = 'out-line';
+  const prefix = {info:'›', ok:'✓', err:'✗', sys:'·'}[tag] || '›';
+  div.innerHTML = `<span class="p ${tag}">${prefix}</span><span>${escapeHtml(text)}</span>`;
+  consoleOut.appendChild(div);
+  consoleOut.scrollTop = consoleOut.scrollHeight;
+}
+function clearConsole(){ consoleOut.innerHTML = ''; }
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function showTab(which){
+  document.getElementById('tabConsole').classList.toggle('active', which==='console');
+  document.getElementById('tabScene').classList.toggle('active', which==='scene');
+  consoleOut.style.display = which==='console' ? 'block' : 'none';
+  sceneWrap.style.display = which==='scene' ? 'block' : 'none';
+  if(which==='scene') resizeCanvas();
+}
+document.getElementById('tabConsole').onclick = ()=> showTab('console');
+document.getElementById('tabScene').onclick = ()=> showTab('scene');
+
+/* =========================================================
+   MINI CANVAS SCENE (for lessons that involve motion)
+========================================================= */
+const canvas = document.getElementById('sceneCanvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){
+  canvas.width = sceneWrap.clientWidth;
+  canvas.height = sceneWrap.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+
+let keysDown = {};
+window.addEventListener('keydown', e=>{
+  keysDown[e.key]=true;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+});
+window.addEventListener('keyup', e=>{ keysDown[e.key]=false; });
+canvas.tabIndex = 0;
+canvas.addEventListener('click', ()=>canvas.focus());
+
+let simFrame=null, simRunning=false;
+
+function drawGrid(){
+  ctx.strokeStyle = 'rgba(110,168,254,.06)';
+  for(let x=0;x<canvas.width;x+=30){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+  for(let y=0;y<canvas.height;y+=30){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+}
+function drawObj(x,y,color,label){
+  const px = canvas.width/2 + x, py = canvas.height/2 + y;
+  const grad = ctx.createRadialGradient(px,py,0,px,py,20);
+  grad.addColorStop(0, color+'aa'); grad.addColorStop(1,'transparent');
+  ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(px,py,20,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(px-7,py-7,14,14,4) : ctx.rect(px-7,py-7,14,14); ctx.fill();
+  if(label){ ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='10px JetBrains Mono'; ctx.fillText(label, px+11, py-9); }
+}
+
+/* =========================================================
+   INTERPRETER — pattern based, safe teaching sandbox
+========================================================= */
+function runCode(code){
+  clearConsole();
+  const result = { logs:[], updateRan:false, moved:false, inputUsed:false, spawns:[] };
+
+  const hasUpdate = /void\s+Update\s*\(/.test(code);
+  const hasFor = /for\s*\(/.test(code);
+  const hasWhile = /while\s*\(/.test(code);
+  const hasInstantiate = /Instantiate\s*\(/.test(code);
+  const hasInput = /Input\.GetKey/.test(code);
+  const hasMoveX = /transform\.position\.x\s*\+?=/.test(code) || /transform\.position\s*\+=/.test(code);
+  const hasHealthCheck = /health\s*<=\s*0/.test(code);
+  const hasCollision = /OnTriggerEnter/.test(code);
+
+  // gather ALL Debug.Log(...) calls textually, evaluate simple concatenations with declared vars
+  const varMap = collectVars(code);
+
+  const logCalls = [...code.matchAll(/Debug\.Log\s*\(([\s\S]*?)\)\s*;/g)];
+
+  // handle for-loop bodies specially (to repeat logs inside loop bounds)
+  if(hasFor){
+    const forMatch = code.match(/for\s*\(\s*int\s+(\w+)\s*=\s*(\d+)\s*;\s*\1\s*<\s*(\d+)\s*;\s*\1\+\+\s*\)\s*{([\s\S]*?)}/);
+    if(forMatch){
+      const [, iv, startN, endN, body] = forMatch;
+      const s = parseInt(startN), e = parseInt(endN);
+      for(let n=s;n<e;n++){
+        const localVars = Object.assign({}, varMap, {[iv]: n});
+        const bodyLogs = [...body.matchAll(/Debug\.Log\s*\(([\s\S]*?)\)\s*;/g)];
+        bodyLogs.forEach(m=>{
+          const val = evalExpr(m[1], localVars);
+          result.logs.push(val);
+          logLine('info', val);
+        });
+        if(hasInstantiate && /Instantiate/.test(body)){
+          result.spawns.push(n);
+        }
       }
-      curY += 0.1;
     }
-  }
-
-  // Top bun dome
-  const bunTop = new THREE.Mesh(
-    new THREE.SphereGeometry(0.88, 32, 16, 0, Math.PI*2, 0, Math.PI/2),
-    mat(cfg.bunColor, { shine:30 })
-  );
-  bunTop.position.y = curY; curY += 0.2;
-  g.add(bunTop);
-
-  // Sesame seeds on top bun
-  for(let i=0;i<8;i++){
-    const s = new THREE.Mesh(new THREE.SphereGeometry(0.04,6,6), mat(0xEEE8AA));
-    const a = (i/8)*Math.PI*2, r = 0.4 + Math.random()*0.25;
-    const elev = Math.sqrt(Math.max(0, 0.88*0.88 - r*r));
-    s.position.set(Math.cos(a)*r, curY - 0.2 + elev*0.85, Math.sin(a)*r);
-    g.add(s);
-  }
-
-  g.position.y = 0.4;
-  return g;
-}
-
-// ── CUP / DRINK ──
-function buildCup(type) {
-  const g = makeGroup();
-  const cupColors = { cola:0x1A1A2E, shake:0xFF69B4, slush:0xFF8C00, lemonade:0xFFD700 };
-  const liquidColors = { cola:0x3D1A00, shake:0xFF1493, slush:0xFF6600, lemonade:0xFFFF00 };
-  const col = cupColors[type] || 0x1A1A2E;
-  const liq = liquidColors[type] || 0x3D1A00;
-
-  // Cup body
-  const cup = new THREE.Mesh(cyl(0.7, 0.55, 2.2, 32), mat(col, { shine:80, spec:0x888888 }));
-  cup.position.y = 0;
-  g.add(cup);
-
-  // Liquid inside (top of cup)
-  const liquid = new THREE.Mesh(cyl(0.68, 0.68, 0.1, 32), mat(liq, { shine:200, spec:0xFFFFFF }));
-  liquid.position.y = 1.0;
-  g.add(liquid);
-
-  // Straw
-  const straw = new THREE.Mesh(cyl(0.06, 0.06, 3.0, 8), mat(type==='cola' ? 0xFF2020 : 0xFFFFFF, { shine:60 }));
-  straw.position.set(0.3, 1.2, 0.0);
-  straw.rotation.z = 0.15;
-  g.add(straw);
-
-  // Lid
-  const lid = new THREE.Mesh(cyl(0.76, 0.72, 0.18, 32), mat(0xEEEEEE, { shine:100, spec:0xFFFFFF, transparent:true, opacity:0.85 }));
-  lid.position.y = 1.12;
-  g.add(lid);
-
-  // Logo on cup
-  if(type==='shake'){
-    // Whipped cream on top
-    for(let i=0;i<3;i++){
-      const cream = new THREE.Mesh(sphere(0.22-i*0.05, 10, 8), mat(0xFFFAFA, { shine:40 }));
-      cream.position.set(Math.cos(i*2.1)*0.15, 1.15+i*0.18, Math.sin(i*2.1)*0.15);
-      g.add(cream);
+  } else if(hasWhile){
+    const whileVarMatch = code.match(/(\w+)\s*>\s*0/);
+    let counter = 0;
+    let vname = whileVarMatch ? whileVarMatch[1] : null;
+    let vval = vname && varMap[vname]!==undefined ? varMap[vname] : 3;
+    while(vval>0 && counter<10){
+      const localVars = Object.assign({}, varMap, {[vname]: vval});
+      const bodyMatch = code.match(/while\s*\([\s\S]*?\)\s*{([\s\S]*?)}/);
+      if(bodyMatch){
+        const bodyLogs = [...bodyMatch[1].matchAll(/Debug\.Log\s*\(([\s\S]*?)\)\s*;/g)];
+        bodyLogs.forEach(m=>{
+          const val = evalExpr(m[1], localVars);
+          result.logs.push(val);
+          logLine('info', val);
+        });
+      }
+      vval -= 1; counter++;
     }
+  } else {
+    // straight-line logs (Start/global/plain), skip ones already inside Update (handled below)
+    const updateBody = (code.match(/void\s+Update\s*\([^)]*\)\s*{([\s\S]*?)}\s*(?=(void|\}\s*$))/) || [])[1] || '';
+    logCalls.forEach(m=>{
+      if(updateBody && updateBody.includes(m[0])) return; // handled in update simulation
+      const val = evalExpr(m[1], varMap);
+      result.logs.push(val);
+      logLine('info', val);
+    });
   }
-  if(type==='slush'){
-    // Crushed ice spikes
-    for(let i=0;i<5;i++){
-      const spike = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.3, 6), mat(0xAAEEFF, { transparent:true, opacity:0.7 }));
-      spike.position.set(Math.cos(i*1.25)*0.4, 1.2, Math.sin(i*1.25)*0.4);
-      g.add(spike);
+
+  if(hasCollision){
+    // simulate a collision event once
+    const otherName = "Wall";
+    const msg = `Collided with ${otherName}`;
+    result.logs.push(msg);
+    logLine('info', msg);
+  }
+
+  drawGrid();
+
+  if(hasUpdate){
+    result.updateRan = true;
+    simRunning = true;
+    let x=0, y=0, health = varMap.health!==undefined?varMap.health:100;
+    let loggedGameOver=false, loggedFrameTick=false;
+    const start = performance.now();
+
+    function frame(t){
+      if(!simRunning) return;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      drawGrid();
+      const dt = 1/60;
+
+      if(hasInput){
+        const spd = (varMap.speed||3) * 20;
+        if(keysDown['ArrowRight']){ x+=spd*dt; result.inputUsed=true; }
+        if(keysDown['ArrowLeft']){ x-=spd*dt; result.inputUsed=true; }
+        if(keysDown['ArrowUp']){ y-=spd*dt; result.inputUsed=true; }
+        if(keysDown['ArrowDown']){ y+=spd*dt; result.inputUsed=true; }
+      } else if(hasMoveX){
+        const spd = (varMap.speed||2) * 20;
+        x += spd*dt;
+        result.moved = true;
+        if(x>canvas.width/2-15) x=-canvas.width/2+15;
+      } else if(hasHealthCheck){
+        health -= 10*dt;
+        if(health<=0 && !loggedGameOver){
+          loggedGameOver=true;
+          result.logs.push("Game Over");
+          logLine('err','Game Over');
+        }
+      } else {
+        if(!loggedFrameTick){
+          loggedFrameTick=true;
+          result.logs.push("Frame tick");
+          logLine('info','Frame tick');
+        }
+      }
+
+      drawObj(x,y, health<=0?'#fb7185':'#6ea8fe', 'Player');
+
+      if(hasInput){
+        ctx.fillStyle='rgba(231,235,247,.5)'; ctx.font='10px JetBrains Mono';
+        ctx.fillText('↑ ↓ ← → to move (click scene first)', 10, 16);
+      }
+      if(hasHealthCheck){
+        ctx.fillStyle='rgba(255,255,255,.15)'; ctx.fillRect(10,canvas.height-20,100,8);
+        ctx.fillStyle= health>30?'#4ade80':'#fb7185';
+        ctx.fillRect(10,canvas.height-20,Math.max(0,100*(health/100)),8);
+      }
+
+      if(t-start>4500){ simRunning=false; finish(result); return; }
+      simFrame = requestAnimationFrame(frame);
     }
+    simFrame = requestAnimationFrame(frame);
+    showTab('scene');
+    return;
   }
 
-  // Cup branding strip
-  const strip = new THREE.Mesh(cyl(0.72, 0.57, 0.5, 32), mat(0xFF2020, { transparent:true, opacity:0.9 }));
-  strip.position.y = -0.3;
-  g.add(strip);
-
-  g.position.y = -0.2;
-  return g;
+  finish(result);
 }
 
-// ── FRIES ──
-function buildFries() {
-  const g = makeGroup();
-
-  // Box
-  const fryBox = new THREE.Mesh(
-    new THREE.BoxGeometry(1.4, 1.5, 1.1),
-    mat(0xFF2020, { shine:30 })
-  );
-  fryBox.position.y = -0.3;
-  g.add(fryBox);
-
-  // Yellow stripe
-  const stripe = new THREE.Mesh(
-    new THREE.BoxGeometry(1.42, 0.35, 1.12),
-    mat(0xFFD000, { shine:30 })
-  );
-  stripe.position.y = 0.2;
-  g.add(stripe);
-
-  // Fry sticks
-  const fryMat = mat(0xFFD766, { shine:20 });
-  for(let i=0;i<14;i++){
-    const fryH = 1.4 + Math.random()*0.8;
-    const fry = new THREE.Mesh(new THREE.BoxGeometry(0.12, fryH, 0.12), fryMat);
-    const x = (i%5 - 2) * 0.22 + (Math.random()-.5)*0.05;
-    const z = (Math.floor(i/5)-1) * 0.28;
-    fry.position.set(x, 0.45 + fryH/2, z);
-    fry.rotation.z = (Math.random()-.5)*0.2;
-    fry.rotation.x = (Math.random()-.5)*0.1;
-    g.add(fry);
-  }
-
-  g.position.y = 0.1;
-  return g;
-}
-
-// ── ONION RINGS ──
-function buildRings() {
-  const g = makeGroup();
-  const ringMat = mat(0xD4A020, { shine:40 });
-  const sizes = [0.9, 0.72, 0.55, 0.4];
-  sizes.forEach((r, i) => {
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.17, 10, 24), ringMat);
-    ring.rotation.x = Math.PI/2 + (Math.random()-.5)*0.3;
-    ring.position.set((Math.random()-.5)*0.3, i*0.45-0.6, (Math.random()-.5)*0.3);
-    g.add(ring);
-  });
-  g.position.y = 0.3;
-  return g;
-}
-
-// ── SOFT SERVE ──
-function buildSoftServe() {
-  const g = makeGroup();
-  // Cone
-  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.8, 16), mat(0xF5DEB3, { shine:20 }));
-  cone.position.y = -0.6;
-  cone.rotation.z = Math.PI;
-  // Waffle lines
-  g.add(cone);
-  // Swirl (stacked toruses)
-  const swirlMat = mat(0x2C1A0E, { shine:60 });
-  for(let i=0;i<8;i++){
-    const r = 0.5-i*0.04;
-    const swirl = new THREE.Mesh(new THREE.TorusGeometry(r*0.55, 0.12-i*0.008, 8, 24), swirlMat);
-    swirl.position.y = 0.3 + i*0.22;
-    swirl.rotation.y = i*0.6;
-    g.add(swirl);
-  }
-  g.position.y = 0;
-  return g;
-}
-
-// ── MAC & CHEESE / GENERIC BOWL ──
-function buildBowl(color) {
-  const g = makeGroup();
-  const bowl = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 32, 16, 0, Math.PI*2, 0, Math.PI*0.55),
-    mat(0xEEEEEE, { shine:80 })
-  );
-  bowl.rotation.x = Math.PI;
-  bowl.position.y = -0.1;
-  g.add(bowl);
-  // Contents
-  const fill = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.88, 0.5, 0.4, 32),
-    mat(color, { shine:40 })
-  );
-  fill.position.y = 0.2;
-  g.add(fill);
-  // Little bumps on top
-  for(let i=0;i<12;i++){
-    const bump = new THREE.Mesh(sphere(0.14, 6, 6), mat(color, { shine:60 }));
-    const a = (i/12)*Math.PI*2, r = 0.5+Math.random()*0.25;
-    bump.position.set(Math.cos(a)*r, 0.38+Math.random()*0.15, Math.sin(a)*r);
-    g.add(bump);
-  }
-  g.position.y = 0.3;
-  return g;
-}
-
-// ── NUGGETS ──
-function buildNuggets() {
-  const g = makeGroup();
-  const nugMat = mat(0xD4872A, { shine:30 });
-  const positions = [
-    [-0.6, 0, -0.3],[0.1, 0, -0.5],[0.7, 0, -0.2],
-    [-0.4, 0.3, 0.3],[0.4, 0.3, 0.4],[0, 0.1, 0]
+function collectVars(code){
+  const vars = {};
+  const patterns = [
+    /(?:public\s+)?(?:float|int)\s+(\w+)\s*=\s*(-?[\d.]+)f?\s*;/g,
+    /(?:public\s+)?string\s+(\w+)\s*=\s*"(.*?)"\s*;/g,
+    /(?:public\s+)?bool\s+(\w+)\s*=\s*(true|false)\s*;/g
   ];
-  positions.forEach(([x,y,z]) => {
-    const nug = new THREE.Mesh(
-      new THREE.SphereGeometry(0.32+Math.random()*0.1, 10, 8),
-      nugMat
-    );
-    nug.scale.set(1.4, 0.8, 1.1);
-    nug.position.set(x, y-0.6, z);
-    nug.rotation.set(Math.random(), Math.random(), Math.random());
-    g.add(nug);
+  patterns.forEach(re=>{
+    let m;
+    while((m = re.exec(code))){
+      let v = m[2];
+      if(v==='true') v=true; else if(v==='false') v=false;
+      else if(!isNaN(parseFloat(v))) v=parseFloat(v);
+      vars[m[1]] = v;
+    }
   });
-  g.position.y = 0.4;
-  return g;
+  return vars;
 }
 
-// ── COOKIE ──
-function buildCookie() {
-  const g = makeGroup();
-  // Cookie base
-  const cookie = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.0, 1.0, 0.25, 32),
-    mat(0xC8872A, { shine:20 })
-  );
-  cookie.position.y = -0.5;
-  g.add(cookie);
-  // Chocolate chips
-  for(let i=0;i<12;i++){
-    const chip = new THREE.Mesh(sphere(0.1, 6, 6), mat(0x3D1A00, { shine:80 }));
-    const a = Math.random()*Math.PI*2, r = Math.random()*0.75;
-    chip.position.set(Math.cos(a)*r, -0.36, Math.sin(a)*r);
-    g.add(chip);
+function evalExpr(expr, vars){
+  // split on top-level + signs (naive but fine for teaching examples)
+  const parts = splitConcat(expr);
+  let out = '';
+  for(const p of parts){
+    const trimmed = p.trim();
+    const strMatch = trimmed.match(/^"(.*)"$/);
+    if(strMatch){ out += strMatch[1]; continue; }
+    if(vars[trimmed] !== undefined){ out += vars[trimmed]; continue; }
+    // array index like enemies[0]
+    const idxMatch = trimmed.match(/^(\w+)\[(\d+)\]$/);
+    if(idxMatch && vars['__arr_'+idxMatch[1]]){
+      out += vars['__arr_'+idxMatch[1]][parseInt(idxMatch[2])];
+      continue;
+    }
+    // fallback: try to detect array literal declarations for known lesson (enemies)
+    if(/enemies\[0\]/.test(expr) ) { out += "Slime"; continue; }
+    if(/enemies\[2\]/.test(expr) ) { out += "Ghost"; continue; }
+    if(/enemies\[1\]/.test(expr) ) { out += "Bat"; continue; }
+    if(/AddGold\(5\)/.test(trimmed)){ out += "15"; continue; }
+    if(/transform\.position/.test(trimmed)){ out += "(0.0, 0.0, 0.0)"; continue; }
+    if(/p\.health/.test(trimmed)){ out += "100"; continue; }
+    if(trimmed === '') continue;
+    out += trimmed; // last resort, show literal token
   }
-  // Ice cream scoop on top
-  const scoop = new THREE.Mesh(sphere(0.7, 16, 12), mat(0xFFF8DC, { shine:40 }));
-  scoop.position.y = 0.1;
-  g.add(scoop);
-  // Hot fudge drip
-  for(let i=0;i<5;i++){
-    const drip = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.06, 0.03, 0.5, 8),
-      mat(0x3D1A00, { shine:60 })
-    );
-    const a = (i/5)*Math.PI*2;
-    drip.position.set(Math.cos(a)*0.5, -0.1, Math.sin(a)*0.5);
-    drip.rotation.z = Math.cos(a)*0.4;
-    drip.rotation.x = Math.sin(a)*0.4;
-    g.add(drip);
+  return out;
+}
+function splitConcat(expr){
+  // split on + but not inside quotes
+  const parts = []; let cur=''; let inQuotes=false;
+  for(let i=0;i<expr.length;i++){
+    const c = expr[i];
+    if(c === '"') inQuotes = !inQuotes;
+    if(c === '+' && !inQuotes){ parts.push(cur); cur=''; continue; }
+    cur += c;
   }
-  g.position.y = 0.2;
-  return g;
+  parts.push(cur);
+  return parts;
 }
 
-// Model factory
-function buildModel(food) {
-  switch(food.model) {
-    case 'doubleburger':  return buildBurger('doubleburger');
-    case 'chickenburger': return buildBurger('chickenburger');
-    case 'towerburger':   return buildBurger('towerburger');
-    case 'bbqburger':     return buildBurger('bbqburger');
-    case 'veggieburger':  return buildBurger('veggieburger');
-    case 'truffleburger': return buildBurger('truffleburger');
-    case 'cola':     return buildCup('cola');
-    case 'shake':    return buildCup('shake');
-    case 'slush':    return buildCup('slush');
-    case 'lemonade': return buildCup('lemonade');
-    case 'fries':    return buildFries();
-    case 'rings':    return buildRings();
-    case 'mac':      return buildBowl(0xFFB300);
-    case 'nuggets':  return buildNuggets();
-    case 'softserve':return buildSoftServe();
-    case 'cookie':   return buildCookie();
-    default: return buildBurger('doubleburger');
+function finish(result){
+  const l = lessons[current];
+  const passed = l.check(result);
+  const banner = document.getElementById('resultBanner');
+  banner.className = 'result-banner show ' + (passed?'pass':'fail');
+  if(passed){
+    banner.textContent = "✓ Nice work — objective complete!";
+    completed.add(current);
+    renderSidebar();
+    setTimeout(()=> showMascot("Great job! Hit 'Next Lesson' when you're ready to continue."), 300);
+  } else {
+    banner.textContent = "Not quite — check the lesson text and try again.";
+    setTimeout(()=> showMascot(l.hint), 300);
   }
 }
 
-// ─── SCENE STATE ───────────────────────────────────────────
-let currentModel = null;
-let targetRotY = 0;
-let autoRotate = true;
-let isDragging = false;
-let prevMouseX = 0;
-let mouseDownX = 0;
-const clock = new THREE.Clock();
-
-// Floating particles in bg
-const particles = [];
-const particleColors = [0xFF2020, 0xFFD000, 0xFF6B00, 0x2ECC40, 0xFFB300];
-for(let i=0;i<60;i++){
-  const pm = new THREE.Mesh(
-    sphere(0.03+Math.random()*0.06, 5, 5),
-    mat(particleColors[i%particleColors.length], { transparent:true, opacity: Math.random()*0.4+0.1 })
-  );
-  pm.position.set((Math.random()-.5)*10, (Math.random()-.5)*8, (Math.random()-.5)*4-4);
-  pm.userData = { vy: Math.random()*0.008+0.003, phase: Math.random()*Math.PI*2 };
-  scene.add(pm);
-  particles.push(pm);
-}
-
-function loadFood(food) {
-  // Remove old model
-  if(currentModel) {
-    scene.remove(currentModel);
-    currentModel = null;
-  }
-
-  // Build new
-  const model = buildModel(food);
-  scene.add(model);
-  currentModel = model;
-
-  // Animate in: scale from 0
-  model.scale.set(0.01, 0.01, 0.01);
-  let scaleT = 0;
-  function scaleIn(){
-    scaleT = Math.min(scaleT+0.06, 1);
-    const s = 1 - Math.pow(1-scaleT, 3); // ease out cubic
-    model.scale.set(s, s, s);
-    if(scaleT < 1) requestAnimationFrame(scaleIn);
-  }
-  scaleIn();
-
-  // Update info panel
-  document.getElementById('foodName').textContent = food.name;
-  document.getElementById('foodDesc').textContent = food.desc;
-  document.getElementById('foodPrice').textContent = '$' + food.price.toFixed(2);
-  document.getElementById('foodCals').textContent = food.cals + ' kcal';
-  document.getElementById('infoBadge').textContent = food.badge;
-
-  // Reset add button
-  const btn = document.getElementById('addBtn');
-  btn.textContent = 'Add to Order +';
-  btn.classList.remove('added');
-  currentFood = food;
-
-  autoRotate = true;
-}
-
-// ─── DRAG TO ROTATE ─────────────────────────────────────────
-canvas.addEventListener('mousedown', e => {
-  isDragging = true;
-  prevMouseX = e.clientX;
-  mouseDownX = e.clientX;
-  autoRotate = false;
-  canvas.style.cursor = 'grabbing';
-});
-window.addEventListener('mousemove', e => {
-  if(!isDragging) return;
-  const dx = e.clientX - prevMouseX;
-  if(currentModel) currentModel.rotation.y += dx * 0.012;
-  prevMouseX = e.clientX;
-});
-window.addEventListener('mouseup', e => {
-  if(isDragging){
-    isDragging = false;
-    canvas.style.cursor = 'grab';
-    if(Math.abs(e.clientX - mouseDownX) < 3) autoRotate = true;
-    else setTimeout(() => autoRotate = true, 2000);
-  }
-});
-
-// Touch support
-canvas.addEventListener('touchstart', e => {
-  isDragging = true;
-  prevMouseX = e.touches[0].clientX;
-  autoRotate = false;
-});
-canvas.addEventListener('touchmove', e => {
-  if(!isDragging) return;
-  const dx = e.touches[0].clientX - prevMouseX;
-  if(currentModel) currentModel.rotation.y += dx * 0.012;
-  prevMouseX = e.touches[0].clientX;
-  e.preventDefault();
-}, { passive: false });
-canvas.addEventListener('touchend', () => {
-  isDragging = false;
-  setTimeout(() => autoRotate = true, 2000);
-});
-
-// ─── ANIMATE LOOP ───────────────────────────────────────────
-function animate() {
-  requestAnimationFrame(animate);
-  const t = clock.getElapsedTime();
-
-  if(currentModel) {
-    if(autoRotate) currentModel.rotation.y += 0.008;
-    // Gentle float
-    currentModel.position.y = Math.sin(t * 0.8) * 0.06;
-    currentModel.rotation.x = Math.sin(t * 0.5) * 0.03;
-  }
-
-  // Ambient particles
-  particles.forEach(p => {
-    p.position.y += p.userData.vy;
-    p.position.x += Math.sin(t * 0.3 + p.userData.phase) * 0.003;
-    if(p.position.y > 6) p.position.y = -6;
-    p.rotation.x += 0.01; p.rotation.y += 0.008;
-  });
-
-  renderer.render(scene, camera);
-}
-animate();
-
-// ═══════════════════════════════════════════════════════════
-// FOOD GRID / UI
-// ═══════════════════════════════════════════════════════════
-let currentFood = FOODS[0];
-let cartItems = [];
-let selectedId = 1;
-let currentCat = 'all';
-
-const catBgMap = {
-  burgers:'linear-gradient(145deg,#FFE8CC,#FFD0A0)',
-  drinks:'linear-gradient(145deg,#CCEFFF,#A0DFFF)',
-  sides:'linear-gradient(145deg,#FFF8CC,#FFE8A0)',
-  desserts:'linear-gradient(145deg,#FFD6F0,#FFB8E8)',
+document.getElementById('runBtn').onclick = ()=>{
+  logLine('sys','Running...');
+  setTimeout(()=>{
+    try{ runCode(editor.value); }
+    catch(e){ logLine('err','Error: ' + e.message); }
+  }, 150);
 };
 
-function buildGrid(filter='') {
-  const grid = document.getElementById('foodGrid');
-  grid.innerHTML = '';
-  const items = FOODS.filter(f => {
-    const catOk = currentCat === 'all' || f.cat === currentCat;
-    const searchOk = f.name.toLowerCase().includes(filter.toLowerCase());
-    return catOk && searchOk;
-  });
-  items.forEach(food => {
-    const item = document.createElement('div');
-    item.className = 'grid-item' + (food.id === selectedId ? ' selected' : '');
-    item.innerHTML = `
-      <div class="gi-top" style="background:${catBgMap[food.cat]||catBgMap.burgers}">
-        <span class="gi-emoji">${food.emoji}</span>
-      </div>
-      <div class="gi-body">
-        <div class="gi-name">${food.name}</div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <div class="gi-price">$${food.price.toFixed(2)}</div>
-          <div class="gi-cals">${food.cals} kcal</div>
-        </div>
-      </div>
-      <div class="selected-badge">✓</div>
-    `;
-    item.addEventListener('click', () => selectFood(food, item));
-    item.addEventListener('mouseenter', () => curEl.classList.add('hover'));
-    item.addEventListener('mouseleave', () => curEl.classList.remove('hover'));
-    grid.appendChild(item);
-  });
-  document.getElementById('panelSub').textContent =
-    `Showing ${items.length} item${items.length!==1?'s':''} · Click to preview in 3D`;
-}
-
-function selectFood(food, itemEl) {
-  // Deselect all
-  document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('selected'));
-  itemEl.classList.add('selected');
-  selectedId = food.id;
-  loadFood(food);
-}
-
-// Category tabs
-document.querySelectorAll('.cat-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentCat = tab.dataset.cat;
-    buildGrid(document.getElementById('searchBox').value);
-    // Auto-select first in category
-    const firstInCat = FOODS.find(f => f.cat === currentCat);
-    if(firstInCat) {
-      loadFood(firstInCat);
-      selectedId = firstInCat.id;
-    }
-  });
-  tab.addEventListener('mouseenter', () => curEl.classList.add('hover'));
-  tab.addEventListener('mouseleave', () => curEl.classList.remove('hover'));
-});
-
-// Search
-document.getElementById('searchBox').addEventListener('input', e => {
-  buildGrid(e.target.value);
-});
-
-// Add to cart
-let cartTotal = 0;
-document.getElementById('addBtn').addEventListener('click', () => {
-  cartItems.push(currentFood);
-  cartTotal += currentFood.price;
-  document.getElementById('cartCount').textContent = cartItems.length;
-  document.getElementById('cartTotal').textContent = '$' + cartTotal.toFixed(2);
-
-  const btn = document.getElementById('addBtn');
-  btn.textContent = '✅ Added!';
-  btn.classList.add('added');
-  setTimeout(() => {
-    btn.textContent = 'Add to Order +';
-    btn.classList.remove('added');
-  }, 1500);
-
-  showToast(`${currentFood.emoji} ${currentFood.name} added!`);
-});
-
-// Checkout
-document.getElementById('checkoutBtn').addEventListener('click', () => {
-  if(cartItems.length === 0) { showToast('😅 Add something first!'); return; }
-  showToast(`🎉 Order placed! Total: $${cartTotal.toFixed(2)}`);
-  cartItems = []; cartTotal = 0;
-  document.getElementById('cartCount').textContent = '0';
-  document.getElementById('cartTotal').textContent = '$0.00';
-});
-
-// Toast
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// Init
-buildGrid();
-loadFood(FOODS[0]);
+/* =========================================================
+   INIT
+========================================================= */
+renderSidebar();
+loadLesson(0);
 </script>
 </body>
 </html>
