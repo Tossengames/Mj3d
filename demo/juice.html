@@ -136,13 +136,23 @@
   .lesson-status.locked-status{color:rgba(220,230,245,.3);}
   .lesson-steps-count{position:absolute;top:18px;left:20px;font-size:10.5px;color:rgba(220,230,245,.3);font-family:'JetBrains Mono',monospace;}
 
-  /* next-step / affiliate section */
-  .next-step-section{background:linear-gradient(135deg,rgba(226,76,199,.08),rgba(76,224,210,.08));border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);}
+  /* next-step / affiliate section (shown only on final lesson completion) */
   .next-step-box{background:var(--panel);border:1px solid rgba(242,184,75,.3);border-radius:var(--radius);padding:36px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
-  .next-step-box .content{flex:1;min-width:260px;}
+  .next-step-box .content{flex:1;min-width:260px;text-align:right;}
   .next-step-box h3{font-size:20px;margin-bottom:10px;}
   .next-step-box p{color:var(--text-dim);font-size:14.5px;}
   .badge-honest{display:inline-block;background:rgba(242,184,75,.14);color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:5px;margin-bottom:12px;}
+
+  /* freebies section */
+  .freebies-section{background:linear-gradient(180deg,transparent,rgba(226,76,199,.04),transparent);}
+  .freebie-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+  .freebie-card{background:var(--panel);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;gap:14px;transition:.2s;}
+  .freebie-card:hover{border-color:var(--magenta);box-shadow:0 0 24px -8px rgba(226,76,199,.35);transform:translateY(-3px);}
+  .freebie-icon{font-size:30px;width:52px;height:52px;background:rgba(226,76,199,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+  .freebie-content h4{font-size:16px;font-weight:700;margin-bottom:6px;}
+  .freebie-content p{font-size:13.5px;color:var(--text-dim);}
+  .freebie-btn{align-self:flex-start;}
+  @media (max-width:700px){ .freebie-grid{grid-template-columns:1fr;} }
 
   footer{padding:40px 0;border-top:1px solid rgba(255,255,255,.06);position:relative;z-index:1;}
   footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
@@ -226,7 +236,7 @@
       <div>
         <span class="eyebrow">MISSION CONTROL — FIRST LAUNCH</span>
         <h1>لا تقرأ عن البرمجة... <span>اكتبها الآن</span></h1>
-        <p class="lead">بعد 30 ثانية من الآن، ستكون قد كتبت أول برنامج فعلي بلغة بايثون. لا تسجيل، لا تثبيت — فقط جرّب في الأسفل.</p>
+        <p class="lead">بعد 30 ثانية من الآن، ستكون قد كتبت أول برنامج فعلي بلغة بايثون. نأخذ بيدك من الصفر عبر أساسيات بايثون خطوة بخطوة، حتى تصل إلى نقطة تكون فيها جاهزًا فعلاً للانطلاق نحو مشاريع ومصادر أعمق. لا تسجيل، لا تثبيت — فقط جرّب في الأسفل.</p>
         <div class="hero-cta">
           <a href="#try" class="btn btn-primary" onclick="scrollToTry(event)">🚀 جرّب الآن مجانًا</a>
           <button class="btn btn-ghost" onclick="showTab('course')">استعرض المسار الكامل</button>
@@ -242,7 +252,7 @@
             <svg viewBox="0 0 100 100"><g id="droid-face-hero"></g></svg>
           </div>
           <div class="speech-bubble">
-            أنا <b style="color:var(--cyan)">زُبيّ</b> 👋، رفيقك في هذه الرحلة. مهمتي إرشادك خطوة بخطوة حتى تكتب أول كود حقيقي بنفسك. جاهز؟
+            أنا <b style="color:var(--cyan)">نيون</b> 👋، رفيقك في هذه الرحلة. مهمتي إرشادك خطوة بخطوة حتى تكتب أول كود حقيقي بنفسك، وتصبح جاهزًا للانطلاق أبعد من هنا. جاهز؟
           </div>
         </div>
       </div>
@@ -297,18 +307,30 @@ print("Your coding mission starts now.")</textarea>
     </div>
   </section>
 
-  <section class="next-step-section">
+  <section class="freebies-section">
     <div class="wrap">
-      <div class="next-step-box">
-        <div class="droid small-droid" style="width:56px;height:56px;flex-shrink:0;">
-          <svg viewBox="0 0 100 100"><g id="droid-face-cta"></g></svg>
+      <div class="section-head">
+        <span class="eyebrow">FREE RESOURCES</span>
+        <h2>هدايا مجانية لتسريع رحلتك</h2>
+        <p>موارد قابلة للتحميل تساعدك أثناء التدرّب — احتفظ بها بجانبك في كل مهمة.</p>
+      </div>
+      <div class="freebie-grid">
+        <div class="freebie-card">
+          <div class="freebie-icon">📄</div>
+          <div class="freebie-content">
+            <h4>ورقة غش بايثون للمبتدئين</h4>
+            <p>ملخص من صفحة واحدة لكل الأساسيات: المتغيرات، الشروط، الحلقات، والدوال.</p>
+          </div>
+          <a href="#" class="btn btn-ghost btn-sm freebie-btn">تحميل PDF ⬇</a>
         </div>
-        <div class="content">
-          <span class="badge-honest">بصراحة تامة</span>
-          <h3>هذا المسار نقطة انطلاق، وليس كل شيء</h3>
-          <p>مهمتنا هنا أن نجعلك مرتاحًا بما يكفي مع أساسيات بايثون لتبدأ رحلتك الحقيقية. بعد إتمام المسار، ننصحك بالانتقال إلى دورة شاملة ومتعمقة لاحتراف اللغة.</p>
+        <div class="freebie-card">
+          <div class="freebie-icon">🗂️</div>
+          <div class="freebie-content">
+            <h4>قائمة مراجعة المسار</h4>
+            <p>تتبّع تقدّمك عبر المهام الـ18 بنسخة قابلة للطباعة.</p>
+          </div>
+          <a href="#" class="btn btn-ghost btn-sm freebie-btn">تحميل PDF ⬇</a>
         </div>
-        <a href="#" class="btn btn-primary" id="affiliate-cta-home">استكشف الدورة المتقدمة ←</a>
       </div>
     </div>
   </section>
@@ -333,21 +355,6 @@ print("Your coding mission starts now.")</textarea>
       <div class="course-grid" id="course-grid-full"></div>
     </div>
   </section>
-  <section class="next-step-section" style="margin-top:20px;">
-    <div class="wrap">
-      <div class="next-step-box">
-        <div class="droid small-droid" style="width:56px;height:56px;flex-shrink:0;">
-          <svg viewBox="0 0 100 100"><g id="droid-face-cta2"></g></svg>
-        </div>
-        <div class="content">
-          <span class="badge-honest">بصراحة تامة</span>
-          <h3>أنهيت المسار؟ هذه هي الخطوة التالية</h3>
-          <p>نحن نبني الأساس فقط. لإتقان بايثون فعليًا (مشاريع حقيقية، مكتبات متقدمة، وممارسة عميقة)، ننصح بدورة متخصصة وشاملة.</p>
-        </div>
-        <a href="#" class="btn btn-primary">استكشف الدورة المتقدمة ←</a>
-      </div>
-    </div>
-  </section>
   <footer>
     <div class="wrap">
       <div class="logo" style="font-size:16px;"><span class="logo-mark" style="width:26px;height:26px;font-size:13px;">🛰️</span>SpaceCode</div>
@@ -365,7 +372,7 @@ print("Your coding mission starts now.")</textarea>
     <p>نحن لسنا بديلاً عن دورة احترافية شاملة — بل نقطة انطلاق صادقة. هدفنا أن نأخذ بيدك من الصفر حتى تصبح مرتاحًا بما يكفي لتكمل رحلتك في مصادر أعمق.</p>
     <div class="droid-row">
       <div class="droid"><svg viewBox="0 0 100 100"><g id="droid-face-about"></g></svg></div>
-      <div class="speech-bubble">أنا زُبيّ، الدرويد المرافق لك في كل مهمة. سأعطيك تلميحات عندما تحتاجها، وأحتفل معك بكل مهمة تُنجزها 🎉</div>
+      <div class="speech-bubble">أنا نيون، الدرويد المرافق لك في كل مهمة. سأعطيك تلميحات عندما تحتاجها، وأحتفل معك بكل مهمة تُنجزها 🎉</div>
     </div>
     <p style="margin-top:30px;">نبدأ ببايثون فقط حاليًا، وسنضيف لغات ومسارات أخرى تدريجيًا بناءً على ما يحتاجه متعلمونا.</p>
   </div>
@@ -415,9 +422,21 @@ print("Your coding mission starts now.")</textarea>
     </div>
 
     <div id="lesson-complete-banner" class="completion-banner hidden">
-      <h3>🎉 مهمة مُنجزة!</h3>
+      <h3 id="complete-banner-title">🎉 مهمة مُنجزة!</h3>
       <p id="next-lesson-preview"></p>
-      <button class="btn btn-primary" onclick="goToNextLesson()">المهمة التالية ←</button>
+      <button class="btn btn-primary" id="next-mission-btn" onclick="goToNextLesson()">المهمة التالية ←</button>
+
+      <div id="final-cta-box" class="next-step-box hidden" style="margin-top:24px;text-align:right;">
+        <div class="droid small" style="width:56px;height:56px;flex-shrink:0;">
+          <svg viewBox="0 0 100 100"><g id="droid-face-final"></g></svg>
+        </div>
+        <div class="content">
+          <span class="badge-honest">الخطوة التالية</span>
+          <h3>أكملت أساسيات بايثون — والآن؟</h3>
+          <p>وصلت إلى مكان ممتاز: تعرف المتغيرات، الشروط، الحلقات، والدوال. من هنا، أفضل استثمار لوقتك هو دورة شاملة تأخذك إلى مشاريع حقيقية ومفاهيم متقدمة.</p>
+        </div>
+        <a href="#" class="btn btn-primary">استكشف الدورة المتقدمة ←</a>
+      </div>
     </div>
   </div>
 </div>
@@ -429,30 +448,62 @@ print("Your coding mission starts now.")</textarea>
    ============================================================ */
 function droidSVG(expression){
   // expression: 'idle' | 'happy' | 'thinking' | 'sad'
-  const eyeColor = 'var(--cyan-bright)';
   let mouth = '';
-  if(expression==='happy') mouth = `<path d="M38 66 Q50 76 62 66" stroke="#04231f" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-  else if(expression==='sad') mouth = `<path d="M38 70 Q50 62 62 70" stroke="#04231f" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-  else if(expression==='thinking') mouth = `<circle cx="50" cy="68" r="3" fill="#04231f"/>`;
-  else mouth = `<line x1="40" y1="67" x2="60" y2="67" stroke="#04231f" stroke-width="4" stroke-linecap="round"/>`;
+  if(expression==='happy') mouth = `<path d="M35 71 Q50 82 65 71" stroke="#04141f" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+  else if(expression==='sad') mouth = `<path d="M36 76 Q50 67 64 76" stroke="#04141f" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+  else if(expression==='thinking') mouth = `<circle cx="52" cy="73" r="3.2" fill="#04141f"/>`;
+  else mouth = `<path d="M40 72 Q50 75 60 72" stroke="#04141f" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+
+  // eyebrow tilt for thinking/sad adds personality without changing eye shape
+  const browL = expression==='thinking' ? `<line x1="24" y1="30" x2="38" y2="26" stroke="#04141f" stroke-width="3" stroke-linecap="round"/>` : '';
+  const browR = expression==='thinking' ? `<line x1="62" y1="26" x2="76" y2="30" stroke="#04141f" stroke-width="3" stroke-linecap="round"/>` : '';
 
   return `
-    <rect x="18" y="18" width="64" height="58" rx="18" fill="url(#droidGrad)"/>
-    <rect x="42" y="4" width="16" height="16" rx="4" fill="url(#droidGrad)"/>
-    <circle cx="50" cy="8" r="4" fill="var(--magenta)"/>
-    <circle cx="35" cy="42" r="12" fill="#04231f"/>
-    <circle cx="65" cy="42" r="12" fill="#04231f"/>
-    <circle cx="35" cy="42" r="7" fill="${eyeColor}"/>
-    <circle cx="65" cy="42" r="7" fill="${eyeColor}"/>
-    <circle cx="37" cy="39" r="2.4" fill="#fff"/>
-    <circle cx="67" cy="39" r="2.4" fill="#fff"/>
-    ${mouth}
     <defs>
-      <linearGradient id="droidGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#4CE0D2"/>
-        <stop offset="100%" stop-color="#2B9E93"/>
+      <linearGradient id="droidBody" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#8FF0E6"/>
+        <stop offset="55%" stop-color="#4CE0D2"/>
+        <stop offset="100%" stop-color="#279489"/>
       </linearGradient>
+      <linearGradient id="droidVisor" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0B1E24"/>
+        <stop offset="100%" stop-color="#04141f"/>
+      </linearGradient>
+      <radialGradient id="eyeGlow" cx="50%" cy="45%" r="60%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="35%" stop-color="#9FF7EE"/>
+        <stop offset="100%" stop-color="#28C8B8"/>
+      </radialGradient>
     </defs>
+
+    <!-- antenna -->
+    <line x1="50" y1="6" x2="50" y2="16" stroke="#5CC7BB" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="50" cy="5" r="4.5" fill="var(--magenta)"/>
+
+    <!-- ears -->
+    <rect x="10" y="40" width="8" height="18" rx="4" fill="#5CC7BB"/>
+    <rect x="82" y="40" width="8" height="18" rx="4" fill="#5CC7BB"/>
+
+    <!-- head -->
+    <rect x="16" y="14" width="68" height="64" rx="24" fill="url(#droidBody)"/>
+    <rect x="16" y="14" width="68" height="64" rx="24" fill="none" stroke="#BFFAF3" stroke-width="1" opacity="0.5"/>
+
+    <!-- visor (big rounded eye area) -->
+    <rect x="26" y="30" width="48" height="30" rx="15" fill="url(#droidVisor)"/>
+
+    <!-- big eyes -->
+    <circle cx="40" cy="45" r="10.5" fill="url(#eyeGlow)"/>
+    <circle cx="60" cy="45" r="10.5" fill="url(#eyeGlow)"/>
+    <circle cx="43" cy="41" r="3" fill="#ffffff"/>
+    <circle cx="63" cy="41" r="3" fill="#ffffff"/>
+    ${browL}${browR}
+
+    <!-- mouth panel -->
+    ${mouth}
+
+    <!-- cheek lights -->
+    <circle cx="24" cy="62" r="2.6" fill="var(--magenta)" opacity="0.85"/>
+    <circle cx="76" cy="62" r="2.6" fill="var(--amber)" opacity="0.85"/>
   `;
 }
 function setDroidExpression(elId, expr){
@@ -460,7 +511,7 @@ function setDroidExpression(elId, expr){
   if(el) el.innerHTML = droidSVG(expr);
 }
 function initAllDroids(){
-  ['droid-face-hero','droid-face-cta','droid-face-cta2','droid-face-about','droid-face-lesson'].forEach(id=>{
+  ['droid-face-hero','droid-face-about','droid-face-lesson','droid-face-final'].forEach(id=>{
     if(document.getElementById(id)) setDroidExpression(id,'idle');
   });
 }
@@ -755,10 +806,20 @@ function completeLesson(){
   const banner=document.getElementById('lesson-complete-banner');
   banner.classList.remove('hidden');
   const nextLesson = LESSONS[currentLessonIdx+1];
-  document.getElementById('next-lesson-preview').textContent = nextLesson
-    ? `المهمة التالية: ${nextLesson.title}`
-    : 'أنهيت جميع المهام المتاحة! هذا هو المكان المثالي للانتقال إلى دورة متعمقة 🚀';
-  if(!nextLesson) document.querySelector('#lesson-complete-banner .btn').classList.add('hidden');
+  const finalCta = document.getElementById('final-cta-box');
+  const nextBtn = document.getElementById('next-mission-btn');
+  if(nextLesson){
+    document.getElementById('complete-banner-title').textContent = '🎉 مهمة مُنجزة!';
+    document.getElementById('next-lesson-preview').textContent = `المهمة التالية: ${nextLesson.title}`;
+    nextBtn.classList.remove('hidden');
+    finalCta.classList.add('hidden');
+  } else {
+    document.getElementById('complete-banner-title').textContent = '🎉 أنهيت المسار بالكامل!';
+    document.getElementById('next-lesson-preview').textContent = 'أحسنت — أتممت جميع المهام الـ18. إليك أين تذهب من هنا:';
+    nextBtn.classList.add('hidden');
+    finalCta.classList.remove('hidden');
+    setDroidExpression('droid-face-final','happy');
+  }
   updateNavProgress();
 }
 function goToNextLesson(){
