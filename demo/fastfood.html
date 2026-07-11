@@ -3,2027 +3,1569 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orbit — Learn C# for Unity</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Game Graveyard — Where Unfinished Games Live On</title>
 <style>
-  :root{
-    --bg:#0b0e1a; --panel:#12162a; --panel-2:#171c34; --line:#262c48;
-    --text:#e7ebf7; --text-dim:#8991b3; --blue:#6ea8fe; --green:#4ade80; --amber:#f5a742; --red:#fb7185;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
-  a{ color:inherit; text-decoration:none; }
-  button{ font-family:inherit; }
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
-  /* ---------------- shared header ---------------- */
-  header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:12px 20px; border-bottom:1px solid var(--line);
-    background:var(--panel); position:sticky; top:0; z-index:40;
-    flex-wrap:wrap; gap:10px;
+  :root{
+    --bg: #1B1233; --bg-deep: #140C26; --panel: #251A45; --panel-2: #2E2056; --line: #4A3A7A;
+    --ink: #FFFFFF; --ink-dim: #C4B8E8;
+    --pink: #FF4D8D; --pink-dk: #C22A63;
+    --cyan: #34E4E0; --cyan-dk: #159C99;
+    --lime: #B4F03C; --lime-dk: #7CA818;
+    --orange: #FF9F3E; --orange-dk: #D4700E;
+    --yellow: #FFD93E;
+    --purple: #9B6BFF; --purple-dk: #6B3FD4;
+    --red: #FF5A52; --red-dk: #C7362F;
+    --glow1: rgba(155,107,255,0.25); --glow2: rgba(52,228,224,0.15); --glow3: rgba(255,77,141,0.12);
+    --title-shadow: rgba(0,0,0,0.55); --hero-emoji-opacity: 0.12;
+    --header-tint: rgba(20,12,38,0.88); --hover-tint: rgba(255,255,255,0.06);
+    --title-main: #FFFFFF; --title-accent: #FFD93E;
   }
-  .logo{ display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; cursor:pointer; }
-  .logo-dot{
-    width:22px; height:22px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #a9c9ff, #6ea8fe 60%, #3a5fc8);
-    box-shadow:0 0 10px rgba(110,168,254,.6);
-    flex-shrink:0;
+
+  html[data-theme="day"]{
+    --bg: #FFF3E2; --bg-deep: #FFFFFF; --panel: #FFFFFF; --panel-2: #FFF9F0; --line: #F0D9BC;
+    --ink: #3A2A1A; --ink-dim: #8A6A50;
+    --pink: #E85D2C; --pink-dk: #B8431A;
+    --cyan: #4EC5C1; --cyan-dk: #2C8E8A;
+    --lime: #8FDD5A; --lime-dk: #4FA82E;
+    --orange: #FF8A3D; --orange-dk: #C4611A;
+    --yellow: #FFD23E;
+    --purple: #B07FE0; --purple-dk: #8058B0;
+    --red: #E0473A; --red-dk: #B02E24;
+    --glow1: rgba(232,93,44,0.10); --glow2: rgba(78,197,193,0.10); --glow3: rgba(255,210,62,0.14);
+    --title-shadow: rgba(0,0,0,0.12); --hero-emoji-opacity: 0.08;
+    --header-tint: rgba(255,255,255,0.85); --hover-tint: rgba(232,93,44,0.08);
+    --title-main: #E85D2C; --title-accent: #2C8E8A;
   }
-  header .right{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
-  nav{ display:flex; align-items:center; gap:20px; font-size:14px; font-weight:500; }
-  nav .navlink{ color:var(--text-dim); cursor:pointer; background:none; border:none; font:inherit; padding:0; }
-  nav .navlink:hover{ color:var(--text); }
-  nav .navlink.active{ color:var(--text); }
-  .nav-cta{
-    background:var(--blue); color:#08101f; padding:8px 16px; border-radius:8px;
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px;
-    cursor:pointer; border:none; white-space:nowrap;
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 15% 0%, var(--glow1) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 20%, var(--glow2) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 100%, var(--glow3) 0%, transparent 50%),
+      var(--bg);
+    color: var(--ink);
+    font-family: 'Fredoka', sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+    transition: background-color .3s ease, color .3s ease;
   }
-  .nav-cta:hover{ background:#84b6ff; }
-  @media (max-width:820px){ nav .navlink{ display:none; } }
+  h1,h2,h3,h4, .display{ font-family: 'Baloo 2', sans-serif; font-weight: 800; color: var(--ink); margin: 0; }
+  .mono{ font-family: 'Space Mono', monospace; }
+  a{ color: inherit; }
+  ::selection{ background: var(--pink); color: white; }
+
+  .game-title{
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-shadow: 3px 3px 0 var(--title-shadow);
+  }
+
+  .wrap{ max-width: 1220px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- header ---------- */
+  header.site{ position: sticky; top: 0; z-index: 50; background: var(--header-tint); backdrop-filter: blur(10px); border-bottom: 3px solid var(--purple); }
+  header.site .bar{ display:flex; align-items:center; justify-content:space-between; padding: 14px 0; gap: 16px; }
+  .wordmark{ display:flex; align-items:center; gap:10px; cursor:pointer; flex-shrink:0; }
+  .wordmark .skull{ font-size: 28px; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.4)); transform: rotate(-8deg); display:inline-block; }
+  .wordmark .game-title{ font-size: 24px; color: var(--title-main); }
+
+  nav.main{ display:flex; gap: 6px; align-items:center; }
+  nav.main button{
+    background: transparent; border: 2px solid transparent; font-family:'Baloo 2', sans-serif; font-weight: 600;
+    font-size: 15px; color: var(--ink-dim); cursor:pointer; padding: 8px 16px; border-radius: 10px; transition: all .15s ease;
+  }
+  nav.main button:hover{ color: var(--ink); background: var(--hover-tint); }
+  nav.main button.active{ color: var(--bg-deep); background: var(--yellow); box-shadow: 0 3px 0 var(--orange-dk); }
+
+  .header-right{ display:flex; align-items:center; gap: 10px; flex-shrink:0; }
+  .account-chip{
+    display:flex; align-items:center; gap:8px; background: var(--panel); border: 2px solid var(--line);
+    border-radius: 999px; padding: 5px 14px 5px 6px; cursor:pointer; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px;
+  }
+  .account-chip .avatar-mini{
+    width: 26px; height:26px; border-radius:50%; background: linear-gradient(135deg, var(--purple), var(--pink));
+    color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
+  }
+
+  .btn{
+    font-family:'Baloo 2', sans-serif; font-weight: 700; font-size: 15px; padding: 11px 22px; border: none; border-radius: 12px;
+    cursor: pointer; color: var(--bg-deep); background: var(--yellow); box-shadow: 0 4px 0 var(--orange-dk);
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); box-shadow: 0 6px 0 var(--orange-dk); }
+  .btn:active{ transform: translateY(2px); box-shadow: 0 2px 0 var(--orange-dk); }
+  .btn.pink{ background: var(--pink); box-shadow: 0 4px 0 var(--pink-dk); color: white; }
+  .btn.pink:hover{ box-shadow: 0 6px 0 var(--pink-dk); }
+  .btn.cyan{ background: var(--cyan); box-shadow: 0 4px 0 var(--cyan-dk); color: var(--bg-deep); }
+  .btn.cyan:hover{ box-shadow: 0 6px 0 var(--cyan-dk); }
+  .btn.ghost{ background: transparent; color: var(--ink); border: 2.5px solid var(--purple); box-shadow: none; }
+  .btn.ghost:hover{ background: var(--hover-tint); transform: translateY(-2px); }
+  .btn.small{ padding: 8px 14px; font-size: 13px; border-radius: 9px; }
+  .btn.tiny{ padding: 6px 11px; font-size: 12px; border-radius: 8px; box-shadow: 0 3px 0 var(--orange-dk); }
+  .btn.tiny.pink{ box-shadow: 0 3px 0 var(--pink-dk); }
+  .btn.tiny:hover{ box-shadow: 0 4px 0 var(--orange-dk); }
+  .btn.tiny.pink:hover{ box-shadow: 0 4px 0 var(--pink-dk); }
+  .btn:disabled{ opacity: .5; cursor: not-allowed; transform:none !important; }
+  .btn.danger{ background: var(--red); box-shadow: 0 4px 0 var(--red-dk); color:white; }
+  .btn.danger:hover{ box-shadow: 0 6px 0 var(--red-dk); }
+
+  /* ---------- reaction buttons (RIP / Revive) ---------- */
+  .reaction-row{ display:flex; gap: 10px; align-items:center; flex-wrap:wrap; }
+  .react-btn{
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 14px;
+    padding: 10px 18px; border-radius: 12px; border: 2.5px solid var(--line);
+    background: var(--panel); color: var(--ink); cursor:pointer; transition: all .15s;
+    display:flex; align-items:center; gap:7px;
+  }
+  .react-btn:hover{ transform: translateY(-2px); }
+  .react-btn.rip.active{ background: var(--panel-2); border-color: var(--ink-dim); color: var(--ink); box-shadow: 0 3px 0 var(--line); }
+  .react-btn.revive.active{ background: var(--pink); border-color: var(--pink-dk); color: white; box-shadow: 0 3px 0 var(--pink-dk); }
+  .react-count{ font-family:'Space Mono',monospace; font-size: 12px; color: var(--ink-dim); }
+  .react-btn-sm{
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 11.5px;
+    padding: 6px 10px; border-radius: 9px; border: 2px solid var(--line);
+    background: var(--panel); color: var(--ink); cursor:pointer; display:flex; align-items:center; gap:4px;
+  }
+  .react-btn-sm.rip.active{ background: var(--panel-2); border-color: var(--ink-dim); }
+  .react-btn-sm.revive.active{ background: var(--pink); border-color: var(--pink-dk); color:white; }
+
+  /* ---------- hero ---------- */
+  .hero{ padding: 60px 0 40px; position: relative; overflow:hidden; }
+  .hero::before{
+    content:'👻 🕹 💀 ✨ 🎮 🦴'; position:absolute; top: 10px; left:0; right:0; font-size: 22px;
+    opacity: var(--hero-emoji-opacity); letter-spacing: 60px; white-space: nowrap; pointer-events:none;
+  }
+  .hero-inner{ position:relative; text-align:center; }
+  .eyebrow-badge{
+    display:inline-flex; align-items:center; gap:8px; background: var(--panel); border: 2px solid var(--purple);
+    border-radius: 999px; padding: 7px 16px; font-family:'Space Mono',monospace; font-size: 12px; color: var(--cyan-dk); margin-bottom: 22px;
+  }
+  html[data-theme="day"] .eyebrow-badge{ color: var(--cyan-dk); }
+  .eyebrow-badge .dot{ width:7px; height:7px; border-radius:50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); }
+  .hero h1.game-title{ font-size: clamp(38px, 6vw, 66px); line-height: 1.05; color: var(--title-main); }
+  .hero h1.game-title .accent{ color: var(--title-accent); text-shadow: 3px 3px 0 var(--title-shadow); }
+  .hero p.lede{ font-size: 17px; color: var(--ink-dim); max-width: 52ch; margin: 20px auto 0; }
+  .hero-actions{ margin-top: 28px; display:flex; gap: 14px; justify-content:center; flex-wrap:wrap; }
+
+  /* ---------- section scaffolding ---------- */
+  section{ padding: 46px 0; }
+  .section-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 26px; gap: 20px; flex-wrap: wrap; }
+  .section-head h2{ font-size: 28px; display:flex; align-items:center; gap:10px; }
+  .section-head p{ color: var(--ink-dim); font-size: 14px; max-width: 44ch; }
+  .refresh-link{
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 13px; color: var(--cyan-dk);
+    background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:5px;
+  }
+
+  /* ---------- game card grid ---------- */
+  .card-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px; }
+  .gcard{
+    background: var(--panel); border: 3px solid var(--line); border-radius: 18px; cursor:pointer; overflow:hidden;
+    display:flex; flex-direction:column; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; position:relative;
+  }
+  .gcard:hover{ transform: translateY(-6px) rotate(-0.6deg); border-color: var(--yellow); box-shadow: 0 12px 0 -4px rgba(0,0,0,0.3), 0 14px 24px rgba(0,0,0,0.4); }
+  .gcard:focus-visible{ outline: 3px solid var(--cyan); outline-offset:2px; }
+  .cover{ height: 140px; position: relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .cover .icon{ font-size: 46px; filter: drop-shadow(2px 3px 0 rgba(0,0,0,0.3)); position:relative; z-index:2; }
+  .cover .shape{ position:absolute; border-radius:50%; opacity:.5; }
+  .cover .shape.s1{ width:90px;height:90px; top:-30px; left:-20px; }
+  .cover .shape.s2{ width:60px;height:60px; bottom:-20px; right:-10px; }
+  .cover .shape.s3{ width:40px;height:40px; top:20px; right:20px; }
+  .status-chip{
+    position:absolute; top: 10px; right: 10px; z-index:3; font-family:'Space Mono',monospace; font-size: 9.5px; font-weight:700;
+    letter-spacing:.05em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; color: var(--bg-deep);
+  }
+  .status-chip.abandoned{ background: var(--red); color:white; }
+  .status-chip.onhold{ background: var(--orange); }
+  .status-chip.prototype{ background: var(--cyan); }
+  .status-chip.idea{ background: #D8CCFF; }
+  .status-chip.canceled{ background: #8A8098; color:white; }
+  .status-chip.revived{ background: var(--lime); }
+  .status-chip.dev{ background: var(--yellow); }
+  .badge-corner{
+    position:absolute; top:10px; left:10px; z-index:3; font-family:'Space Mono',monospace; font-size:9px; font-weight:700;
+    padding: 4px 8px; border-radius: 999px; background: rgba(0,0,0,0.35); color:white; letter-spacing:.04em; text-transform:uppercase;
+  }
+  .gcard .body{ padding: 14px 15px 16px; display:flex; flex-direction:column; gap:7px; flex:1; }
+  .gcard h4{ font-size: 17px; font-weight:700; line-height:1.2; }
+  .genre-line{ font-family:'Space Mono',monospace; font-size: 10px; text-transform:uppercase; letter-spacing:.05em; color: var(--ink-dim); }
+  .gcard p.snippet{ font-size: 12.5px; color: var(--ink-dim); flex:1; line-height:1.4; }
+  .gcard .foot{
+    display:flex; justify-content:space-between; align-items:center; margin-top: 4px; padding-top: 10px;
+    border-top: 2px dashed var(--line); font-family:'Space Mono',monospace; font-size: 11px; color: var(--ink-dim);
+  }
+  .foot .reactions{ display:flex; gap:8px; }
+  .foot .rip-mini{ color: var(--ink-dim); }
+  .foot .revive-mini{ color: var(--pink); font-weight:700; }
+
+  .filters{ display:flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; align-items:center; }
+  .filters select, .filters input[type=text]{
+    font-family:'Fredoka', sans-serif; font-size: 13.5px; font-weight:500; padding: 10px 14px; border-radius: 10px;
+    border: 2px solid var(--line); background: var(--panel); color: var(--ink);
+  }
+  .filters input[type=text]{ min-width: 220px; flex:1; }
+  .filters select:focus, .filters input:focus{ outline: none; border-color: var(--cyan); }
+
+  .empty-state{ text-align:center; padding: 60px 20px; color: var(--ink-dim); font-family:'Space Mono',monospace; font-size: 13px; border: 2px dashed var(--line); border-radius: 18px; }
+
+  .genre-band{ display:flex; flex-wrap:wrap; gap: 10px; }
+  .genre-pill{
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 13.5px; padding: 10px 18px; border-radius: 999px; cursor:pointer;
+    border: 2.5px solid var(--line); background: var(--panel); color: var(--ink); transition: all .15s;
+  }
+  .genre-pill:hover{ transform: translateY(-2px); border-color: var(--yellow); }
+
+  /* ---------- login gate banner ---------- */
+  .login-gate{
+    background: var(--panel); border: 2.5px dashed var(--purple); border-radius: 16px;
+    padding: 18px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .login-gate p{ font-size: 14px; color: var(--ink-dim); margin:0; }
+  .login-gate p b{ color: var(--ink); }
+
+  /* ---------- detail page ---------- */
+  .back-link{
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 14px; color: var(--ink-dim); cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; margin-bottom: 22px; transition: color .15s;
+  }
+  .back-link:hover{ color: var(--yellow); }
+  .detail-head{ display:grid; grid-template-columns: 1fr 1.3fr; gap: 36px; margin-bottom: 10px; }
+  .detail-cover{ height: 280px; border-radius: 20px; border: 3px solid var(--line); position: relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .detail-cover .icon{ font-size: 78px; filter: drop-shadow(3px 4px 0 rgba(0,0,0,0.3)); position:relative; z-index:2; }
+  .detail-info .case{ font-family:'Space Mono',monospace; font-size:12px; color: var(--cyan-dk); margin-bottom:8px; }
+  .detail-info h2{ font-size: 34px; }
+  .fields{ margin-top: 18px; display:grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+  .field .k{ font-family:'Space Mono',monospace; font-size: 10px; text-transform:uppercase; letter-spacing:.06em; color: var(--ink-dim); }
+  .field .v{ font-size: 15px; margin-top: 3px; font-weight:600; }
+  .detail-actions{ margin-top: 22px; display:flex; gap: 14px; align-items:center; flex-wrap:wrap; }
+  .revive-count{ font-family:'Space Mono',monospace; font-size: 13px; color: var(--ink-dim); }
+  .report-link{ font-family:'Space Mono',monospace; font-size: 11.5px; color: var(--ink-dim); text-decoration: underline; cursor:pointer; background:none; border:none; }
+
+  .prose-block{ margin-top: 36px; max-width: 76ch; }
+  .prose-block h3{ font-size: 20px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 3px solid var(--purple); display:inline-block; }
+  .prose-block .story{ white-space: pre-wrap; font-size: 16px; color: var(--ink-dim); line-height:1.65; }
+
+  .media-links{ margin-top: 32px; }
+  .media-links h3{ font-size: 20px; padding-bottom:10px; border-bottom: 3px solid var(--cyan); display:inline-block; margin-bottom:14px; }
+  .media-links ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+  .media-links li a{
+    display:inline-block; font-family:'Space Mono',monospace; font-size: 13px; background: var(--panel); border: 2px solid var(--line);
+    border-radius: 10px; padding: 10px 16px; text-decoration:none; transition: border-color .15s;
+  }
+  .media-links li a:hover{ border-color: var(--cyan); }
+
+  .comments-block{ margin-top: 32px; }
+  .comments-block h3{ font-size: 20px; padding-bottom:10px; border-bottom: 3px solid var(--pink); display:inline-block; margin-bottom:14px; }
+  .beta-tag{ font-family:'Space Mono',monospace; font-size: 9.5px; font-weight:700; background: var(--yellow); color: var(--bg-deep); padding: 3px 8px; border-radius: 999px; vertical-align: middle; margin-left: 8px; }
+  .placeholder-note{ font-family:'Space Mono',monospace; font-size: 12px; color: var(--ink-dim); background: var(--panel); border: 2px dashed var(--line); border-radius: 14px; padding: 16px 18px; }
+
+  .comment{ display:flex; gap: 12px; padding: 16px 0; border-bottom: 2px dashed var(--line); }
+  .comment:first-child{ padding-top: 0; }
+  .comment-avatar{
+    width: 38px; height:38px; border-radius: 50%; flex-shrink:0; background: var(--purple); color: white;
+    display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 15px;
+  }
+  .comment-body{ flex:1; }
+  .comment-head{ display:flex; gap:10px; align-items:baseline; }
+  .comment-name{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 14px; }
+  .comment-time{ font-family:'Space Mono',monospace; font-size: 11px; color: var(--ink-dim); }
+  .comment-text{ margin: 4px 0 0; font-size: 14px; color: var(--ink-dim); line-height:1.5; }
+  .comment-form{ margin-top: 20px; background: var(--panel); border: 2px solid var(--line); border-radius: 14px; padding: 16px; }
+  .comment-form textarea{
+    width:100%; min-height: 80px; font-family:'Fredoka', sans-serif; font-size: 14px; padding: 11px 13px; border-radius: 10px;
+    border: 2px solid var(--line); background: var(--bg-deep); color: var(--ink); resize: vertical; margin-bottom: 10px;
+  }
+  .comment-form textarea:focus{ outline:none; border-color: var(--cyan); }
+  .comment-form-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+
+  /* ---------- profile page ---------- */
+  .profile-head{ display:flex; gap: 28px; align-items:flex-start; flex-wrap:wrap; }
+  .profile-avatar{
+    width: 96px; height: 96px; border-radius: 26px; flex-shrink:0; background: linear-gradient(135deg, var(--purple), var(--pink));
+    color:white; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size: 40px; border: 3px solid var(--line);
+  }
+  .profile-info{ flex:1; min-width: 240px; }
+  .profile-info h2{ font-size: 30px; }
+  .profile-bio{ margin-top: 14px; font-size: 15px; color: var(--ink-dim); max-width: 62ch; line-height:1.55; }
+
+  /* ---------- submit form ---------- */
+  .form-wrap{ max-width: 760px; }
+  .form-section{ margin-bottom: 34px; background: var(--panel); border: 2.5px solid var(--line); border-radius: 18px; padding: 22px 24px; }
+  .fs-title{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 15px; color: var(--orange-dk); margin-bottom: 18px; display:flex; align-items:center; gap:8px; }
+  html[data-theme="day"] .fs-title{ color: var(--pink-dk); }
+  .form-row{ margin-bottom: 18px; }
+  .form-row label{ display:block; font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 13.5px; margin-bottom: 7px; color: var(--ink); }
+  .form-row .hint{ font-size: 12px; color: var(--ink-dim); margin-top: 5px; }
+  .form-row input[type=text], .form-row input[type=url], .form-row input[type=email], .form-row input[type=password],
+  .form-row select, .form-row textarea{
+    width:100%; font-family:'Fredoka', sans-serif; font-size: 14.5px; padding: 11px 13px; border-radius: 10px;
+    border: 2px solid var(--line); background: var(--bg-deep); color: var(--ink);
+  }
+  .form-row textarea{ min-height: 150px; resize: vertical; line-height:1.55; }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus{ outline:none; border-color: var(--cyan); }
+  .two-col{ display:grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .multi-url-row{ display:flex; gap:8px; margin-bottom:8px; }
+  .multi-url-row input{ flex:1; }
+  .add-link{ font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 12.5px; background:none; border:none; color: var(--cyan-dk); cursor:pointer; padding:4px 0; }
+  .remove-link{ background: var(--bg-deep); border:2px solid var(--line); color:var(--ink-dim); cursor:pointer; border-radius: 8px; font-size:14px; width: 42px; }
+
+  .confirm-box{
+    background: var(--bg-deep); border: 2.5px solid var(--purple); border-radius: 14px; padding: 18px; display:flex; gap: 12px;
+    align-items:flex-start; transition: border-color .2s, box-shadow .2s;
+  }
+  .confirm-box.error{ border-color: var(--red); box-shadow: 0 0 0 4px rgba(255,90,82,0.2); animation: shake .4s ease; }
+  @keyframes shake{ 0%,100%{ transform: translateX(0); } 20%{ transform: translateX(-6px); } 40%{ transform: translateX(6px); } 60%{ transform: translateX(-4px); } 80%{ transform: translateX(4px); } }
+  .confirm-error-msg{ display:none; color: var(--red); font-family:'Baloo 2', sans-serif; font-weight: 700; font-size: 13.5px; margin-top: 10px; align-items:center; gap:6px; }
+  .confirm-error-msg.show{ display:flex; }
+  .confirm-box input[type=checkbox]{ margin-top: 4px; width: 18px; height:18px; accent-color: var(--pink); flex-shrink:0; }
+  .confirm-box .ctext{ font-size: 13.5px; }
+  .confirm-box .ctext b{ display:block; margin-bottom:4px; color: var(--orange-dk); }
+  html[data-theme="day"] .confirm-box .ctext b{ color: var(--pink-dk); }
+  .confirm-box .ctext .fine{ display:block; margin-top: 6px; font-size: 11.5px; color: var(--ink-dim); }
+  .confirm-box .ctext a{ color: var(--cyan-dk); text-decoration: underline; }
+
+  .submit-bar{ margin-top: 26px; display:flex; justify-content: space-between; align-items:center; gap: 16px; flex-wrap: wrap; }
+
+  .toast{
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--purple); color: white;
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 14px; padding: 14px 24px; border-radius: 14px;
+    box-shadow: 0 6px 0 var(--purple-dk); opacity: 0; pointer-events:none; transition: opacity .25s ease, transform .25s ease; z-index: 100;
+  }
+  .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---------- about / policy pages ---------- */
+  .about-lede{ font-family:'Baloo 2',sans-serif; font-size: 24px; line-height: 1.4; max-width: 62ch; margin-bottom: 30px; color: var(--ink-dim); font-weight:600; }
+  .about-lede .accent{ color: var(--orange-dk); }
+  html[data-theme="day"] .about-lede .accent{ color: var(--pink-dk); }
+  .about-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 34px; }
+  .about-card{ border: 2.5px solid var(--line); background: var(--panel); border-radius: 16px; padding: 22px; }
+  .about-card .emoji{ font-size: 26px; margin-bottom: 10px; }
+  .about-card h4{ font-size:17px; margin-bottom:8px; }
+  .about-card p{ font-size: 13.5px; color: var(--ink-dim); }
+  .policy-box{ margin-top: 44px; border-top: 3px solid var(--purple); padding-top: 28px; }
+  .policy-box h3{ font-size: 19px; margin-bottom: 10px; color: var(--orange-dk); }
+  html[data-theme="day"] .policy-box h3{ color: var(--pink-dk); }
+  .policy-box p{ color: var(--ink-dim); font-size: 14.5px; max-width: 70ch; margin-bottom: 10px; }
+
+  .policy-page h2{ font-size: 30px; margin-bottom: 8px; }
+  .policy-updated{ font-family:'Space Mono',monospace; font-size: 12px; color: var(--ink-dim); margin-bottom: 30px; }
+  .policy-toc{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 40px; }
+  .policy-toc a{
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; background: var(--panel); border:2px solid var(--line);
+    border-radius: 999px; padding: 7px 14px; text-decoration:none; cursor:pointer;
+  }
+  .policy-section{ margin-bottom: 38px; max-width: 76ch; }
+  .policy-section h3{ font-size: 20px; margin-bottom:12px; padding-bottom:8px; border-bottom: 3px solid var(--purple); display:inline-block; }
+  .policy-section p, .policy-section li{ color: var(--ink-dim); font-size: 14.5px; line-height:1.65; margin-bottom: 10px; }
+  .policy-section ul{ padding-left: 22px; }
+  .policy-section strong{ color: var(--ink); }
+
+  /* ---------- auth modal ---------- */
+  .modal-overlay{
+    position: fixed; inset:0; background: rgba(0,0,0,0.55); z-index: 200; display:none;
+    align-items:center; justify-content:center; padding: 20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background: var(--panel); border: 3px solid var(--line); border-radius: 20px; padding: 30px; max-width: 420px; width:100%;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:14px; background:none; border:none; color: var(--ink-dim); font-size: 20px; cursor:pointer;
+  }
+  .modal-box h3{ font-size: 24px; margin-bottom: 6px; }
+  .modal-box .modal-sub{ font-size: 13.5px; color: var(--ink-dim); margin-bottom: 22px; }
+  .modal-tabs{ display:flex; gap:8px; margin-bottom: 22px; }
+  .modal-tab{
+    flex:1; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; padding: 10px; border-radius: 10px;
+    border: 2px solid var(--line); background: var(--bg-deep); color: var(--ink-dim); cursor:pointer;
+  }
+  .modal-tab.active{ background: var(--pink); border-color: var(--pink-dk); color: white; }
+  .modal-note{ font-family:'Space Mono',monospace; font-size: 11px; color: var(--ink-dim); background: var(--bg-deep); border: 2px dashed var(--line); border-radius: 10px; padding: 12px 14px; margin-top: 16px; }
+
+  /* ---------- dashboard ---------- */
+  .dash-stats{ display:flex; gap: 14px; flex-wrap:wrap; margin-bottom: 30px; }
+  .dash-stat{ background: var(--panel); border: 2.5px solid var(--line); border-radius: 14px; padding: 14px 22px; }
+  .dash-stat .num{ font-family:'Baloo 2',sans-serif; font-size: 24px; font-weight:800; color: var(--orange-dk); }
+  html[data-theme="day"] .dash-stat .num{ color: var(--pink-dk); }
+  .dash-stat .lab{ font-family:'Space Mono',monospace; font-size: 10px; text-transform:uppercase; color: var(--ink-dim); letter-spacing:.06em; }
+  .dash-row{
+    display:flex; align-items:center; gap: 16px; background: var(--panel); border: 2.5px solid var(--line); border-radius: 16px;
+    padding: 14px 18px; margin-bottom: 14px; flex-wrap:wrap;
+  }
+  .dash-row .dash-cover{
+    width: 60px; height: 60px; border-radius: 12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size: 24px;
+  }
+  .dash-row .dash-info{ flex:1; min-width: 180px; }
+  .dash-row .dash-info h5{ font-family:'Baloo 2',sans-serif; font-size:16px; margin-bottom:3px; }
+  .dash-row .dash-info .meta{ font-family:'Space Mono',monospace; font-size:11px; color: var(--ink-dim); }
+  .dash-row .dash-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  footer{ padding: 34px 0 50px; border-top: 3px solid var(--purple); margin-top: 20px; }
+  footer .foot-grid{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap: 20px; }
+  footer .f-mark{ font-family:'Baloo 2',sans-serif; font-size: 17px; font-weight:700; }
+  footer p.tag{ font-family:'Space Mono',monospace; font-size: 11px; color: var(--ink-dim); margin-top: 6px; max-width: 40ch; }
+  footer .f-links{ display:flex; gap: 22px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 13px; color: var(--ink-dim); flex-wrap:wrap; }
+  footer .f-links a{ cursor:pointer; }
+  footer .f-links a:hover{ color: var(--orange-dk); }
+  html[data-theme="day"] footer .f-links a:hover{ color: var(--pink-dk); }
 
   .page{ display:none; }
   .page.active{ display:block; }
 
-  /* ================= HOME ================= */
-  .hero{
-    position:relative; padding:70px 20px 60px; text-align:center; overflow:hidden;
-    background:
-      radial-gradient(ellipse 700px 400px at 20% 0%, rgba(110,168,254,.10), transparent 60%),
-      radial-gradient(ellipse 600px 400px at 85% 20%, rgba(167,139,250,.08), transparent 60%);
+  @media (max-width: 860px){
+    .detail-head{ grid-template-columns: 1fr; }
+    .fields{ grid-template-columns: 1fr; }
+    .two-col{ grid-template-columns: 1fr; }
+    .about-grid{ grid-template-columns: 1fr; }
+    nav.main{ display:none; }
+    .hero::before{ display:none; }
+    .profile-head{ flex-direction:column; }
   }
-  .hero-content{ position:relative; z-index:1; max-width:720px; margin:0 auto; }
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:8px;
-    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--blue);
-    background:rgba(110,168,254,.1); border:1px solid rgba(110,168,254,.25);
-    padding:6px 14px; border-radius:20px; margin-bottom:20px;
-  }
-  .hero h1{ font-family:'Space Grotesk',sans-serif; font-size:38px; line-height:1.15; margin:0 0 16px; }
-  .hero h1 span{ color:var(--blue); }
-  .hero p.lead{ font-size:15.5px; line-height:1.7; color:#c7cde3; margin:0 auto 28px; max-width:600px; }
-  .hero-buttons{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .btn{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px;
-    padding:12px 22px; border-radius:9px; cursor:pointer; border:1px solid var(--line);
-    background:var(--panel-2); color:var(--text); display:inline-block;
-  }
-  .btn:hover{ border-color:var(--blue); }
-  .btn.primary{ background:var(--blue); border-color:var(--blue); color:#08101f; }
-  .btn.primary:hover{ background:#84b6ff; }
-
-  .hero-preview{
-    margin:48px auto 0; max-width:720px; border:1px solid var(--line); border-radius:14px;
-    background:var(--panel); overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.4); text-align:left;
-  }
-  .hero-preview .bar{ display:flex; gap:6px; padding:12px 14px; border-bottom:1px solid var(--line); background:var(--panel-2); }
-  .hero-preview .dot{ width:10px; height:10px; border-radius:50%; }
-  .hero-preview pre{ margin:0; padding:18px 20px; font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.7; color:#dbe6ff; overflow-x:auto; }
-  .hero-preview .kw{ color:#a9c9ff; } .hero-preview .cm{ color:#6b7394; }
-
-  section.block{ padding:56px 20px; max-width:1080px; margin:0 auto; }
-  .section-head{ text-align:center; max-width:600px; margin:0 auto 36px; }
-  .section-head .kicker{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--blue); margin-bottom:10px; }
-  .section-head h2{ font-family:'Space Grotesk',sans-serif; font-size:26px; margin:0 0 10px; }
-  .section-head p{ color:var(--text-dim); font-size:14px; line-height:1.7; }
-
-  .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-  @media (max-width:800px){ .grid3{ grid-template-columns:1fr; } }
-  .card{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px; }
-  .card .icon{
-    width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-    background:rgba(110,168,254,.12); color:var(--blue); font-size:17px; margin-bottom:12px;
-  }
-  .card h3{ font-family:'Space Grotesk',sans-serif; font-size:15.5px; margin:0 0 8px; }
-  .card p{ font-size:13.5px; color:var(--text-dim); line-height:1.6; margin:0; }
-
-  .path{ display:flex; flex-direction:column; gap:0; }
-  .path-item{ display:flex; gap:16px; padding:16px 0; border-bottom:1px solid var(--line); }
-  .path-item:last-child{ border-bottom:none; }
-  .path-num{ font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--blue); width:30px; flex-shrink:0; padding-top:2px; }
-  .path-item h4{ font-family:'Space Grotesk',sans-serif; font-size:14.5px; margin:0 0 4px; }
-  .path-item p{ font-size:13px; color:var(--text-dim); margin:0; line-height:1.6; }
-  .path-item.next-step{
-    background:linear-gradient(90deg, rgba(245,167,66,.06), transparent);
-    border-left:2px solid var(--amber); padding-left:14px; margin-top:4px;
-  }
-  .path-item.next-step .path-num{ color:var(--amber); }
-
-  .cta-band{ text-align:center; padding:50px 20px; background:var(--panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
-  .cta-band h2{ font-family:'Space Grotesk',sans-serif; font-size:22px; margin:0 0 10px; }
-  .cta-band p{ color:var(--text-dim); font-size:14px; margin:0 0 22px; }
-
-  footer{ padding:30px 20px; text-align:center; color:var(--text-dim); font-size:13px; }
-  footer nav{ display:flex !important; justify-content:center; gap:20px; margin-bottom:14px; flex-wrap:wrap; }
-  footer nav .navlink{ display:inline !important; }
-  footer nav .navlink:hover{ color:var(--text); }
-
-  /* ================= ABOUT / CONTACT / FREEBIES (simple pages) ================= */
-  .simple-main{ max-width:700px; margin:0 auto; padding:56px 20px 80px; }
-  .simple-main .kicker{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--blue); margin-bottom:12px; }
-  .simple-main h1{ font-family:'Space Grotesk',sans-serif; font-size:30px; margin:0 0 20px; }
-  .simple-main p{ font-size:14.5px; line-height:1.75; color:#c7cde3; margin:0 0 18px; }
-  .simple-main h2{ font-family:'Space Grotesk',sans-serif; font-size:18px; margin:32px 0 12px; }
-  .stat-row{ display:flex; gap:14px; margin:28px 0 36px; flex-wrap:wrap; }
-  .stat{ flex:1; min-width:130px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; }
-  .stat .num{ font-family:'Space Grotesk',sans-serif; font-size:22px; color:var(--blue); }
-  .stat .label{ font-size:12px; color:var(--text-dim); margin-top:4px; }
-  .cta-box{
-    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px; margin-top:28px;
-    display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
-  }
-  .cta-box .btn{ background:var(--blue); border-color:var(--blue); color:#08101f; }
-
-  .fgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-  @media (max-width:800px){ .fgrid{ grid-template-columns:1fr; } }
-  .fcard{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px; display:flex; flex-direction:column; }
-  .fcard .tag{
-    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--amber);
-    background:rgba(245,167,66,.1); border:1px solid rgba(245,167,66,.25);
-    padding:3px 10px; border-radius:12px; margin-bottom:12px; width:fit-content;
-  }
-  .fcard h3{ font-family:'Space Grotesk',sans-serif; font-size:15px; margin:0 0 8px; }
-  .fcard p{ font-size:13px; color:var(--text-dim); line-height:1.6; margin:0 0 18px; flex:1; }
-  .fcard .dl-btn{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12.5px;
-    padding:8px 14px; border-radius:7px; border:1px solid var(--line); background:var(--panel-2);
-    color:var(--text-dim); text-align:center;
-  }
-
-  .contact-list{ display:flex; flex-direction:column; gap:10px; text-align:left; max-width:520px; margin:0 auto; }
-  .contact-row{ display:flex; align-items:center; gap:14px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
-  .contact-row:hover{ border-color:var(--blue); }
-  .contact-icon{
-    width:36px; height:36px; border-radius:9px; flex-shrink:0; background:rgba(110,168,254,.12); color:var(--blue);
-    display:flex; align-items:center; justify-content:center; font-size:16px;
-  }
-  .contact-row .label{ font-size:12px; color:var(--text-dim); }
-  .contact-row .value{ font-family:'JetBrains Mono',monospace; font-size:13.5px; }
-
-  /* ================= LESSONS LIST PAGE ================= */
-  .lessons-header{ max-width:900px; margin:0 auto; padding:40px 20px 8px; text-align:center; }
-  .lessons-header .kicker{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--blue); margin-bottom:10px; }
-  .lessons-header h1{ font-family:'Space Grotesk',sans-serif; font-size:28px; margin:0 0 10px; }
-  .lessons-header p{ color:var(--text-dim); font-size:14px; margin:0 0 4px; }
-  .overall-progress{ max-width:400px; margin:18px auto 0; }
-  .overall-bar{ height:8px; background:var(--panel-2); border:1px solid var(--line); border-radius:5px; overflow:hidden; }
-  .overall-fill{ height:100%; background:linear-gradient(90deg,#6ea8fe,#4ade80); }
-  .overall-label{ font-size:12px; color:var(--text-dim); margin-top:6px; font-family:'JetBrains Mono',monospace; }
-
-  .lessons-grid-wrap{ max-width:900px; margin:0 auto; padding:24px 20px 80px; }
-  .track-block{ margin-bottom:32px; }
-  .track-title{
-    font-family:'Space Grotesk',sans-serif; font-size:13px; text-transform:uppercase; letter-spacing:1.2px;
-    color:var(--text-dim); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--line);
-  }
-  .lesson-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-  @media (max-width:700px){ .lesson-grid{ grid-template-columns:1fr; } }
-  .lesson-card{
-    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
-    display:flex; align-items:center; gap:14px; cursor:pointer; transition:border-color .15s;
-  }
-  .lesson-card:hover{ border-color:var(--blue); }
-  .lesson-card.locked{ cursor:not-allowed; opacity:.5; }
-  .lesson-card.locked:hover{ border-color:var(--line); }
-  .lc-badge{
-    width:38px; height:38px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
-    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600;
-    background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim);
-  }
-  .lesson-card.done .lc-badge{ background:var(--green); border-color:var(--green); color:#04170c; }
-  .lesson-card.current .lc-badge{ background:var(--blue); border-color:var(--blue); color:#08101f; }
-  .lc-title{ font-family:'Space Grotesk',sans-serif; font-size:14.5px; font-weight:600; margin-bottom:2px; }
-  .lc-sub{ font-size:12px; color:var(--text-dim); }
-  .lc-lock{ margin-left:auto; color:var(--text-dim); font-size:16px; flex-shrink:0; }
-
-  /* ================= PRACTICE PAGE ================= */
-  #practicePage{ max-width:1100px; margin:0 auto; padding:0 0 60px; }
-  .practice-topbar{
-    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-    padding:16px 20px; border-bottom:1px solid var(--line); background:var(--panel);
-  }
-  .back-link{
-    display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-dim); cursor:pointer; background:none; border:none; font-family:inherit;
-  }
-  .back-link:hover{ color:var(--text); }
-  .practice-title{ font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; }
-  .step-pills{ display:flex; gap:6px; }
-  .step-pill{
-    width:8px; height:8px; border-radius:50%; background:var(--line);
-  }
-  .step-pill.active{ background:var(--blue); }
-  .step-pill.done{ background:var(--green); }
-
-  .practice-body{ padding:24px 20px; }
-
-  /* --- STEP 1: Explain --- */
-  .explain-block{ max-width:760px; margin:0 auto; }
-  .explain-block h1{ font-family:'Space Grotesk',sans-serif; font-size:24px; margin:0 0 6px; }
-  .explain-block .kicker3{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--blue); margin-bottom:8px; }
-  .explain-block p{ font-size:14.5px; line-height:1.75; color:#c7cde3; margin:0 0 16px; }
-  .explain-block code{ background:rgba(110,168,254,.12); color:#a9c9ff; padding:2px 6px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:13px; }
-
-  .syntax-box{ background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; margin:20px 0; }
-  .syntax-box-head{ padding:10px 16px; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); }
-  .syntax-line{
-    display:grid; grid-template-columns:auto 1fr; gap:16px; padding:10px 16px; border-bottom:1px solid var(--line); align-items:start;
-  }
-  .syntax-line:last-child{ border-bottom:none; }
-  .syntax-code{ font-family:'JetBrains Mono',monospace; font-size:13px; color:#a9c9ff; white-space:nowrap; }
-  .syntax-desc{ font-size:13px; color:var(--text-dim); line-height:1.5; }
-  @media (max-width:600px){
-    .syntax-line{ grid-template-columns:1fr; gap:6px; }
-    .syntax-code{ white-space:normal; }
-  }
-
-  .example-box{
-    background:#0d1024; border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin:20px 0;
-    font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.7; color:#dbe6ff; overflow-x:auto;
-  }
-  .example-label{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
-
-  .task-box{
-    background:rgba(110,168,254,.07); border:1px solid rgba(110,168,254,.25); border-radius:10px; padding:16px 18px; margin:24px 0;
-  }
-  .task-box .label{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; color:var(--blue); margin-bottom:6px; }
-  .task-box p{ margin:0; font-size:14px; color:var(--text); }
-
-  .step-nav{ display:flex; justify-content:center; gap:10px; margin-top:28px; }
-  .step-btn{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13.5px; padding:11px 24px; border-radius:8px;
-    cursor:pointer; border:1px solid var(--blue); background:var(--blue); color:#08101f;
-  }
-  .step-btn:hover{ background:#84b6ff; }
-  .step-btn.ghost{ background:transparent; color:var(--text-dim); border-color:var(--line); }
-  .step-btn.ghost:hover{ border-color:var(--text-dim); color:var(--text); }
-
-  /* --- STEP 2: Code editor (own stacked layout, no overlap) --- */
-  .code-stage{ display:flex; flex-direction:column; gap:14px; max-width:900px; margin:0 auto; }
-  .task-recap{
-    background:rgba(110,168,254,.07); border:1px solid rgba(110,168,254,.25); border-radius:10px; padding:14px 16px; font-size:13.5px;
-  }
-  .task-recap b{ color:var(--blue); }
-
-  .editor-block{ background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
-  .editor-bar{
-    display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--line);
-    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); flex-wrap:wrap; gap:8px;
-  }
-  .editor-bar-actions{ display:flex; gap:8px; }
-  .icon-btn{
-    background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim); font-size:12px;
-    padding:6px 12px; border-radius:6px; cursor:pointer; font-family:'Space Grotesk',sans-serif; font-weight:600;
-  }
-  .icon-btn:hover{ border-color:var(--blue); color:var(--text); }
-  .run-btn{
-    background:var(--green); color:#04170c; border:none; font-family:'Space Grotesk',sans-serif;
-    font-weight:700; font-size:12.5px; padding:7px 16px; border-radius:6px; cursor:pointer;
-  }
-  .run-btn:hover{ filter:brightness(1.08); }
-  #editor{
-    width:100%; min-height:220px; resize:vertical; border:none; outline:none; background:#0d1024; color:#dbe6ff;
-    font-family:'JetBrains Mono',monospace; font-size:13.5px; line-height:1.6; padding:16px; tab-size:4; display:block;
-  }
-
-  .result-block{ background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
-  .result-tabs{ display:flex; border-bottom:1px solid var(--line); background:var(--panel-2); }
-  .result-tab{ padding:10px 16px; font-size:12.5px; color:var(--text-dim); cursor:pointer; border-bottom:2px solid transparent; background:none; border-top:none; border-left:none; border-right:none; font-family:inherit; }
-  .result-tab.active{ color:var(--text); border-bottom-color:var(--blue); }
-  #consoleOut{
-    padding:14px 16px; font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.7; min-height:120px; max-height:280px; overflow-y:auto;
-  }
-  .out-line{ display:flex; gap:8px; }
-  .out-line .p{ flex-shrink:0; }
-  .p.info{ color:var(--blue); } .p.ok{ color:var(--green); } .p.err{ color:var(--red); } .p.sys{ color:var(--text-dim); }
-  #sceneWrap{ display:none; position:relative; height:220px; }
-  #sceneCanvas{ width:100%; height:100%; display:block; background:radial-gradient(ellipse at 50% 30%, #10163a 0%, #05070f 75%); }
-
-  .result-banner{
-    padding:12px 16px; font-size:13.5px; font-weight:600; display:none; align-items:center; gap:8px;
-    font-family:'Space Grotesk',sans-serif; border-top:1px solid var(--line);
-  }
-  .result-banner.show{ display:flex; }
-  .result-banner.pass{ background:rgba(74,222,128,.12); color:var(--green); }
-  .result-banner.fail{ background:rgba(251,113,133,.1); color:var(--red); }
-
-  .hint-block{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
-  .hint-toggle{
-    display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13.5px; color:var(--amber);
-  }
-  .hint-body{ display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
-  .hint-body.open{ display:block; }
-  .hint-level{ font-size:13px; line-height:1.6; color:var(--text-dim); margin-bottom:10px; padding:10px 12px; background:var(--panel-2); border-radius:8px; }
-  .hint-level pre{ margin:8px 0 0; background:#0d1024; padding:10px 12px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dbe6ff; overflow-x:auto; }
-  .hint-btn{
-    background:none; border:1px solid var(--line); color:var(--text-dim); font-size:12.5px; padding:7px 14px; border-radius:7px; cursor:pointer; font-family:'Space Grotesk',sans-serif; font-weight:600;
-  }
-  .hint-btn:hover{ border-color:var(--amber); color:var(--amber); }
-  .hint-btn:disabled{ opacity:.4; cursor:not-allowed; }
-
-  /* --- STEP 3: Quiz --- */
-  .quiz-block{ max-width:640px; margin:0 auto; }
-  .quiz-block h2{ font-family:'Space Grotesk',sans-serif; font-size:20px; margin:0 0 6px; text-align:center; }
-  .quiz-block .kicker3{ text-align:center; display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--blue); margin-bottom:16px; }
-  .quiz-question{ font-size:15.5px; font-weight:600; margin-bottom:16px; text-align:center; }
-  .quiz-options{ display:flex; flex-direction:column; gap:10px; }
-  .quiz-option{
-    background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:13px 16px; cursor:pointer;
-    font-size:13.5px; text-align:left; font-family:inherit; color:var(--text);
-  }
-  .quiz-option:hover{ border-color:var(--blue); }
-  .quiz-option.correct{ border-color:var(--green); background:rgba(74,222,128,.1); }
-  .quiz-option.wrong{ border-color:var(--red); background:rgba(251,113,133,.1); }
-  .quiz-option:disabled{ cursor:default; }
-  .quiz-feedback{ margin-top:16px; padding:14px 16px; border-radius:10px; font-size:13.5px; line-height:1.6; display:none; }
-  .quiz-feedback.show{ display:block; }
-  .quiz-feedback.pass{ background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3); color:var(--green); }
-  .quiz-feedback.fail{ background:rgba(251,113,133,.1); border:1px solid rgba(251,113,133,.3); color:var(--red); }
-
-  /* ---------------- mascot (contextual, in-flow, not floating popup) ---------------- */
-  .mascot-inline{
-    display:none; align-items:flex-start; gap:12px; background:var(--panel-2); border:1px solid var(--line);
-    border-radius:12px; padding:14px 16px; margin-top:16px; max-width:640px; margin-left:auto; margin-right:auto;
-    position:relative;
-  }
-  .mascot-inline.show{ display:flex; }
-  .mascot-face{
-    width:38px; height:38px; border-radius:50%; flex-shrink:0;
-    background:radial-gradient(circle at 32% 28%, #cfe0ff, #6ea8fe 55%, #3a5fc8); box-shadow:0 0 12px rgba(110,168,254,.5); position:relative;
-  }
-  .mascot-face .eye{ position:absolute; top:14px; width:4px; height:6px; background:#0b0e1a; border-radius:50%; }
-  .mascot-face .eye.l{ left:11px; } .mascot-face .eye.r{ left:21px; }
-  .mascot-content{ flex:1; }
-  .mascot-name{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; color:var(--blue); margin-bottom:3px; }
-  .mascot-text{ font-size:13px; line-height:1.55; }
-  .mascot-close{ position:absolute; top:10px; right:12px; cursor:pointer; color:var(--text-dim); font-size:15px; background:none; border:none; }
-  .mascot-close:hover{ color:var(--text); }
-
-  ::-webkit-scrollbar{ width:9px; height:9px; }
-  ::-webkit-scrollbar-track{ background:transparent; }
-  ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:6px; }
+  :focus-visible{ outline: 3px solid var(--cyan); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce){ *{ transition: none !important; scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo" onclick="goTo('home')"><div class="logo-dot"></div>Orbit</div>
-  <div class="right">
-    <nav id="mainNav">
-      <button class="navlink" data-page="home" onclick="goTo('home')">Home</button>
-      <button class="navlink" data-page="about" onclick="goTo('about')">About</button>
-      <button class="navlink" data-page="freebies" onclick="goTo('freebies')">Freebies</button>
-      <button class="navlink" data-page="contact" onclick="goTo('contact')">Contact</button>
+<header class="site">
+  <div class="wrap bar">
+    <div class="wordmark" data-nav="home">
+      <span class="skull">💀</span>
+      <span class="game-title">Game Graveyard</span>
+    </div>
+    <nav class="main">
+      <button data-nav="home" class="active">Home</button>
+      <button data-nav="browse">Browse</button>
+      <button data-nav="submit">Submit</button>
+      <button data-nav="about">About</button>
     </nav>
-    <button class="nav-cta" onclick="goTo('lessons')">Start Learning</button>
+    <div class="header-right">
+      <button class="btn small ghost" id="theme-toggle" aria-label="Switch theme" style="padding:8px 12px; font-size:16px; line-height:1;">🌙</button>
+      <div id="logged-out-actions" style="display:flex; gap:8px;">
+        <button class="btn small ghost" id="open-login">Log In</button>
+        <button class="btn small" id="open-signup">Sign Up</button>
+      </div>
+      <div id="logged-in-actions" style="display:none;">
+        <div class="account-chip" id="account-chip">
+          <span class="avatar-mini" id="chip-avatar">?</span>
+          <span id="chip-name">User</span>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
-<!-- pages will be injected below by later steps -->
-<div id="pages-root">
-<div class="page active" id="page-home">
+<!-- ============ HOME ============ -->
+<main class="page active" id="page-home">
+
   <section class="hero">
-    <div class="hero-content">
-      <div class="eyebrow">✦ Free interactive lessons</div>
-      <h1>Learn <span>C# for Unity</span>,<br>one small step at a time.</h1>
-      <p class="lead">Orbit teaches you to actually write C# yourself — real syntax, real Unity concepts, with explanations, guided practice, and a quiz after every lesson. Build the practical foundation you need before moving into full game development.</p>
-      <div class="hero-buttons">
-        <button class="btn primary" onclick="goTo('lessons')">Start Learning — it's free</button>
-        <button class="btn" onclick="goTo('about')">How it works</button>
-      </div>
-      <div class="hero-preview">
-        <div class="bar"><div class="dot" style="background:#fb7185"></div><div class="dot" style="background:#f5a742"></div><div class="dot" style="background:#4ade80"></div></div>
-        <pre><span class="kw">public class</span> Player : MonoBehaviour
-{
-    <span class="kw">public float</span> speed = 3f;
-
-    <span class="kw">void</span> Update()
-    {
-        <span class="cm">// runs every frame</span>
-        transform.position.x += speed * Time.deltaTime;
-    }
-}</pre>
+    <div class="wrap hero-inner">
+      <div class="eyebrow-badge"><span class="dot"></span> Archive is live · new games added daily</div>
+      <h1 class="game-title">Games die too.<br>We keep them <span class="accent">playable in memory.</span></h1>
+      <p class="lede">Browse hundreds of canceled, abandoned, and unfinished games. Mark them RIP or vote to revive. Discover what could've been.</p>
+      <div class="hero-actions">
+        <button class="btn pink" data-nav="browse">🎮 Browse the Graveyard</button>
+        <button class="btn ghost" data-nav="submit">⚰️ Submit Your Game</button>
       </div>
     </div>
   </section>
 
-  <section class="block">
-    <div class="section-head">
-      <div class="kicker">WHY ORBIT</div>
-      <h2>Built for absolute beginners</h2>
-      <p>No setup, no installs, no prior experience needed. Just open your browser and start writing real C#.</p>
-    </div>
-    <div class="grid3">
-      <div class="card"><div class="icon">✍️</div><h3>You write the code</h3><p>No pre-filled answers. Every lesson gives you an explanation and a task, then you write the actual C# yourself.</p></div>
-      <div class="card"><div class="icon">💡</div><h3>Hints when stuck</h3><p>Escalating hints — from a small nudge to a full solution — so you're never stuck for long, but always try first.</p></div>
-      <div class="card"><div class="icon">✅</div><h3>Quiz after every lesson</h3><p>A short multiple-choice check makes sure the concept actually stuck before you move on.</p></div>
+  <section id="following-section" style="display:none;">
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>🔔 From Developers You Follow</h2><p>New and notable from the people you're following.</p></div>
+      </div>
+      <div class="card-grid" id="grid-following"></div>
     </div>
   </section>
 
-  <section class="block">
-    <div class="section-head">
-      <div class="kicker">THE PATH</div>
-      <h2>Where Orbit fits</h2>
-      <p>Orbit is the on-ramp — the practical foundation that gets you ready for real game development.</p>
-    </div>
-    <div class="path">
-      <div class="path-item">
-        <div class="path-num">01</div>
-        <div><h4>C# Foundations</h4><p>Variables, types, conditionals, loops, arrays, functions, and classes — the building blocks of any C# program.</p></div>
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>🎲 Discover Something Random</h2><p>A fresh shuffle of the archive — refresh for more.</p></div>
+        <button class="refresh-link" id="reshuffle-random">🔄 Shuffle again</button>
       </div>
-      <div class="path-item">
-        <div class="path-num">02</div>
-        <div><h4>Unity Essentials</h4><p>MonoBehaviour, the Update loop, Transform, Vector3, input handling, and the patterns behind real gameplay code.</p></div>
-      </div>
-      <div class="path-item next-step">
-        <div class="path-num">03</div>
-        <div><h4>Next: Build real projects in Unity</h4><p>With the fundamentals in place, you're ready for full project-based courses inside the actual Unity Editor. See our recommended next step below.</p></div>
-      </div>
+      <div class="card-grid" id="grid-random"></div>
     </div>
   </section>
 
-  <div class="cta-band">
-    <h2>Ready to write your first script?</h2>
-    <p>22 free lessons. No account needed. Start right in your browser.</p>
-    <button class="btn primary" onclick="goTo('lessons')">Start Learning</button>
-  </div>
-
-  <footer>
-    <nav>
-      <button class="navlink" onclick="goTo('home')">Home</button>
-      <button class="navlink" onclick="goTo('about')">About</button>
-      <button class="navlink" onclick="goTo('freebies')">Freebies</button>
-      <button class="navlink" onclick="goTo('contact')">Contact</button>
-    </nav>
-    <div>© 2026 Orbit. Built for beginners taking their first step into game development.</div>
-  </footer>
-</div>
-
-<div class="page" id="page-about">
-  <main class="simple-main">
-    <div class="kicker">ABOUT ORBIT</div>
-    <h1>A gentle on-ramp into Unity development.</h1>
-    <p>Orbit exists for one reason: getting started with game programming feels harder than it should. Most people bounce off Unity before they've written a single working script.</p>
-    <p>Every lesson here follows the same loop: read a clear explanation of a concept, see an annotated example, then write the code yourself from a mostly-empty editor. If you get stuck, hints escalate gradually instead of just handing you the answer. Once your code runs correctly, a short quiz checks that the idea actually stuck before you move to the next lesson.</p>
-
-    <div class="stat-row">
-      <div class="stat"><div class="num">22</div><div class="label">Free lessons</div></div>
-      <div class="stat"><div class="num">0</div><div class="label">Installs required</div></div>
-      <div class="stat"><div class="num">2</div><div class="label">Learning tracks</div></div>
-    </div>
-
-    <h2>What Orbit is — and isn't</h2>
-    <p>Orbit runs entirely in your browser, teaching the concepts and code patterns clearly and quickly, without the friction of installing a full engine on day one.</p>
-    <p>It's not a replacement for building real projects inside the actual Unity Editor. Once you've worked through the lessons here, you'll have the grounding to dive into full project-based courses and start shipping real games.</p>
-
-    <div class="cta-box">
-      <div>
-        <h2 style="margin-top:0;">Ready to start?</h2>
-        <p style="margin-bottom:0;">Jump into lesson one — no account needed.</p>
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>🌱 Needs Some Love</h2><p>Lower-traffic projects that deserve a look — everyone gets a chance to be seen.</p></div>
       </div>
-      <button class="btn" onclick="goTo('lessons')">Start Learning</button>
+      <div class="card-grid" id="grid-underdog"></div>
     </div>
-  </main>
-  <footer>
-    <nav>
-      <button class="navlink" onclick="goTo('home')">Home</button>
-      <button class="navlink" onclick="goTo('about')">About</button>
-      <button class="navlink" onclick="goTo('freebies')">Freebies</button>
-      <button class="navlink" onclick="goTo('contact')">Contact</button>
-    </nav>
-    <div>© 2026 Orbit. Built for beginners taking their first step into game development.</div>
-  </footer>
-</div>
+  </section>
 
-<div class="page" id="page-freebies">
-  <main class="simple-main" style="max-width:1000px;">
-    <div class="kicker" style="text-align:center;">FREE RESOURCES</div>
-    <h1 style="text-align:center;">Freebies</h1>
-    <p style="text-align:center; max-width:560px; margin:0 auto 36px;">Downloadable extras to go with your lessons — cheat sheets, templates, and starter files. New freebies added regularly.</p>
-    <div class="fgrid">
-      <div class="fcard"><div class="tag">PDF</div><h3>C# Syntax Cheat Sheet</h3><p>A one-page quick reference for variables, loops, conditionals, and common syntax.</p><div class="dl-btn">Coming soon</div></div>
-      <div class="fcard"><div class="tag">UNITY PROJECT</div><h3>Starter Player Controller</h3><p>A ready-to-import Unity script for basic movement and input, matching what you learn in Orbit.</p><div class="dl-btn">Coming soon</div></div>
-      <div class="fcard"><div class="tag">PDF</div><h3>MonoBehaviour Quick Guide</h3><p>A printable reference covering Start, Update, and the most common Unity lifecycle methods.</p><div class="dl-btn">Coming soon</div></div>
-      <div class="fcard"><div class="tag">CHECKLIST</div><h3>Before You Open Unity</h3><p>A checklist of concepts to be comfortable with before diving into your first real Unity project.</p><div class="dl-btn">Coming soon</div></div>
-      <div class="fcard"><div class="tag">TEMPLATE</div><h3>Script Naming & Structure Guide</h3><p>Best practices for organizing and naming your C# scripts as your projects grow.</p><div class="dl-btn">Coming soon</div></div>
-      <div class="fcard"><div class="tag">PDF</div><h3>Unity Keyboard Shortcuts</h3><p>The essential editor shortcuts to speed up your workflow once you're building in Unity.</p><div class="dl-btn">Coming soon</div></div>
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>🆕 Latest Submissions</h2><p>Fresh off the hard drive — newest additions to the archive.</p></div>
+      </div>
+      <div class="card-grid" id="grid-latest"></div>
     </div>
-  </main>
-  <footer>
-    <nav>
-      <button class="navlink" onclick="goTo('home')">Home</button>
-      <button class="navlink" onclick="goTo('about')">About</button>
-      <button class="navlink" onclick="goTo('freebies')">Freebies</button>
-      <button class="navlink" onclick="goTo('contact')">Contact</button>
-    </nav>
-    <div>© 2026 Orbit. Built for beginners taking their first step into game development.</div>
-  </footer>
-</div>
+  </section>
 
-<div class="page" id="page-contact">
-  <main class="simple-main" style="text-align:center;">
-    <div class="kicker">GET IN TOUCH</div>
-    <h1>Contact</h1>
-    <p class="lead" style="text-align:center;">Questions, feedback, or ideas for new lessons? Reach out through any of these.</p>
-    <div class="contact-list">
-      <a class="contact-row" href="mailto:hello@orbitlearn.example">
-        <div class="contact-icon">✉</div>
-        <div><div class="label">Email</div><div class="value">hello@orbitlearn.example</div></div>
-      </a>
-      <a class="contact-row" href="#">
-        <div class="contact-icon">🐦</div>
-        <div><div class="label">X / Twitter</div><div class="value">@orbitlearn</div></div>
-      </a>
-      <a class="contact-row" href="#">
-        <div class="contact-icon">▶</div>
-        <div><div class="label">YouTube</div><div class="value">/orbitlearn</div></div>
-      </a>
-      <a class="contact-row" href="#">
-        <div class="contact-icon">💬</div>
-        <div><div class="label">Discord</div><div class="value">discord.gg/orbitlearn</div></div>
-      </a>
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>❤️‍🔥 Most Wanted for Revival</h2><p>The games the community most wants to see finished.</p></div>
+      </div>
+      <div class="card-grid" id="grid-wanted"></div>
     </div>
-  </main>
-  <footer>
-    <nav>
-      <button class="navlink" onclick="goTo('home')">Home</button>
-      <button class="navlink" onclick="goTo('about')">About</button>
-      <button class="navlink" onclick="goTo('freebies')">Freebies</button>
-      <button class="navlink" onclick="goTo('contact')">Contact</button>
-    </nav>
-    <div>© 2026 Orbit. Built for beginners taking their first step into game development.</div>
-  </footer>
-</div>
+  </section>
 
-<div class="page" id="page-lessons">
-  <div class="lessons-header">
-    <div class="kicker">YOUR PATH</div>
-    <h1>Lessons</h1>
-    <p>Pick up where you left off, or review anything you've completed.</p>
-    <div class="overall-progress">
-      <div class="overall-bar"><div class="overall-fill" id="overallFill" style="width:0%"></div></div>
-      <div class="overall-label" id="overallLabel">0 of 22 complete</div>
+  <section>
+    <div class="wrap">
+      <div class="section-head"><div><h2>🎯 Browse by Genre</h2></div></div>
+      <div class="genre-band" id="genre-band"></div>
     </div>
-  </div>
-  <div class="lessons-grid-wrap" id="lessonsGridWrap"></div>
-</div>
+  </section>
 
-<div class="page" id="page-practice">
-  <div id="practicePage">
-    <div class="practice-topbar">
-      <button class="back-link" onclick="goTo('lessons')">← All Lessons</button>
-      <div class="practice-title" id="practiceTitle">Lesson</div>
-      <div class="step-pills">
-        <div class="step-pill" id="pill-0"></div>
-        <div class="step-pill" id="pill-1"></div>
-        <div class="step-pill" id="pill-2"></div>
+</main>
+
+<!-- ============ BROWSE ============ -->
+<main class="page" id="page-browse">
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>🗂 Browse All Games</h2><p id="browse-count-label"></p></div>
+      </div>
+      <div class="filters">
+        <input type="text" id="f-search" placeholder="🔍 Search by title...">
+        <select id="f-status"><option value="">Any status</option></select>
+        <select id="f-genre"><option value="">Any genre</option></select>
+        <select id="f-engine"><option value="">Any engine</option></select>
+        <select id="f-sort">
+          <option value="latest">Sort: Latest</option>
+          <option value="viewed">Sort: Most viewed</option>
+          <option value="voted">Sort: Most Revive votes</option>
+          <option value="az">Sort: A–Z</option>
+        </select>
+      </div>
+      <div class="card-grid" id="grid-browse"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ PROJECT DETAIL ============ -->
+<main class="page" id="page-detail">
+  <section><div class="wrap" id="detail-content"></div></section>
+</main>
+
+<!-- ============ SUBMIT ============ -->
+<main class="page" id="page-submit">
+  <section>
+    <div class="wrap" id="submit-wrap">
+      <!-- content injected by JS depending on login state -->
+    </div>
+  </section>
+</main>
+
+<!-- ============ DASHBOARD ============ -->
+<main class="page" id="page-dashboard">
+  <section>
+    <div class="wrap" id="dashboard-wrap">
+      <!-- content injected by JS -->
+    </div>
+  </section>
+</main>
+
+<!-- ============ ABOUT ============ -->
+<main class="page" id="page-about">
+  <section>
+    <div class="wrap">
+      <h2 style="font-size:32px; margin-bottom:22px;">💀 About the Archive</h2>
+      <p class="about-lede">Game Graveyard exists to preserve the stories of games that were <span class="accent">never finished</span>. Every abandoned project contains creativity, effort, and lessons worth remembering — this is where they're kept instead of lost.</p>
+
+      <div class="about-grid">
+        <div class="about-card"><div class="emoji">🛠</div><h4>For developers</h4><p>Give your unfinished work a permanent home, explain the journey, and find people who still want to see it exist.</p></div>
+        <div class="about-card"><div class="emoji">🎮</div><h4>For players</h4><p>Explore canceled and unfinished games, mark them RIP or vote to revive, and dig into the stories behind them.</p></div>
+        <div class="about-card"><div class="emoji">🗃</div><h4>For everyone</h4><p>A place where unfinished games don't vanish — the record stays, even if development doesn't continue.</p></div>
+      </div>
+
+      <div class="policy-box">
+        <h3>Legal & Policies</h3>
+        <p>Ownership confirmation, our takedown process, terms of use, and privacy details all live on one page so it's easy to find everything in one place.</p>
+        <button class="btn small ghost" data-nav="policy">📜 Read Full Policies</button>
       </div>
     </div>
-    <div class="practice-body" id="practiceBody"></div>
-  </div>
-</div>
+  </section>
+</main>
 
+<!-- ============ POLICY ============ -->
+<main class="page" id="page-policy">
+  <section>
+    <div class="wrap policy-page">
+      <span class="back-link" data-nav="about">← Back to About</span>
+      <h2>📜 Terms, Privacy & Takedown Policy</h2>
+      <div class="policy-updated">Last updated: a placeholder draft — not yet legally reviewed. Treat as a starting point, not a finished policy.</div>
+
+      <div class="policy-toc">
+        <a data-scroll="pol-terms">Terms of Use</a>
+        <a data-scroll="pol-content">Content Ownership</a>
+        <a data-scroll="pol-takedown">Takedown Policy</a>
+        <a data-scroll="pol-conduct">Community Conduct</a>
+        <a data-scroll="pol-privacy">Privacy</a>
+        <a data-scroll="pol-disclaimer">Disclaimer</a>
+      </div>
+
+      <div class="policy-section" id="pol-terms">
+        <h3>1. Terms of Use</h3>
+        <p>Game Graveyard is a free, community-run archive for unfinished, abandoned, canceled, and revived game projects. By creating an account or submitting content, you agree to these terms. The service is provided as-is, free of charge, with no guarantee of uptime, permanence, or accuracy of user-submitted content.</p>
+        <p>You must be old enough to legally agree to these terms in your country to create an account. We reserve the right to suspend or remove accounts that violate these terms.</p>
+      </div>
+
+      <div class="policy-section" id="pol-content">
+        <h3>2. Content Ownership & Your Submissions</h3>
+        <p>You retain ownership of anything you submit — text, images, links, or descriptions. By submitting, you grant Game Graveyard a non-exclusive license to display that content on the site.</p>
+        <p><strong>Every submission requires you to confirm, via checkbox, that the project is your own or that you have permission to share it.</strong> This confirmation is logged with a timestamp at the time of submission. Misrepresenting ownership is a violation of these terms and may result in account suspension.</p>
+        <p>Logged-in users can edit or permanently delete their own submissions at any time from their Dashboard.</p>
+      </div>
+
+      <div class="policy-section" id="pol-takedown">
+        <h3>3. Takedown Policy</h3>
+        <p>If you believe content on this archive infringes your rights — including a project submitted by someone other than its rightful owner — you can request its removal.</p>
+        <ul>
+          <li>Contact us using the report link on any project page, or via the contact method listed at the bottom of this page.</li>
+          <li>Include the project name/URL and a brief explanation of your claim.</li>
+          <li>We aim to review valid requests within a few business days and will remove content found to be in violation.</li>
+          <li>Repeat or clearly bad-faith submissions from the same account may result in permanent suspension.</li>
+        </ul>
+        <p>This is a good-faith moderation process, not a substitute for formal legal action where that's required.</p>
+      </div>
+
+      <div class="policy-section" id="pol-conduct">
+        <h3>4. Community Conduct</h3>
+        <p>Comments, reactions (RIP / Revive), and follows require a logged-in account so that community activity stays accountable. We ask that comments stay respectful — critique the project, not the person. Harassment, hate speech, spam, or coordinated vote manipulation may result in comment removal or account suspension.</p>
+      </div>
+
+      <div class="policy-section" id="pol-privacy">
+        <h3>5. Privacy</h3>
+        <p>Once real accounts are implemented, we intend to collect only what's needed to operate the site: an email address and password (securely hashed, never stored in plain text) for login, and whatever profile details you choose to add. We will not sell user data to third parties or use it for advertising.</p>
+        <p>This current version of the site is a prototype — no real accounts, emails, or passwords are being stored anywhere yet.</p>
+      </div>
+
+      <div class="policy-section" id="pol-disclaimer">
+        <h3>6. Disclaimer</h3>
+        <p>Game Graveyard is an independent, fan/community-run archive and is not affiliated with, endorsed by, or sponsored by any game studio, publisher, or platform mentioned in user submissions. Project descriptions reflect the submitting user's own account of events and may not be independently verified.</p>
+        <p style="margin-top:20px;">Questions about these policies? This is placeholder contact info for now: <strong>hello@gamegraveyard.example</strong></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="f-mark">💀 Game Graveyard</div>
+      <p class="tag">An archive of unfinished games — preserved, not deleted.</p>
+    </div>
+    <div class="f-links">
+      <a data-nav="browse">Browse</a>
+      <a data-nav="submit">Submit</a>
+      <a data-nav="about">About</a>
+      <a data-nav="policy">Policies</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ AUTH MODAL ============ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close">✕</button>
+    <h3 id="modal-title">Welcome Back</h3>
+    <p class="modal-sub" id="modal-sub">Log in to vote, comment, follow, and submit games.</p>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login">Log In</button>
+      <button class="modal-tab" id="tab-signup">Sign Up</button>
+    </div>
+    <form id="auth-form">
+      <div class="form-row" id="signup-name-row" style="display:none;">
+        <label for="auth-name">Display Name</label>
+        <input type="text" id="auth-name" placeholder="How you'll appear to others">
+      </div>
+      <div class="form-row">
+        <label for="auth-email">Email</label>
+        <input type="email" id="auth-email" placeholder="you@example.com" required>
+      </div>
+      <div class="form-row">
+        <label for="auth-password">Password</label>
+        <input type="password" id="auth-password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn pink" style="width:100%;" id="auth-submit-btn">Log In</button>
+    </form>
+    <div class="modal-note">🔧 Placeholder auth — no real account is created, no password is stored anywhere. This just simulates being logged in for demo purposes.</div>
+  </div>
 </div>
 
 <script>
-const trackDefs = [
-  { key:"foundations", label:"C# Foundations", ids:[0,1,2,3,4,5,6,7,8,9,10,11] },
-  { key:"unity", label:"Unity Essentials", ids:[12,13,14,15,16,17,18,19,20,21] }
-];
+(function(){
 
-const lessons = [
-
-/* ================= 0: Hello, C# ================= */
-{
-  title:"Hello, C#",
-  kicker:"01 · Foundations",
-  explain:`<p>Almost every programming lesson starts the same way: printing a message. In Unity, the way you print a message to the console is <code>Debug.Log()</code>.</p>
-           <p>This single line teaches you three things every C# statement shares: a <b>method call</b> (the thing that does work), <b>parentheses</b> holding what you pass into it, and a <b>semicolon</b> ending the line.</p>`,
-  syntax:[
-    {code:'Debug', desc:"The class that holds debugging tools built into Unity."},
-    {code:'.Log(', desc:"The method (function) you're calling on Debug. The dot connects a class to something it can do."},
-    {code:'"text here"', desc:"A string — text wrapped in double quotes. This is what gets printed."},
-    {code:');', desc:"Closes the parentheses, then a semicolon ends the statement. Every C# statement ends in ;"}
-  ],
-  example:`Debug.Log("Systems online.");`,
-  task:"Write one line of code that prints the message <code>Mission started</code> to the console using Debug.Log.",
-  skeleton:`// Write your Debug.Log statement below
-
-`,
-  hints:[
-    "Every Debug.Log call follows the same shape: Debug.Log(\"your text\");",
-    "Start typing Debug.Log( then add your message in double quotes, then close with );",
-    `Debug.Log("Mission started");`
-  ],
-  check:(r)=> r.logs.some(l=>/mission started/i.test(l)),
-  quiz:{
-    question:"What does Debug.Log() do?",
-    options:["Deletes a variable","Prints a message to the console","Creates a new GameObject","Pauses the game"],
-    correct:1,
-    explanation:"Debug.Log() sends a message to Unity's Console window — the most common way to check what your code is doing."
+  // ================= THEME =================
+  const themeBtn = document.getElementById('theme-toggle');
+  function applyTheme(theme){
+    if(theme === 'day'){ document.documentElement.setAttribute('data-theme', 'day'); themeBtn.textContent = '☀️'; }
+    else { document.documentElement.removeAttribute('data-theme'); themeBtn.textContent = '🌙'; }
   }
-},
+  let currentTheme = 'day';
+  applyTheme(currentTheme);
+  themeBtn.addEventListener('click', () => { currentTheme = currentTheme === 'night' ? 'day' : 'night'; applyTheme(currentTheme); });
 
-/* ================= 1: Variables ================= */
-{
-  title:"Variables",
-  kicker:"02 · Foundations",
-  explain:`<p>A variable is a labeled container that stores a piece of data. C# is <b>strongly typed</b>, meaning every variable must declare what <i>kind</i> of data it holds, and it can only ever hold that kind.</p>
-           <p>The four types you'll use constantly: whole numbers, decimal numbers, text, and true/false values.</p>`,
-  syntax:[
-    {code:'int lives = 3;', desc:"int stores whole numbers — no decimal point."},
-    {code:'float speed = 5.5f;', desc:"float stores decimal numbers. Note the f at the end — C# requires it."},
-    {code:'string name = "Nova";', desc:"string stores text, always in double quotes."},
-    {code:'bool isAlive = true;', desc:"bool stores only true or false."}
-  ],
-  example:`int score = 0;
-string playerName = "Rex";
-Debug.Log(playerName);`,
-  task:"Declare an <code>int</code> variable named <code>lives</code> set to <code>3</code>. Then use Debug.Log to print it, combined with a label, like: <code>Lives: 3</code>.",
-  skeleton:`// 1. Declare an int variable called lives, set to 3
+  // ================= FAKE AUTH STATE =================
+  let currentUser = null; // { name, email }
 
+  function isLoggedIn(){ return !!currentUser; }
 
-// 2. Debug.Log it with a "Lives: " label
-
-`,
-  hints:[
-    "Declaring a variable looks like: type name = value; — for example, int lives = 3;",
-    `Declare it first: int lives = 3;  Then log it: Debug.Log("Lives: " + lives);`,
-    `int lives = 3;\nDebug.Log("Lives: " + lives);`
-  ],
-  check:(r)=> /lives/i.test(r.logs.join(' ')) && /3/.test(r.logs.join(' ')),
-  quiz:{
-    question:"Which type would you use to store a decimal number like 5.5?",
-    options:["int","string","float","bool"],
-    correct:2,
-    explanation:"float is for decimal numbers. int is only for whole numbers, and in C# float literals need an 'f' suffix (5.5f)."
+  function requireLogin(actionLabel){
+    if(isLoggedIn()) return true;
+    showToast(`🔒 Log in to ${actionLabel}`);
+    openAuthModal('login');
+    return false;
   }
-},
 
-/* ================= 2: Math Operators ================= */
-{
-  title:"Math Operators",
-  kicker:"03 · Foundations",
-  explain:`<p>C# supports standard math: <code>+ - * /</code>. You'll also constantly see shorthand operators like <code>+=</code>, which means "take the current value and add to it."</p>`,
-  syntax:[
-    {code:'gold + 25', desc:"Adds 25 to gold and gives you the result (doesn't change gold itself)."},
-    {code:'gold += 25;', desc:"Shorthand for gold = gold + 25; — this DOES change gold."},
-    {code:'gold -= 10;', desc:"Shorthand for gold = gold - 10;"}
-  ],
-  example:`int score = 10;
-score += 5;
-Debug.Log("Score: " + score);`,
-  task:"Declare an <code>int</code> named <code>gold</code> starting at <code>100</code>. Add <code>25</code> to it using <code>+=</code>. Then log the result with a label.",
-  skeleton:`// 1. Declare gold, starting at 100
-
-
-// 2. Add 25 to gold using +=
-
-
-// 3. Log it
-
-`,
-  hints:[
-    "Remember: variable += number; adds that number to the variable's current value.",
-    `int gold = 100; then gold += 25; then Debug.Log("Gold: " + gold);`,
-    `int gold = 100;\ngold += 25;\nDebug.Log("Gold: " + gold);`
-  ],
-  check:(r)=> /gold/i.test(r.logs.join(' ')) && /125/.test(r.logs.join(' ')),
-  quiz:{
-    question:"What does score += 5; do?",
-    options:["Sets score to 5","Compares score to 5","Adds 5 to score's current value","Divides score by 5"],
-    correct:2,
-    explanation:"+= is shorthand for 'take the current value and add to it' — score += 5 is the same as score = score + 5."
-  }
-},
-
-/* ================= 3: Strings ================= */
-{
-  title:"Strings",
-  kicker:"04 · Foundations",
-  explain:`<p>Strings hold text. You can combine (concatenate) strings and variables using <code>+</code> — C# converts numbers to text automatically when you do this.</p>`,
-  syntax:[
-    {code:'"Welcome, "', desc:"A string literal — plain text in quotes."},
-    {code:'+ player', desc:"Joins a variable onto the string. If player is 'Rex', this becomes 'Welcome, Rex'."},
-    {code:'+ "!"', desc:"You can keep chaining as many + as you like."}
-  ],
-  example:`string player = "Rex";
-Debug.Log("Welcome, " + player + "!");`,
-  task:"Declare a <code>string</code> named <code>shipName</code> set to any name you like. Log a message that says <code>Departing on the [shipName]</code>.",
-  skeleton:`// 1. Declare shipName
-
-
-// 2. Log "Departing on the " + shipName
-
-`,
-  hints:[
-    "You need a string variable, then combine it into a Debug.Log using +.",
-    `string shipName = "Star Runner"; then Debug.Log("Departing on the " + shipName);`,
-    `string shipName = "Star Runner";\nDebug.Log("Departing on the " + shipName);`
-  ],
-  check:(r)=> /departing on the/i.test(r.logs.join(' ')),
-  quiz:{
-    question:"What symbol joins strings and variables together in C#?",
-    options:["&","+","%",".."],
-    correct:1,
-    explanation:"The + operator concatenates (joins) strings and variables in C#."
-  }
-},
-
-/* ================= 4: If Statements ================= */
-{
-  title:"If Statements",
-  kicker:"05 · Foundations",
-  explain:`<p><code>if</code> statements let your program make decisions. The code inside the curly braces <code>{ }</code> only runs when the condition in parentheses is true.</p>`,
-  syntax:[
-    {code:'if (health < 50)', desc:"The condition. If health is less than 50, this is true."},
-    {code:'{', desc:"Opens the block of code that runs when the condition is true."},
-    {code:'    Debug.Log(...);', desc:"This only runs if the condition above was true."},
-    {code:'}', desc:"Closes the block."}
-  ],
-  example:`int health = 40;
-if (health < 50)
-{
-    Debug.Log("Low health warning!");
-}`,
-  task:"Declare an <code>int</code> named <code>fuel</code> set to <code>15</code>. Write an if statement that logs <code>Fuel low</code> when fuel is less than 20.",
-  skeleton:`// 1. Declare fuel = 15
-
-
-// 2. if statement: if fuel < 20, log "Fuel low"
-
-`,
-  hints:[
-    "The shape is: if (condition) { statement; }",
-    `int fuel = 15; then if (fuel < 20) { Debug.Log("Fuel low"); }`,
-    `int fuel = 15;\nif (fuel < 20)\n{\n    Debug.Log("Fuel low");\n}`
-  ],
-  check:(r)=> /fuel low/i.test(r.logs.join(' ')),
-  quiz:{
-    question:"When does the code inside an if block run?",
-    options:["Always, no matter what","Only when the condition evaluates to true","Only once when the program starts","Never — if is just a comment"],
-    correct:1,
-    explanation:"The code inside { } after an if only executes when the condition inside the parentheses is true."
-  }
-},
-
-/* ================= 5: Else & Comparisons ================= */
-{
-  title:"Else & Comparisons",
-  kicker:"06 · Foundations",
-  explain:`<p><code>else</code> gives you a fallback path for when the if condition is false. C# comparison operators: <code>==</code> (equal to), <code>!=</code> (not equal), <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>.</p>
-           <p>A common beginner mistake: <code>=</code> assigns a value, but <code>==</code> compares two values. Mixing them up is one of the most common bugs in programming.</p>`,
-  syntax:[
-    {code:'if (health > 0)', desc:"Runs the next block if health is greater than 0."},
-    {code:'else', desc:"Runs this alternate block only if the if-condition was false."},
-    {code:'health == 0', desc:"Checks if health equals exactly 0. Double equals, not single!"}
-  ],
-  example:`int health = 0;
-if (health > 0)
-{
-    Debug.Log("Alive");
-}
-else
-{
-    Debug.Log("Game Over");
-}`,
-  task:"Declare <code>int shields = 0;</code>. Write an if/else: if shields is greater than 0, log <code>Shields up</code>, otherwise log <code>Shields down</code>.",
-  skeleton:`// 1. Declare shields = 0
-
-
-// 2. if/else based on shields > 0
-
-`,
-  hints:[
-    "The shape is: if (condition) { ... } else { ... }",
-    `if (shields > 0) { Debug.Log("Shields up"); } else { Debug.Log("Shields down"); }`,
-    `int shields = 0;\nif (shields > 0)\n{\n    Debug.Log("Shields up");\n}\nelse\n{\n    Debug.Log("Shields down");\n}`
-  ],
-  check:(r)=> /shields down|shields up/i.test(r.logs.join(' ')),
-  quiz:{
-    question:"What's the difference between = and == in C#?",
-    options:["No difference, they're interchangeable","= assigns a value, == compares two values","== assigns a value, = compares two values","Both are used only in loops"],
-    correct:1,
-    explanation:"A single = assigns a value to a variable. A double == checks whether two values are equal — mixing these up is a very common bug."
-  }
-},
-
-/* ================= 6: Logical Operators ================= */
-{
-  title:"Logical Operators",
-  kicker:"07 · Foundations",
-  explain:`<p>Sometimes one condition isn't enough. Logical operators combine multiple conditions: <code>&&</code> means "and" (both must be true), <code>||</code> means "or" (at least one must be true), and <code>!</code> means "not" (flips true/false).</p>`,
-  syntax:[
-    {code:'hasKey && !doorLocked', desc:"True only if hasKey is true AND doorLocked is false."},
-    {code:'hasKey || hasCode', desc:"True if EITHER hasKey or hasCode is true."},
-    {code:'!doorLocked', desc:"Flips doorLocked — if it's false, !doorLocked is true."}
-  ],
-  example:`bool hasKey = true;
-bool doorLocked = false;
-if (hasKey && !doorLocked)
-{
-    Debug.Log("Door opens");
-}`,
-  task:"Declare two bools: <code>hasFuel = true</code> and <code>engineOn = true</code>. Log <code>Ready for launch</code> only if both are true.",
-  skeleton:`// 1. Declare hasFuel and engineOn, both true
-
-
-// 2. if both are true, log "Ready for launch"
-
-`,
-  hints:[
-    "Use && to require both conditions to be true at once.",
-    `if (hasFuel && engineOn) { Debug.Log("Ready for launch"); }`,
-    `bool hasFuel = true;\nbool engineOn = true;\nif (hasFuel && engineOn)\n{\n    Debug.Log("Ready for launch");\n}`
-  ],
-  check:(r)=> /ready for launch/i.test(r.logs.join(' ')),
-  quiz:{
-    question:"What does && require?",
-    options:["At least one side to be true","Both sides to be true","Neither side to be true","Exactly one side to be false"],
-    correct:1,
-    explanation:"&& (AND) only evaluates to true when both conditions on either side are true."
-  }
-},
-
-/* ================= 7: For Loops ================= */
-{
-  title:"For Loops",
-  kicker:"08 · Foundations",
-  explain:`<p>A <code>for</code> loop repeats a block of code a specific number of times. It has three parts: a starting value, a condition to keep looping, and a step that runs after each pass.</p>`,
-  syntax:[
-    {code:'for (int i = 0;', desc:"Start: create a counter variable i, beginning at 0."},
-    {code:' i < 5;', desc:"Condition: keep looping while i is less than 5."},
-    {code:' i++)', desc:"Step: after each loop, increase i by 1. i++ means i = i + 1."},
-    {code:'{ ... }', desc:"The code inside runs once per loop, using the current value of i."}
-  ],
-  example:`for (int i = 0; i < 5; i++)
-{
-    Debug.Log("Wave " + i);
-}`,
-  task:"Write a for loop that logs <code>Enemy spawned N</code> for N from 0 to 3 (4 total: 0,1,2,3).",
-  skeleton:`// for loop from 0 to 3, logging "Enemy spawned " + i
-
-`,
-  hints:[
-    "The loop condition i < 4 will run for i = 0,1,2,3 — four times total.",
-    `for (int i = 0; i < 4; i++) { Debug.Log("Enemy spawned " + i); }`,
-    `for (int i = 0; i < 4; i++)\n{\n    Debug.Log("Enemy spawned " + i);\n}`
-  ],
-  check:(r)=> r.logs.length>=3,
-  quiz:{
-    question:"In for (int i = 0; i < 5; i++), how many times does the loop run?",
-    options:["4 times","5 times","6 times","Infinite"],
-    correct:1,
-    explanation:"i starts at 0 and the loop continues while i < 5, so it runs for i = 0,1,2,3,4 — five times total."
-  }
-},
-
-/* ================= 8: While Loops ================= */
-{
-  title:"While Loops",
-  kicker:"09 · Foundations",
-  explain:`<p>A <code>while</code> loop repeats as long as its condition stays true. Unlike a for loop, it doesn't have a built-in counter — you have to update the condition yourself inside the loop, or it will run forever.</p>`,
-  syntax:[
-    {code:'while (fuel > 0)', desc:"Keeps looping as long as fuel is greater than 0."},
-    {code:'fuel--;', desc:"Decreases fuel by 1 each loop — this eventually makes the condition false, stopping the loop."}
-  ],
-  example:`int fuel = 3;
-while (fuel > 0)
-{
-    Debug.Log("Fuel left: " + fuel);
-    fuel--;
-}`,
-  task:"Declare <code>int charges = 4;</code>. Write a while loop that logs <code>Charge remaining: N</code> and decreases charges by 1 each time, until charges reaches 0.",
-  skeleton:`// 1. Declare charges = 4
-
-
-// 2. while loop logging and decreasing charges
-
-`,
-  hints:[
-    "Don't forget to decrease the variable inside the loop, or it never ends.",
-    `while (charges > 0) { Debug.Log("Charge remaining: " + charges); charges--; }`,
-    `int charges = 4;\nwhile (charges > 0)\n{\n    Debug.Log("Charge remaining: " + charges);\n    charges--;\n}`
-  ],
-  check:(r)=> r.logs.length>=3,
-  quiz:{
-    question:"What happens if you forget to change the condition variable inside a while loop?",
-    options:["The loop runs exactly once","The loop never starts","The loop runs forever (infinite loop)","C# automatically fixes it"],
-    correct:2,
-    explanation:"If nothing inside the loop changes the condition, it stays true forever, creating an infinite loop that freezes your program."
-  }
-},
-
-/* ================= 9: Arrays ================= */
-{
-  title:"Arrays",
-  kicker:"10 · Foundations",
-  explain:`<p>An array stores a fixed-size list of values of the same type. Each item has an index, or position, and — importantly — <b>arrays start counting at 0</b>, not 1.</p>`,
-  syntax:[
-    {code:'string[] enemies', desc:"Declares an array of strings. The [] means 'array of'."},
-    {code:'{ "Slime", "Bat", "Ghost" }', desc:"The values, in curly braces, separated by commas."},
-    {code:'enemies[0]', desc:"Accesses the first item — index 0 — which is 'Slime'."}
-  ],
-  example:`string[] enemies = { "Slime", "Bat", "Ghost" };
-Debug.Log(enemies[0]);`,
-  task:"Create a <code>string[]</code> array named <code>crew</code> with three names of your choice. Log the second item (index 1).",
-  skeleton:`// 1. Declare a string[] crew with 3 names
-
-
-// 2. Log crew[1]
-
-`,
-  hints:[
-    "Remember index 1 is the SECOND item, since arrays start at 0.",
-    `string[] crew = { "Ann", "Beck", "Cole" }; then Debug.Log(crew[1]);`,
-    `string[] crew = { "Ann", "Beck", "Cole" };\nDebug.Log(crew[1]);`
-  ],
-  check:(r)=> r.logs.length>0,
-  quiz:{
-    question:"In an array with 3 items, what index is the FIRST item?",
-    options:["1","0","3","-1"],
-    correct:1,
-    explanation:"Arrays in C# are zero-indexed — the first item is always at index 0, not 1."
-  }
-},
-
-/* ================= 10: Functions ================= */
-{
-  title:"Functions",
-  kicker:"11 · Foundations",
-  explain:`<p>Functions (also called methods) let you package reusable code. A function can take inputs (called parameters) and can send back a result using <code>return</code>.</p>`,
-  syntax:[
-    {code:'int AddGold(int amount)', desc:"int = what type this function returns. AddGold = name. (int amount) = the input parameter."},
-    {code:'{ return amount + 10; }', desc:"The function body. return sends a value back to whoever called this function."},
-    {code:'AddGold(5)', desc:"Calling the function with 5 as the input — this whole expression becomes whatever it returns."}
-  ],
-  example:`int AddGold(int amount)
-{
-    return amount + 10;
-}
-Debug.Log("Total: " + AddGold(5));`,
-  task:"Write a function <code>int DoubleIt(int n)</code> that returns <code>n * 2</code>. Then log the result of calling it with <code>7</code>.",
-  skeleton:`// 1. Write the function DoubleIt
-
-
-// 2. Log DoubleIt(7)
-
-`,
-  hints:[
-    "The function shape: int Name(int param) { return param * 2; }",
-    `int DoubleIt(int n) { return n * 2; } then Debug.Log("Result: " + DoubleIt(7));`,
-    `int DoubleIt(int n)\n{\n    return n * 2;\n}\nDebug.Log("Result: " + DoubleIt(7));`
-  ],
-  check:(r)=> /14/.test(r.logs.join(' ')),
-  quiz:{
-    question:"What does 'return' do inside a function?",
-    options:["Ends the entire program","Sends a value back to whoever called the function","Prints to the console","Deletes the function"],
-    correct:1,
-    explanation:"return exits the function and sends a value back to the code that called it."
-  }
-},
-
-/* ================= 11: Classes & Objects ================= */
-{
-  title:"Classes & Objects",
-  kicker:"12 · Foundations",
-  explain:`<p>A class is a blueprint describing data and behavior. An object is an actual instance created from that blueprint using <code>new</code>. In Unity, every script you write is a class.</p>`,
-  syntax:[
-    {code:'class Player {', desc:"Defines a new blueprint called Player."},
-    {code:'public int health = 100;', desc:"A field on the class. public means other code outside the class can access it."},
-    {code:'Player p = new Player();', desc:"Creates an actual object from the Player blueprint, storing it in variable p."},
-    {code:'p.health', desc:"Accesses the health field on the specific object p."}
-  ],
-  example:`class Player {
-    public int health = 100;
-}
-Player p = new Player();
-Debug.Log(p.health);`,
-  task:"Create a class <code>Ship</code> with a public int field <code>fuel = 50</code>. Create an object from it named <code>myShip</code>, and log its fuel.",
-  skeleton:`// 1. Define class Ship with public int fuel = 50
-
-
-// 2. Create myShip and log myShip.fuel
-
-`,
-  hints:[
-    "The class needs curly braces around its field. Creating an object uses 'new ClassName()'.",
-    `class Ship { public int fuel = 50; } then Ship myShip = new Ship(); Debug.Log("Fuel: " + myShip.fuel);`,
-    `class Ship {\n    public int fuel = 50;\n}\nShip myShip = new Ship();\nDebug.Log("Fuel: " + myShip.fuel);`
-  ],
-  check:(r)=> /fuel/i.test(r.logs.join(' ')) && /50/.test(r.logs.join(' ')),
-  quiz:{
-    question:"What's the relationship between a class and an object?",
-    options:["They're the same thing","A class is a blueprint; an object is an actual instance made from it","An object is a blueprint; a class is an instance","Classes can only exist inside objects"],
-    correct:1,
-    explanation:"A class defines the structure and behavior. An object is a real instance created from that class using 'new'."
-  }
-},
-
-/* ================= 12: MonoBehaviour ================= */
-{
-  title:"MonoBehaviour",
-  kicker:"13 · Unity Essentials",
-  explain:`<p>This is where Unity-specific scripting begins. Every script attached to a GameObject in Unity inherits from <code>MonoBehaviour</code> — a base class that gives your script access to special methods Unity calls automatically at the right time.</p>
-           <p><code>Start()</code> is one of these — Unity calls it exactly once, right when the object becomes active.</p>`,
-  syntax:[
-    {code:'public class Player : MonoBehaviour', desc:"': MonoBehaviour' means Player inherits Unity's special script powers."},
-    {code:'void Start()', desc:"A method Unity automatically calls once, when the object is created."},
-    {code:'{ Debug.Log(...); }', desc:"Code that runs during that one-time call."}
-  ],
-  example:`public class Player : MonoBehaviour
-{
-    void Start()
-    {
-        Debug.Log("Player has entered the scene");
+  function updateHeaderForAuth(){
+    const outEl = document.getElementById('logged-out-actions');
+    const inEl = document.getElementById('logged-in-actions');
+    if(isLoggedIn()){
+      outEl.style.display = 'none';
+      inEl.style.display = 'block';
+      document.getElementById('chip-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+      document.getElementById('chip-name').textContent = currentUser.name;
+    } else {
+      outEl.style.display = 'flex';
+      inEl.style.display = 'none';
     }
-}`,
-  task:"Write a MonoBehaviour class named <code>Drone</code> with a Start() method that logs <code>Drone activated</code>.",
-  skeleton:`// public class Drone : MonoBehaviour
-// with a Start() method
-
-`,
-  hints:[
-    "The structure is: public class Name : MonoBehaviour { void Start() { ... } }",
-    `public class Drone : MonoBehaviour { void Start() { Debug.Log("Drone activated"); } }`,
-    `public class Drone : MonoBehaviour\n{\n    void Start()\n    {\n        Debug.Log("Drone activated");\n    }\n}`
-  ],
-  check:(r)=> r.logs.length>0,
-  quiz:{
-    question:"When does Unity call a script's Start() method?",
-    options:["Every frame, repeatedly","Once, when the object is created","Only when the player presses a key","Never automatically"],
-    correct:1,
-    explanation:"Start() runs exactly once, right before the object's first frame — ideal for one-time setup code."
   }
-},
 
-/* ================= 13: The Update Loop ================= */
-{
-  title:"The Update Loop",
-  kicker:"14 · Unity Essentials",
-  explain:`<p><code>Update()</code> is called by Unity once every single rendered frame — usually 60 times per second. It's the heartbeat of gameplay: movement, input checks, and timers almost always live here.</p>`,
-  syntax:[
-    {code:'void Update()', desc:"Called automatically, every frame, for as long as the object exists."},
-  ],
-  example:`public class Player : MonoBehaviour
-{
-    void Update()
-    {
-        Debug.Log("Frame tick");
-    }
-}`,
-  task:"Write a MonoBehaviour class <code>Radar</code> with an Update() method that logs <code>Scanning...</code>. (We'll only show it once in the console here so it doesn't spam.)",
-  skeleton:`// public class Radar : MonoBehaviour
-// with an Update() method
-
-`,
-  hints:[
-    "Same shape as Start(), but named Update instead.",
-    `public class Radar : MonoBehaviour { void Update() { Debug.Log("Scanning..."); } }`,
-    `public class Radar : MonoBehaviour\n{\n    void Update()\n    {\n        Debug.Log("Scanning...");\n    }\n}`
-  ],
-  check:(r)=> r.updateRan,
-  quiz:{
-    question:"Roughly how often is Update() called during gameplay?",
-    options:["Once per game session","Once per second","Once per frame (often ~60 times/second)","Only when triggered manually"],
-    correct:2,
-    explanation:"Update() runs once per rendered frame, which is typically around 60 times per second."
-  }
-},
-
-/* ================= 14: GameObjects & Transform ================= */
-{
-  title:"GameObjects & Transform",
-  kicker:"15 · Unity Essentials",
-  explain:`<p>Every object in a Unity scene is a <code>GameObject</code>. Its position, rotation, and scale in the world are stored in a component called <code>Transform</code>, accessible from any script attached to it via <code>transform</code>.</p>`,
-  syntax:[
-    {code:'transform.position', desc:"A Vector3 (x, y, z) representing where this object sits in the scene."},
-  ],
-  example:`void Start()
-{
-    Debug.Log("Starting position: " + transform.position);
-}`,
-  task:"Write a MonoBehaviour class <code>Beacon</code> with a Start() method that logs the object's starting <code>transform.position</code>.",
-  skeleton:`// public class Beacon : MonoBehaviour
-// with Start() logging transform.position
-
-`,
-  hints:[
-    "Just Debug.Log the transform.position inside Start().",
-    `public class Beacon : MonoBehaviour { void Start() { Debug.Log("Position: " + transform.position); } }`,
-    `public class Beacon : MonoBehaviour\n{\n    void Start()\n    {\n        Debug.Log("Position: " + transform.position);\n    }\n}`
-  ],
-  check:(r)=> r.logs.length>0,
-  quiz:{
-    question:"What does transform.position store?",
-    options:["The object's color","The object's name","The object's position in the scene as x, y, z","The object's script code"],
-    correct:2,
-    explanation:"transform.position is a Vector3 holding the object's x, y, and z coordinates in the scene."
-  }
-},
-
-/* ================= 15: Moving an Object ================= */
-{
-  title:"Moving an Object",
-  kicker:"16 · Unity Essentials",
-  explain:`<p>To move something smoothly over time, you nudge its position a tiny bit every frame inside <code>Update()</code>. Multiplying by <code>Time.deltaTime</code> (the time since the last frame) keeps movement speed consistent no matter the framerate.</p>`,
-  syntax:[
-    {code:'public float speed = 2f;', desc:"A field for how fast the object moves, adjustable in Unity's Inspector."},
-    {code:'transform.position.x += speed * Time.deltaTime;', desc:"Moves the object along x each frame, scaled by time so it's frame-rate independent."}
-  ],
-  example:`public class Player : MonoBehaviour
-{
-    public float speed = 2f;
-
-    void Update()
-    {
-        transform.position.x += speed * Time.deltaTime;
-    }
-}`,
-  task:"Write a MonoBehaviour class <code>Satellite</code> with a public float <code>speed = 3f</code>, and an Update() that moves transform.position.x forward each frame using speed * Time.deltaTime. Watch the Scene tab.",
-  skeleton:`// public class Satellite : MonoBehaviour
-// public float speed = 3f
-// Update() moves position.x
-
-`,
-  hints:[
-    "You need the speed field, then in Update: transform.position.x += speed * Time.deltaTime;",
-    `public class Satellite : MonoBehaviour { public float speed = 3f; void Update() { transform.position.x += speed * Time.deltaTime; } }`,
-    `public class Satellite : MonoBehaviour\n{\n    public float speed = 3f;\n\n    void Update()\n    {\n        transform.position.x += speed * Time.deltaTime;\n    }\n}`
-  ],
-  check:(r)=> r.moved,
-  quiz:{
-    question:"Why multiply movement by Time.deltaTime?",
-    options:["It makes the code shorter","It keeps movement speed consistent regardless of framerate","It's required by C# syntax","It only matters for 3D games"],
-    correct:1,
-    explanation:"Time.deltaTime is the time since the last frame. Multiplying by it means your object moves the same real-world distance per second no matter how fast or slow frames are rendering."
-  }
-},
-
-/* ================= 16: Vector3 Basics ================= */
-{
-  title:"Vector3 Basics",
-  kicker:"17 · Unity Essentials",
-  explain:`<p><code>Vector3</code> represents a point or direction in 3D space using x, y, and z. Almost everything spatial in Unity — positions, directions, velocities — uses Vector3.</p>`,
-  syntax:[
-    {code:'new Vector3(1, 0, 0)', desc:"Creates a vector pointing purely along the x-axis."},
-    {code:'direction * speed * Time.deltaTime', desc:"Scales a direction vector by speed and time to get a frame's worth of movement."}
-  ],
-  example:`Vector3 direction = new Vector3(1, 0, 0);
-transform.position += direction * speed * Time.deltaTime;`,
-  task:"Write a MonoBehaviour <code>Probe</code> with public float <code>speed = 2f</code>. In Update(), create a Vector3 direction of (0, 1, 0) and move transform.position by direction * speed * Time.deltaTime.",
-  skeleton:`// public class Probe : MonoBehaviour
-// public float speed = 2f
-// Update() moves using a Vector3 direction
-
-`,
-  hints:[
-    "Declare the Vector3 inside Update, then add it (scaled) to transform.position.",
-    `Vector3 direction = new Vector3(0, 1, 0); transform.position += direction * speed * Time.deltaTime;`,
-    `public class Probe : MonoBehaviour\n{\n    public float speed = 2f;\n\n    void Update()\n    {\n        Vector3 direction = new Vector3(0, 1, 0);\n        transform.position += direction * speed * Time.deltaTime;\n    }\n}`
-  ],
-  check:(r)=> r.moved,
-  quiz:{
-    question:"What does Vector3 represent?",
-    options:["A single number","A color value","A point or direction in 3D space (x, y, z)","A type of loop"],
-    correct:2,
-    explanation:"Vector3 holds three numbers — x, y, z — used to represent positions, directions, or movement in 3D space."
-  }
-},
-
-/* ================= 17: Reading Input ================= */
-{
-  title:"Reading Input",
-  kicker:"18 · Unity Essentials",
-  explain:`<p><code>Input.GetKey()</code> checks whether a specific key is currently held down. It's almost always checked inside Update(), since input can change every frame.</p>`,
-  syntax:[
-    {code:'Input.GetKey(KeyCode.RightArrow)', desc:"Returns true while the right arrow key is held down."},
-  ],
-  example:`if (Input.GetKey(KeyCode.RightArrow))
-{
-    transform.position.x += speed * Time.deltaTime;
-}`,
-  task:"Write a MonoBehaviour <code>Rover</code> with public float <code>speed = 3f</code>. In Update(), check all 4 arrow keys and move transform.position.x / y accordingly. Try it in the Scene tab afterward!",
-  skeleton:`// public class Rover : MonoBehaviour
-// public float speed = 3f
-// Update() checks Input.GetKey for all 4 arrows
-
-`,
-  hints:[
-    "You need 4 separate if statements, one per arrow key, each moving position by speed * Time.deltaTime.",
-    `if (Input.GetKey(KeyCode.RightArrow)) transform.position.x += speed * Time.deltaTime; — repeat this pattern for Left (x -=), Up (y +=), Down (y -=).`,
-    `public class Rover : MonoBehaviour\n{\n    public float speed = 3f;\n\n    void Update()\n    {\n        if (Input.GetKey(KeyCode.RightArrow))\n            transform.position.x += speed * Time.deltaTime;\n        if (Input.GetKey(KeyCode.LeftArrow))\n            transform.position.x -= speed * Time.deltaTime;\n        if (Input.GetKey(KeyCode.UpArrow))\n            transform.position.y += speed * Time.deltaTime;\n        if (Input.GetKey(KeyCode.DownArrow))\n            transform.position.y -= speed * Time.deltaTime;\n    }\n}`
-  ],
-  check:(r)=> r.inputUsed || r.hasInputCode,
-  quiz:{
-    question:"What does Input.GetKey(KeyCode.RightArrow) return?",
-    options:["The name of the key pressed","True while that specific key is held down","The number of keys pressed","Nothing — it only works with the mouse"],
-    correct:1,
-    explanation:"Input.GetKey returns true for every frame the specified key is held down, and false otherwise."
-  }
-},
-
-/* ================= 18: Health System ================= */
-{
-  title:"Health System",
-  kicker:"19 · Unity Essentials",
-  explain:`<p>Combining a variable that changes over time with a conditional check is one of the most common gameplay patterns — health bars, cooldowns, timers, and ammo counters all use this same shape.</p>`,
-  syntax:[
-    {code:'health -= 10f * Time.deltaTime;', desc:"Decreases health steadily over time, frame-independent thanks to Time.deltaTime."},
-    {code:'if (health <= 0)', desc:"Checks whether health has run out."}
-  ],
-  example:`public float health = 100f;
-
-void Update()
-{
-    health -= 10f * Time.deltaTime;
-    if (health <= 0)
-    {
-        Debug.Log("Game Over");
-    }
-}`,
-  task:"Write a MonoBehaviour <code>Reactor</code> with public float <code>heat = 100f</code>. In Update(), increase heat by 15 * Time.deltaTime, and log <code>Overheated</code> once heat passes 100... wait, it starts at 100 — instead: decrease heat by 20*Time.deltaTime and log <code>Reactor offline</code> when heat reaches 0 or below.",
-  skeleton:`// public class Reactor : MonoBehaviour
-// public float heat = 100f
-// Update() decreases heat, checks <= 0
-
-`,
-  hints:[
-    "Same shape as the health example — just renamed to heat and a different message.",
-    `heat -= 20f * Time.deltaTime; if (heat <= 0) { Debug.Log("Reactor offline"); }`,
-    `public class Reactor : MonoBehaviour\n{\n    public float heat = 100f;\n\n    void Update()\n    {\n        heat -= 20f * Time.deltaTime;\n        if (heat <= 0)\n        {\n            Debug.Log("Reactor offline");\n        }\n    }\n}`
-  ],
-  check:(r)=> r.logs.some(l=>/offline|game over/i.test(l)) || r.hasHealthCode,
-  quiz:{
-    question:"Why is this decrease-then-check pattern so common in games?",
-    options:["It's the only way to use Debug.Log","It's the basic shape behind health bars, cooldowns, and timers","It only works with the number 100","It's specific to Unity's Vector3"],
-    correct:1,
-    explanation:"A value that changes over time, paired with a condition that reacts once a threshold is crossed, is the core logic behind health, stamina, cooldowns, and countdown timers."
-  }
-},
-
-/* ================= 19: Collisions ================= */
-{
-  title:"Collisions",
-  kicker:"20 · Unity Essentials",
-  explain:`<p>Unity automatically calls <code>OnTriggerEnter()</code> when two objects with colliders overlap. This is how you detect hits, pickups, and zone entries without manually checking positions every frame.</p>`,
-  syntax:[
-    {code:'void OnTriggerEnter(Collider other)', desc:"Unity calls this automatically when another collider enters this object's trigger zone."},
-    {code:'other.name', desc:"The name of the other object involved in the collision."}
-  ],
-  example:`void OnTriggerEnter(Collider other)
-{
-    Debug.Log("Collided with " + other.name);
-}`,
-  task:"Write a MonoBehaviour <code>Shield</code> with an OnTriggerEnter(Collider other) method that logs <code>Impact from</code> followed by the other object's name.",
-  skeleton:`// public class Shield : MonoBehaviour
-// with OnTriggerEnter(Collider other)
-
-`,
-  hints:[
-    "The method signature must match exactly: OnTriggerEnter(Collider other)",
-    `public class Shield : MonoBehaviour { void OnTriggerEnter(Collider other) { Debug.Log("Impact from " + other.name); } }`,
-    `public class Shield : MonoBehaviour\n{\n    void OnTriggerEnter(Collider other)\n    {\n        Debug.Log("Impact from " + other.name);\n    }\n}`
-  ],
-  check:(r)=> r.logs.some(l=>/impact|collided/i.test(l)),
-  quiz:{
-    question:"When does Unity call OnTriggerEnter()?",
-    options:["Every frame","When the player presses a button","Automatically, when two colliders overlap","Only in 2D games"],
-    correct:2,
-    explanation:"OnTriggerEnter fires automatically the moment two objects with trigger colliders start overlapping — no manual checking required."
-  }
-},
-
-/* ================= 20: Spawning Objects ================= */
-{
-  title:"Spawning Objects",
-  kicker:"21 · Unity Essentials",
-  explain:`<p><code>Instantiate()</code> creates a new copy of an object at runtime — the basis of bullets, enemy waves, particle effects, and pickups. It's often combined with a for loop to create several at once.</p>`,
-  syntax:[
-    {code:'for (int i = 0; i < 3; i++)', desc:"Repeats the spawn logic 3 times."},
-    {code:'Instantiate(enemyPrefab);', desc:"Creates a new copy of enemyPrefab in the scene."}
-  ],
-  example:`for (int i = 0; i < 3; i++)
-{
-    Instantiate("Enemy");
-    Debug.Log("Spawned enemy " + i);
-}`,
-  task:"Write a MonoBehaviour <code>Spawner</code> with a Start() method containing a for loop that spawns 4 asteroids: call <code>Instantiate(\"Asteroid\")</code> and log <code>Spawned asteroid N</code> each time.",
-  skeleton:`// public class Spawner : MonoBehaviour
-// Start() with a for loop spawning 4 asteroids
-
-`,
-  hints:[
-    "Put the for loop inside Start(), looping i from 0 to 3 (4 total).",
-    `for (int i = 0; i < 4; i++) { Instantiate("Asteroid"); Debug.Log("Spawned asteroid " + i); }`,
-    `public class Spawner : MonoBehaviour\n{\n    void Start()\n    {\n        for (int i = 0; i < 4; i++)\n        {\n            Instantiate("Asteroid");\n            Debug.Log("Spawned asteroid " + i);\n        }\n    }\n}`
-  ],
-  check:(r)=> r.spawns.length>=2,
-  quiz:{
-    question:"What does Instantiate() do?",
-    options:["Deletes an object","Creates a new copy of an object at runtime","Moves the camera","Pauses the game"],
-    correct:1,
-    explanation:"Instantiate() creates a new instance of a prefab or object while the game is running — the standard way to spawn enemies, bullets, or items."
-  }
-},
-
-/* ================= 21: Public Variables ================= */
-{
-  title:"Public Variables",
-  kicker:"22 · Unity Essentials",
-  explain:`<p>Marking a field <code>public</code> exposes it in Unity's Inspector panel, letting anyone tweak values without touching code — hugely useful for designers and quick tuning.</p>
-           <p>You've now covered the essential toolkit behind real Unity gameplay scripts. This is genuinely enough to start experimenting inside the Unity Editor itself.</p>`,
-  syntax:[
-    {code:'public float jumpForce = 5f;', desc:"A public field. Shows up as an editable number in Unity's Inspector."},
-    {code:'public string playerName = "Nova";', desc:"Public fields work for any type, not just numbers."}
-  ],
-  example:`public class Player : MonoBehaviour
-{
-    public float jumpForce = 5f;
-    public string playerName = "Nova";
-}`,
-  task:"Write a MonoBehaviour <code>Pilot</code> with two public fields: <code>float boost = 4f</code> and <code>string callsign = \"Falcon\"</code>. In Start(), log a message combining both.",
-  skeleton:`// public class Pilot : MonoBehaviour
-// public float boost = 4f
-// public string callsign = "Falcon"
-// Start() logs both
-
-`,
-  hints:[
-    "Declare both public fields at the top of the class, then reference them inside Start().",
-    `Debug.Log(callsign + " ready with boost " + boost);`,
-    `public class Pilot : MonoBehaviour\n{\n    public float boost = 4f;\n    public string callsign = "Falcon";\n\n    void Start()\n    {\n        Debug.Log(callsign + " ready with boost " + boost);\n    }\n}`
-  ],
-  check:(r)=> r.logs.length>0,
-  quiz:{
-    question:"Why make a variable 'public' in a Unity script?",
-    options:["It runs faster","It becomes editable in Unity's Inspector without touching code","It's required for all variables","It hides the variable from other scripts"],
-    correct:1,
-    explanation:"public fields on a MonoBehaviour automatically appear as editable fields in the Unity Inspector — letting you tune values without changing code."
-  }
-}
-
-];
-
-</script>
-<script>
-function goTo(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const el = document.getElementById('page-'+page);
-  if(el) el.classList.add('active');
-  document.querySelectorAll('#mainNav .navlink').forEach(b=>{
-    b.classList.toggle('active', b.dataset.page===page);
+  document.getElementById('account-chip').addEventListener('click', () => {
+    showPage('dashboard');
+    renderDashboard();
   });
-  window.scrollTo(0,0);
-}
-</script>
-<script>
-/* =========================================================
-   STATE
-========================================================= */
-let currentLessonId = 0;
-let completed = new Set();
-let currentStep = 0; // 0 = explain, 1 = code, 2 = quiz
-let hintLevel = 0; // 0 = none shown, 1/2/3 = tiers revealed
-let lastRunResult = null;
-let codePassed = false;
 
-/* =========================================================
-   NAV OVERRIDE (extend base goTo to handle lessons render)
-========================================================= */
-const _origGoTo = goTo;
-goTo = function(page){
-  _origGoTo(page);
-  if(page === 'lessons') renderLessonsGrid();
-};
+  // ---------- auth modal ----------
+  const authModal = document.getElementById('auth-modal');
+  const tabLogin = document.getElementById('tab-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const signupNameRow = document.getElementById('signup-name-row');
+  const modalTitle = document.getElementById('modal-title');
+  const modalSub = document.getElementById('modal-sub');
+  const authSubmitBtn = document.getElementById('auth-submit-btn');
+  let authMode = 'login';
 
-/* =========================================================
-   LESSON UNLOCK LOGIC (strictly linear)
-========================================================= */
-function isUnlocked(id){
-  if(id === 0) return true;
-  return completed.has(id-1);
-}
+  function setAuthMode(mode){
+    authMode = mode;
+    tabLogin.classList.toggle('active', mode === 'login');
+    tabSignup.classList.toggle('active', mode === 'signup');
+    signupNameRow.style.display = mode === 'signup' ? 'block' : 'none';
+    modalTitle.textContent = mode === 'signup' ? 'Create Your Account' : 'Welcome Back';
+    modalSub.textContent = mode === 'signup' ? 'Sign up to vote, comment, follow, and submit games.' : 'Log in to vote, comment, follow, and submit games.';
+    authSubmitBtn.textContent = mode === 'signup' ? 'Sign Up' : 'Log In';
+  }
+  tabLogin.addEventListener('click', () => setAuthMode('login'));
+  tabSignup.addEventListener('click', () => setAuthMode('signup'));
 
-/* =========================================================
-   LESSONS GRID PAGE
-========================================================= */
-function renderLessonsGrid(){
-  const wrap = document.getElementById('lessonsGridWrap');
-  wrap.innerHTML = '';
-  trackDefs.forEach(track=>{
-    const block = document.createElement('div');
-    block.className = 'track-block';
-    const title = document.createElement('div');
-    title.className = 'track-title';
-    title.textContent = track.label;
-    block.appendChild(title);
+  function openAuthModal(mode){
+    setAuthMode(mode || 'login');
+    authModal.classList.add('show');
+    document.getElementById('auth-email').focus();
+  }
+  function closeAuthModal(){ authModal.classList.remove('show'); document.getElementById('auth-form').reset(); }
 
-    const grid = document.createElement('div');
-    grid.className = 'lesson-grid';
-    track.ids.forEach(id=>{
-      const l = lessons[id];
-      const unlocked = isUnlocked(id);
-      const done = completed.has(id);
-      const card = document.createElement('div');
-      card.className = 'lesson-card' + (unlocked?'':' locked') + (done?' done':'') + (id===currentLessonId && !done ? ' current':'');
-      card.innerHTML = `
-        <div class="lc-badge">${done ? '✓' : (id+1)}</div>
-        <div>
-          <div class="lc-title">${l.title}</div>
-          <div class="lc-sub">${l.kicker}</div>
-        </div>
-        ${unlocked ? '' : '<div class="lc-lock">🔒</div>'}
-      `;
-      if(unlocked){
-        card.onclick = ()=> enterPractice(id);
-      }
-      grid.appendChild(card);
+  document.getElementById('open-login').addEventListener('click', () => openAuthModal('login'));
+  document.getElementById('open-signup').addEventListener('click', () => openAuthModal('signup'));
+  document.getElementById('modal-close').addEventListener('click', closeAuthModal);
+  authModal.addEventListener('click', (e) => { if(e.target === authModal) closeAuthModal(); });
+
+  document.getElementById('auth-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value.trim();
+    const nameInput = document.getElementById('auth-name').value.trim();
+    const name = authMode === 'signup' ? (nameInput || email.split('@')[0]) : (email.split('@')[0] || 'Player');
+    currentUser = { name: name.charAt(0).toUpperCase() + name.slice(1), email };
+    updateHeaderForAuth();
+    closeAuthModal();
+    showToast(authMode === 'signup' ? `Welcome, ${currentUser.name}! 🎉` : `Welcome back, ${currentUser.name}!`);
+    renderHome();
+    if(document.getElementById('page-submit').classList.contains('active')) renderSubmitPage();
+  });
+
+  // simple logout, reachable from dashboard
+  function logout(){
+    currentUser = null;
+    updateHeaderForAuth();
+    showPage('home');
+    renderHome();
+    showToast('Logged out.');
+  }
+
+  // ================= NAV =================
+  function showPage(name){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.querySelectorAll('nav.main button').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = el.dataset.nav;
+      showPage(target);
+      if(target === 'browse') renderBrowse();
+      if(target === 'submit') renderSubmitPage();
+      if(target === 'dashboard') renderDashboard();
     });
-    block.appendChild(grid);
-    wrap.appendChild(block);
+  });
+  document.querySelectorAll('.policy-toc a').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById(a.dataset.scroll).scrollIntoView({ behavior:'smooth', block:'start' });
+    });
   });
 
-  const total = lessons.length;
-  const done = completed.size;
-  document.getElementById('overallFill').style.width = `${(done/total)*100}%`;
-  document.getElementById('overallLabel').textContent = `${done} of ${total} complete`;
-}
-
-/* =========================================================
-   ENTER PRACTICE
-========================================================= */
-function enterPractice(id){
-  currentLessonId = id;
-  currentStep = 0;
-  hintLevel = 0;
-  codePassed = false;
-  lastRunResult = null;
-  goTo('practice');
-  document.getElementById('practiceTitle').textContent = lessons[id].title;
-  renderStep();
-}
-
-function renderPills(){
-  for(let i=0;i<3;i++){
-    const pill = document.getElementById('pill-'+i);
-    pill.className = 'step-pill' + (i===currentStep?' active':'') + (i<currentStep?' done':'');
+  function openProject(id){
+    const p = projects.find(x => x.id === id);
+    if(!p) return;
+    p.views += 1;
+    renderDetail(p);
+    showPage('detail');
   }
-}
 
-function renderStep(){
-  renderPills();
-  const body = document.getElementById('practiceBody');
-  const l = lessons[currentLessonId];
-  if(currentStep === 0){
-    body.innerHTML = renderExplainHTML(l);
-  } else if(currentStep === 1){
-    body.innerHTML = renderCodeHTML(l);
-    wireCodeStep(l);
-  } else if(currentStep === 2){
-    body.innerHTML = renderQuizHTML(l);
-    wireQuizStep(l);
+  function escapeHTML(str){
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
   }
-  window.scrollTo(0,0);
-}
 
-/* =========================================================
-   STEP 1: EXPLAIN
-========================================================= */
-function renderExplainHTML(l){
-  const syntaxRows = l.syntax.map(s=>`
-    <div class="syntax-line">
-      <div class="syntax-code">${escapeHtml(s.code)}</div>
-      <div class="syntax-desc">${s.desc}</div>
-    </div>
-  `).join('');
+  // ================= DATA =================
+  const GENRE_STYLE = {
+    Action:      { g1:"#FF4D8D", g2:"#C22A63", icon:"⚔️" },
+    Adventure:   { g1:"#34E4E0", g2:"#159C99", icon:"🗺️" },
+    RPG:         { g1:"#9B6BFF", g2:"#6B3FD4", icon:"📜" },
+    Horror:      { g1:"#FF5A52", g2:"#7A1F1A", icon:"👁️" },
+    Racing:      { g1:"#FF9F3E", g2:"#D4700E", icon:"🏁" },
+    Strategy:    { g1:"#B4F03C", g2:"#5C8A10", icon:"♟️" },
+    Puzzle:      { g1:"#FFD93E", g2:"#D4A50E", icon:"🧩" },
+    Platformer:  { g1:"#34E4E0", g2:"#9B6BFF", icon:"🕹️" },
+    Simulation:  { g1:"#B4F03C", g2:"#159C99", icon:"⚙️" },
+    Other:       { g1:"#9B6BFF", g2:"#FF4D8D", icon:"✨" }
+  };
 
-  return `
-    <div class="explain-block">
-      <div class="kicker3">${l.kicker}</div>
-      <h1>${l.title}</h1>
-      ${l.explain}
+  const DEV_BIOS = {
+    "K. Reyes": "Solo developer who likes stealth games and quiet corners of half-finished cities. Currently freelancing while thinking about a Shadow of Kage comeback.",
+    "Nightbloom Games": "Two-person horror studio focused on atmosphere over jump scares. Currently working on an audio-drama side project.",
+    "Mara Voss": "Physics nerd and part-time student. Makes small, weird puzzle toys between semesters.",
+    "Combustion Collective": "A rotating cast of friends who've been making arcade racers together since college.",
+    "T. Okonkwo": "Design-first hobbyist. Prefers paper prototypes to code — figures out if it's fun before it's ever built.",
+    "Lantern & Wire": "A narrative-focused two-person team. Big fans of radio dramas and unreliable narrators.",
+    "Deer Path Studio": "Small indie studio building slow, atmospheric RPGs about places changing over time.",
+    "Bent Nail Games": "Scrappy arcade-fighter studio. Believes every cancelled game deserves a second look.",
+    "Iris Fenn": "Platformer specialist obsessed with movement feel over everything else.",
+    "Overcast Studio": "Systems-heavy simulation team, currently on hiatus but not done."
+  };
+  const DEV_JOINED = {
+    "K. Reyes": "2022", "Nightbloom Games": "2023", "Mara Voss": "2024",
+    "Combustion Collective": "2021", "T. Okonkwo": "2025", "Lantern & Wire": "2020",
+    "Deer Path Studio": "2023", "Bent Nail Games": "2019", "Iris Fenn": "2024", "Overcast Studio": "2022"
+  };
 
-      <div class="syntax-box">
-        <div class="syntax-box-head">Syntax breakdown</div>
-        ${syntaxRows}
-      </div>
+  const seed = [
+    { id:1, title:"Shadow of Kage", genre:"Action", status:"Abandoned", engine:"Unity", dev:"K. Reyes", devtime:"12 months", year:"2022", views:1840, ripCount:64, reviveCount:312,
+      story:"Shadow of Kage started as a two-week prototype for a game jam and quietly grew into something much bigger. The idea was simple: a ninja stealth game where light and shadow weren't just aesthetic, but the entire mechanic — enemies could only see you if you crossed a lit tile.\n\nThe first six months were the best development experience I've ever had. The core mechanic worked, it felt good, and a small community started following devlogs. But scope crept. I kept adding systems — a crafting layer, branching missions, a whole second city district — without finishing the first one properly.\n\nAt month ten I was solo, out of savings, and the stealth AI still had game-breaking bugs I couldn't figure out alone. I stopped updating the devlog in month twelve. I still think about finishing it.",
+      video:"", demo:"https://itch.io",
+      comments:[
+        { name:"PixelHermit", text:"This one hurts. The demo footage looked so good — genuinely thought this would be the next big stealth indie.", time:"3 days ago" },
+        { name:"Kayla R.", text:"Voted revive immediately. Please come back to this someday!", time:"1 day ago" }
+      ] },
+    { id:2, title:"Hollow Orbit", genre:"Horror", status:"Canceled", engine:"Godot", dev:"Nightbloom Games", devtime:"5 months", year:"2023", views:940, ripCount:41, reviveCount:188,
+      story:"A survival horror game set on an abandoned space station, told almost entirely through audio logs. We wanted something closer to a haunted house than a shooter — no weapons, just a flashlight and your own paranoia.\n\nThe publisher we were talking to passed after a demo build, and without funding the two-person team couldn't keep going while also paying rent. It's fully canceled, not on hold — we've both moved to other projects. But the atmosphere we built still holds up, and we'd love for someone to see it.",
+      video:"", demo:"" },
+    { id:3, title:"Tideglass", genre:"Puzzle", status:"Prototype", engine:"Unreal Engine", dev:"Mara Voss", devtime:"3 months", year:"2024", views:512, ripCount:9, reviveCount:96,
+      story:"A physics puzzle game about bending light through glass sculptures underwater. Started as a shader experiment and turned into an actual playable prototype with about 15 puzzle rooms.\n\nCurrently paused while I finish my degree — this one isn't dead, just sleeping. Posting it here mostly to see if anyone's interested before I pick it back up.",
+      video:"", demo:"" },
+    { id:4, title:"Rustbelt Racer", genre:"Racing", status:"On Hold", engine:"Unity", dev:"Combustion Collective", devtime:"9 months", year:"2021", views:1210, ripCount:22, reviveCount:401,
+      story:"An arcade racer set in a decaying industrial city, built around destructible scenery and a rubber-band AI that actually felt fair. We had a working vertical slice with three tracks and eight cars.\n\nOur lead artist had to step away for personal reasons and the project stalled without anyone to keep the visual pipeline moving. Everyone involved still wants to finish it — 'on hold' is accurate, not a euphemism.",
+      video:"", demo:"" },
+    { id:5, title:"Paper Kingdoms", genre:"Strategy", status:"Idea", engine:"Other", dev:"T. Okonkwo", devtime:"", year:"2025", views:88, ripCount:2, reviveCount:14,
+      story:"A turn-based strategy game where the entire map is literally made of folded paper, and terrain changes as you fold and unfold sections of the board. Right now this exists as about 40 pages of design notes and one very rough paper prototype played with index cards.\n\nPosting early because I want feedback on the core folding mechanic before committing engine time to it.",
+      video:"", demo:"" },
+    { id:6, title:"Static Choir", genre:"Adventure", status:"Abandoned", engine:"Godot", dev:"Lantern & Wire", devtime:"14 months", year:"2020", views:2230, ripCount:88, reviveCount:560,
+      story:"A narrative adventure about a radio operator in a town where the signal occasionally lets you hear the future. We had full voice acting for two of six chapters and a nearly complete script.\n\nThe team split up amicably after 14 months — different life circumstances pulled everyone in different directions. This is the project I'm proudest of that never saw daylight. All assets are just sitting on a drive.",
+      video:"", demo:"",
+      comments:[
+        { name:"radiodaze", text:"The two chapters that exist are on YouTube somewhere, right? This premise is incredible.", time:"6 days ago" },
+        { name:"Tomás", text:"'Told through audio logs' + radio operator + hearing the future is such a good hook. Devastated this stopped.", time:"2 days ago" },
+        { name:"GhostFrequency", text:"Following in case any of the team wants to pick this back up with a new collaborator.", time:"yesterday" }
+      ] },
+    { id:7, title:"Ferrowood", genre:"RPG", status:"In Development", engine:"Unreal Engine", dev:"Deer Path Studio", devtime:"20 months", year:"2023", views:1670, ripCount:5, reviveCount:275,
+      story:"A low-fantasy RPG about a logging town slowly being reclaimed by an unexplainable forest. Still actively in development, but slower than announced — posting here for transparency and to log the journey honestly rather than go quiet like most devlogs do when things get hard.",
+      video:"", demo:"" },
+    { id:8, title:"Glassjaw Arena", genre:"Other", status:"Revived", engine:"Unity", dev:"Bent Nail Games", devtime:"6 months (original) + 4 months (revival)", year:"2019", views:3040, ripCount:12, reviveCount:812,
+      story:"A brutal one-hit-kill arena fighter that was shelved in 2019 after our publisher deal fell through. Filed it here in year one of this site mostly as a memorial. The revival vote count convinced a small studio to pick up the concept under license — new build launches next year.",
+      video:"", demo:"" },
+    { id:9, title:"Marrow Deep", genre:"Platformer", status:"Prototype", engine:"Godot", dev:"Iris Fenn", devtime:"4 months", year:"2024", views:340, ripCount:6, reviveCount:52,
+      story:"A grapple-hook platformer where you play as a creature made of bone, hooking onto the environment with your own ribs. Twelve levels blocked out, movement feels great. Shelved because I couldn't crack the art style — everything I tried looked wrong next to the mechanics.",
+      video:"", demo:"" },
+    { id:10, title:"Silo 7", genre:"Simulation", status:"On Hold", engine:"Unity", dev:"Overcast Studio", devtime:"11 months", year:"2022", views:780, ripCount:18, reviveCount:140,
+      story:"A colony management sim set entirely underground, where oxygen and light are the resources you're really managing. Deep systems, mostly working economy, no real bugs — just ran out of runway. Team's still together, just working day jobs now.",
+      video:"", demo:"" },
+    { id:11, title:"Nine Lives Casino", genre:"Simulation", status:"Idea", engine:"Other", dev:"T. Okonkwo", devtime:"", year:"2025", views:41, ripCount:1, reviveCount:6,
+      story:"A tiny management sim about running a casino for cats. Still just a design doc and a spreadsheet of card game rules. Posting super early to gauge interest before investing real time.",
+      video:"", demo:"" },
+    { id:12, title:"Undertow Signal", genre:"Horror", status:"Canceled", engine:"Godot", dev:"Nightbloom Games", devtime:"2 months", year:"2024", views:63, ripCount:3, reviveCount:11,
+      story:"A short experimental horror piece about a lighthouse keeper who starts hearing voices in the foghorn. Only ever a vertical slice — about 20 minutes of content. Canceled quickly when we realized the concept worked better as a short film than a game.",
+      video:"", demo:"" }
+  ];
 
-      <div class="example-label">Example</div>
-      <div class="example-box">${escapeHtml(l.example)}</div>
+  const STATUS_KEYS = { "Idea":"idea","Prototype":"prototype","In Development":"dev","On Hold":"onhold","Abandoned":"abandoned","Canceled":"canceled","Revived":"revived" };
+  const GENRES = ["Action","Adventure","RPG","Horror","Racing","Strategy","Puzzle","Platformer","Simulation","Other"];
+  const ENGINES = ["Unity","Unreal Engine","Godot","Custom Engine","Other"];
+  const STATUSES = ["Idea","Prototype","In Development","On Hold","Abandoned","Canceled","Revived"];
 
-      <div class="task-box">
-        <div class="label">YOUR TASK</div>
-        <p>${l.task}</p>
-      </div>
+  let projects = JSON.parse(JSON.stringify(seed));
+  let userReactions = {};   // { projectId: 'rip' | 'revive' }
+  let followedDevs = new Set();
+  let mySubmissions = [];   // ids of projects submitted by currentUser this session
 
-      <div class="step-nav">
-        <button class="step-btn" onclick="goToStep(1)">Start Coding →</button>
-      </div>
-    </div>
-  `;
-}
+  // ================= CARD RENDERING =================
+  function coverStyle(genre){
+    const s = GENRE_STYLE[genre] || GENRE_STYLE.Other;
+    return `background: linear-gradient(135deg, ${s.g1}, ${s.g2});`;
+  }
+  function coverHTML(genre, big){
+    const s = GENRE_STYLE[genre] || GENRE_STYLE.Other;
+    return `
+      <div class="shape s1" style="background:rgba(255,255,255,0.18);"></div>
+      <div class="shape s2" style="background:rgba(0,0,0,0.15);"></div>
+      <div class="shape s3" style="background:rgba(255,255,255,0.12);"></div>
+      <span class="icon" style="${big?'font-size:78px;':''}">${s.icon}</span>
+    `;
+  }
 
-function goToStep(step){
-  currentStep = step;
-  renderStep();
-}
-
-/* =========================================================
-   STEP 2: CODE
-========================================================= */
-function renderCodeHTML(l){
-  return `
-    <div class="code-stage">
-      <div class="task-recap"><b>Task:</b> ${l.task}</div>
-
-      <div class="editor-block">
-        <div class="editor-bar">
-          <span>Script.cs</span>
-          <div class="editor-bar-actions">
-            <button class="icon-btn" id="resetBtn">Reset</button>
-            <button class="run-btn" id="runBtn">▶ Run</button>
+  function cardHTML(p, opts){
+    opts = opts || {};
+    const key = STATUS_KEYS[p.status] || 'idea';
+    const snippet = p.story.split('\n')[0].slice(0, 100) + (p.story.length > 100 ? '…' : '');
+    const badge = opts.badge ? `<span class="badge-corner">${opts.badge}</span>` : '';
+    return `
+      <article class="gcard" data-id="${p.id}" tabindex="0" role="button" aria-label="View ${escapeHTML(p.title)}">
+        <div class="cover" style="${coverStyle(p.genre)}">
+          ${coverHTML(p.genre)}
+          ${badge}
+          <span class="status-chip ${key}">${p.status}</span>
+        </div>
+        <div class="body">
+          <h4>${escapeHTML(p.title)}</h4>
+          <div class="genre-line">${p.genre}${p.engine ? ' · ' + p.engine : ''}</div>
+          <p class="snippet">${escapeHTML(snippet)}</p>
+          <div class="foot">
+            <span>👁 ${p.views.toLocaleString()}</span>
+            <span class="reactions"><span class="rip-mini">🕊 ${p.ripCount}</span><span class="revive-mini">❤️‍🔥 ${p.reviveCount}</span></span>
           </div>
         </div>
-        <textarea id="editor" spellcheck="false">${escapeHtml(l.skeleton)}</textarea>
-      </div>
-
-      <div class="result-block">
-        <div class="result-tabs">
-          <button class="result-tab active" id="tabConsole">Console</button>
-          <button class="result-tab" id="tabScene">Scene</button>
-        </div>
-        <div id="consoleOut"></div>
-        <div id="sceneWrap"><canvas id="sceneCanvas"></canvas></div>
-        <div class="result-banner" id="resultBanner"></div>
-      </div>
-
-      <div class="hint-block">
-        <div class="hint-toggle" id="hintToggle">
-          <span>💡 Need a hint?</span>
-          <span id="hintChevron">▾</span>
-        </div>
-        <div class="hint-body" id="hintBody">
-          <div id="hintLevels"></div>
-          <button class="hint-btn" id="revealHintBtn">Show a hint</button>
-        </div>
-      </div>
-
-      <div id="mascotSlot"></div>
-
-      <div class="step-nav">
-        <button class="step-btn ghost" onclick="goToStep(0)">← Back to Explanation</button>
-        <button class="step-btn" id="continueBtn" disabled onclick="goToStep(2)">Continue to Quiz →</button>
-      </div>
-    </div>
-  `;
-}
-
-function wireCodeStep(l){
-  clearConsole();
-  logLine('sys', 'Write your code, then press Run.');
-  document.getElementById('runBtn').onclick = ()=>{
-    showResultTab('console');
-    logLine('sys','Running...');
-    setTimeout(()=>{
-      try{
-        const code = document.getElementById('editor').value;
-        const result = runCode(code, l);
-        lastRunResult = result;
-        finishRun(l, result);
-      }catch(e){
-        logLine('err','Error: ' + e.message);
-      }
-    }, 150);
-  };
-  document.getElementById('resetBtn').onclick = ()=>{
-    document.getElementById('editor').value = l.skeleton;
-    clearConsole();
-    logLine('sys','Reset to starting skeleton.');
-    document.getElementById('resultBanner').className = 'result-banner';
-  };
-  document.getElementById('tabConsole').onclick = ()=> showResultTab('console');
-  document.getElementById('tabScene').onclick = ()=> showResultTab('scene');
-
-  document.getElementById('hintToggle').onclick = ()=>{
-    const body = document.getElementById('hintBody');
-    body.classList.toggle('open');
-    document.getElementById('hintChevron').textContent = body.classList.contains('open') ? '▴' : '▾';
-  };
-  renderHintLevels(l);
-  document.getElementById('revealHintBtn').onclick = ()=> revealNextHint(l);
-
-  hideMascotInline();
-}
-
-function showResultTab(which){
-  document.getElementById('tabConsole').classList.toggle('active', which==='console');
-  document.getElementById('tabScene').classList.toggle('active', which==='scene');
-  document.getElementById('consoleOut').style.display = which==='console' ? 'block' : 'none';
-  document.getElementById('sceneWrap').style.display = which==='scene' ? 'block' : 'none';
-  if(which==='scene') resizeCanvas();
-}
-
-function renderHintLevels(l){
-  const container = document.getElementById('hintLevels');
-  container.innerHTML = '';
-  for(let i=0;i<hintLevel;i++){
-    const div = document.createElement('div');
-    div.className = 'hint-level';
-    if(i===2){
-      div.innerHTML = `<b>Full solution:</b><pre>${escapeHtml(l.hints[2])}</pre>`;
-    } else {
-      div.textContent = l.hints[i];
-    }
-    container.appendChild(div);
+      </article>
+    `;
   }
-  const btn = document.getElementById('revealHintBtn');
-  if(hintLevel>=3){
-    btn.disabled = true;
-    btn.textContent = "No more hints";
-  } else {
-    btn.textContent = hintLevel===0 ? "Show a hint" : (hintLevel===1 ? "Show a bigger hint" : "Show full solution");
-  }
-}
-function revealNextHint(l){
-  if(hintLevel<3) hintLevel++;
-  renderHintLevels(l);
-  document.getElementById('hintBody').classList.add('open');
-  document.getElementById('hintChevron').textContent = '▴';
-}
 
-/* =========================================================
-   MASCOT (contextual inline, not floating)
-========================================================= */
-function showMascotInline(text){
-  const slot = document.getElementById('mascotSlot');
-  if(!slot) return;
-  slot.innerHTML = `
-    <div class="mascot-inline show">
-      <div class="mascot-face"><div class="eye l"></div><div class="eye r"></div></div>
-      <div class="mascot-content">
-        <div class="mascot-name">Blip</div>
-        <div class="mascot-text">${text}</div>
-      </div>
-      <button class="mascot-close" onclick="hideMascotInline()">✕</button>
-    </div>
-  `;
-}
-function hideMascotInline(){
-  const slot = document.getElementById('mascotSlot');
-  if(slot) slot.innerHTML = '';
-}
-
-/* =========================================================
-   CONSOLE
-========================================================= */
-function logLine(tag, text){
-  const consoleOut = document.getElementById('consoleOut');
-  if(!consoleOut) return;
-  const div = document.createElement('div');
-  div.className = 'out-line';
-  const prefix = {info:'›', ok:'✓', err:'✗', sys:'·'}[tag] || '›';
-  div.innerHTML = `<span class="p ${tag}">${prefix}</span><span>${escapeHtml(text)}</span>`;
-  consoleOut.appendChild(div);
-  consoleOut.scrollTop = consoleOut.scrollHeight;
-}
-function clearConsole(){
-  const consoleOut = document.getElementById('consoleOut');
-  if(consoleOut) consoleOut.innerHTML = '';
-}
-function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
-/* =========================================================
-   CANVAS SCENE
-========================================================= */
-let canvas, ctx;
-function resizeCanvas(){
-  canvas = document.getElementById('sceneCanvas');
-  if(!canvas) return;
-  ctx = canvas.getContext('2d');
-  const wrap = document.getElementById('sceneWrap');
-  canvas.width = wrap.clientWidth || 400;
-  canvas.height = wrap.clientHeight || 220;
-}
-window.addEventListener('resize', ()=>{ if(canvas) resizeCanvas(); });
-
-let keysDown = {};
-window.addEventListener('keydown', e=>{
-  keysDown[e.key]=true;
-  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
-});
-window.addEventListener('keyup', e=>{ keysDown[e.key]=false; });
-
-let simFrame=null, simRunning=false;
-
-function drawGrid(){
-  ctx.strokeStyle = 'rgba(110,168,254,.06)';
-  for(let x=0;x<canvas.width;x+=30){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
-  for(let y=0;y<canvas.height;y+=30){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
-}
-function drawObj(x,y,color,label){
-  const px = canvas.width/2 + x, py = canvas.height/2 + y;
-  const grad = ctx.createRadialGradient(px,py,0,px,py,20);
-  grad.addColorStop(0, color+'aa'); grad.addColorStop(1,'transparent');
-  ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(px,py,20,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = color;
-  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(px-7,py-7,14,14,4) : ctx.rect(px-7,py-7,14,14); ctx.fill();
-  if(label){ ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='10px JetBrains Mono'; ctx.fillText(label, px+11, py-9); }
-}
-
-/* =========================================================
-   INTERPRETER — pattern-based teaching sandbox
-========================================================= */
-function runCode(code, lesson){
-  clearConsole();
-  resizeCanvas();
-  const result = { logs:[], updateRan:false, moved:false, inputUsed:false, spawns:[], hasInputCode:false, hasHealthCode:false };
-
-  const hasUpdate = /void\s+Update\s*\(/.test(code);
-  const hasFor = /for\s*\(/.test(code);
-  const hasWhile = /while\s*\(/.test(code);
-  const hasInstantiate = /Instantiate\s*\(/.test(code);
-  const hasInput = /Input\.GetKey/.test(code);
-  const hasMoveX = /transform\.position\.(x|y)\s*\+?=/.test(code) || /transform\.position\s*\+=/.test(code);
-  const hasHealthCheck = /<=\s*0/.test(code) && /-=/.test(code);
-  const hasCollision = /OnTriggerEnter/.test(code);
-
-  result.hasInputCode = hasInput;
-  result.hasHealthCode = hasHealthCheck;
-
-  const varMap = collectVars(code);
-  const logCalls = [...code.matchAll(/Debug\.Log\s*\(([\s\S]*?)\)\s*;/g)];
-
-  if(hasFor){
-    const forMatch = code.match(/for\s*\(\s*int\s+(\w+)\s*=\s*(\d+)\s*;\s*\1\s*<\s*(\d+)\s*;\s*\1\+\+\s*\)\s*{([\s\S]*?)}/);
-    if(forMatch){
-      const [, iv, startN, endN, body] = forMatch;
-      const s = parseInt(startN), e = parseInt(endN);
-      for(let n=s;n<e && n<12;n++){
-        const localVars = Object.assign({}, varMap, {[iv]: n});
-        const bodyLogs = [...body.matchAll(/Debug\.Log\s*\(([\s\S]*?)\)\s*;/g)];
-        bodyLogs.forEach(m=>{
-          const val = evalExpr(m[1], localVars);
-          result.logs.push(val);
-          logLine('info', val);
-        });
-        if(hasInstantiate && /Instantiate/.test(body)){
-          result.spawns.push(n);
-        }
-      }
-    } else if(!hasUpdate){
-      logLine('err', "Couldn't find a valid for-loop pattern. Check your loop syntax against the example.");
-    }
-  } else if(hasWhile){
-    const whileVarMatch = code.match(/(\w+)\s*>\s*0/);
-    let counter = 0;
-    let vname = whileVarMatch ? whileVarMatch[1] : null;
-    let vval = vname && varMap[vname]!==undefined ? varMap[vname] : 3;
-    while(vval>0 && counter<12){
-      const localVars = Object.assign({}, varMap, {[vname]: vval});
-      const bodyMatch = code.match(/while\s*\([\s\S]*?\)\s*{([\s\S]*?)}/);
-      if(bodyMatch){
-        const bodyLogs = [...bodyMatch[1].matchAll(/Debug\.Log\s*\(([\s\S]*?)\)\s*;/g)];
-        bodyLogs.forEach(m=>{
-          const val = evalExpr(m[1], localVars);
-          result.logs.push(val);
-          logLine('info', val);
-        });
-      }
-      vval -= 1; counter++;
-    }
-  } else if(!hasUpdate){
-    logCalls.forEach(m=>{
-      const val = evalExpr(m[1], varMap);
-      result.logs.push(val);
-      logLine('info', val);
+  function attachCardHandlers(container){
+    container.querySelectorAll('.gcard').forEach(el => {
+      const id = Number(el.dataset.id);
+      el.addEventListener('click', () => openProject(id));
+      el.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openProject(id); } });
     });
   }
 
-  if(hasCollision){
-    const otherName = "Wall";
-    const msg = `Impact from ${otherName}`;
-    result.logs.push(msg);
-    logLine('info', msg);
+  function shuffledSample(arr, n){
+    const copy = [...arr];
+    for(let i = copy.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy.slice(0, n);
   }
 
-  drawGrid();
-
-  if(hasUpdate){
-    result.updateRan = true;
-    simRunning = true;
-    let x=0, y=0;
-    let stateVar = Object.keys(varMap).find(k=>/health|heat|shield|energy/i.test(k));
-    let stateVal = stateVar ? varMap[stateVar] : 100;
-    let loggedThreshold=false, loggedFrameTick=false;
-    const start = performance.now();
-
-    function frame(t){
-      if(!simRunning) return;
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      drawGrid();
-      const dt = 1/60;
-
-      if(hasInput){
-        const spd = (varMap.speed||3) * 20;
-        if(keysDown['ArrowRight']){ x+=spd*dt; result.inputUsed=true; }
-        if(keysDown['ArrowLeft']){ x-=spd*dt; result.inputUsed=true; }
-        if(keysDown['ArrowUp']){ y-=spd*dt; result.inputUsed=true; }
-        if(keysDown['ArrowDown']){ y+=spd*dt; result.inputUsed=true; }
-      } else if(hasHealthCheck){
-        stateVal -= 15*dt;
-        if(stateVal<=0 && !loggedThreshold){
-          loggedThreshold=true;
-          const capturedLogs = [...code.matchAll(/Debug\.Log\s*\(([\s\S]*?)\)\s*;/g)];
-          const msg = capturedLogs.length ? evalExpr(capturedLogs[capturedLogs.length-1][1], varMap) : "Threshold reached";
-          result.logs.push(msg);
-          logLine('err', msg);
-        }
-      } else if(hasMoveX){
-        const spd = (varMap.speed||2) * 20;
-        x += spd*dt;
-        result.moved = true;
-        if(x>canvas.width/2-15) x=-canvas.width/2+15;
-      } else {
-        if(!loggedFrameTick){
-          loggedFrameTick=true;
-          const capturedLogs = [...code.matchAll(/Debug\.Log\s*\(([\s\S]*?)\)\s*;/g)];
-          if(capturedLogs.length){
-            const val = evalExpr(capturedLogs[0][1], varMap);
-            result.logs.push(val);
-            logLine('info', val);
-          }
-        }
-      }
-
-      drawObj(x,y, stateVal<=0?'#fb7185':'#6ea8fe', 'Object');
-
-      if(hasInput){
-        ctx.fillStyle='rgba(231,235,247,.5)'; ctx.font='10px JetBrains Mono';
-        ctx.fillText('↑ ↓ ← → to move (click scene first)', 10, 16);
-      }
-      if(hasHealthCheck){
-        ctx.fillStyle='rgba(255,255,255,.15)'; ctx.fillRect(10,canvas.height-20,100,8);
-        ctx.fillStyle= stateVal>30?'#4ade80':'#fb7185';
-        ctx.fillRect(10,canvas.height-20,Math.max(0,100*(stateVal/100)),8);
-      }
-
-      if(t-start>4000){ simRunning=false; finishRunAsync(lesson, result); return; }
-      simFrame = requestAnimationFrame(frame);
+  // ================= HOME =================
+  function renderHome(){
+    // following section
+    const followingSec = document.getElementById('following-section');
+    if(isLoggedIn() && followedDevs.size > 0){
+      const followingProjects = projects.filter(p => followedDevs.has(p.dev)).sort((a,b)=>b.id-a.id);
+      if(followingProjects.length){
+        followingSec.style.display = 'block';
+        const grid = document.getElementById('grid-following');
+        grid.innerHTML = followingProjects.slice(0,4).map(p => cardHTML(p, { badge: '🔔 Followed dev' })).join('');
+        attachCardHandlers(grid);
+      } else { followingSec.style.display = 'none'; }
+    } else {
+      followingSec.style.display = 'none';
     }
-    simFrame = requestAnimationFrame(frame);
-    showResultTab('scene');
-    return { pending:true };
+
+    renderRandom();
+
+    // underdog: lowest-viewed 40%, random pick of 4
+    const sortedByViews = [...projects].sort((a,b)=>a.views-b.views);
+    const bottomPool = sortedByViews.slice(0, Math.max(4, Math.ceil(projects.length * 0.4)));
+    const underdogPicks = shuffledSample(bottomPool, 4);
+    const gridUnderdog = document.getElementById('grid-underdog');
+    gridUnderdog.innerHTML = underdogPicks.map(p => cardHTML(p, { badge: '🌱 Underseen' })).join('');
+    attachCardHandlers(gridUnderdog);
+
+    const latest = [...projects].sort((a,b)=>b.id-a.id).slice(0,4);
+    const gridLatest = document.getElementById('grid-latest');
+    gridLatest.innerHTML = latest.map(p => cardHTML(p)).join('');
+    attachCardHandlers(gridLatest);
+
+    const wanted = [...projects].sort((a,b)=>b.reviveCount-a.reviveCount).slice(0,4);
+    const gridWanted = document.getElementById('grid-wanted');
+    gridWanted.innerHTML = wanted.map(p => cardHTML(p)).join('');
+    attachCardHandlers(gridWanted);
+
+    const band = document.getElementById('genre-band');
+    band.innerHTML = GENRES.map(g => `<button class="genre-pill" data-genre="${g}">${GENRE_STYLE[g].icon} ${g}</button>`).join('');
+    band.querySelectorAll('.genre-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        showPage('browse');
+        document.getElementById('f-genre').value = btn.dataset.genre;
+        renderBrowse();
+      });
+    });
   }
 
-  return result;
-}
+  function renderRandom(){
+    const picks = shuffledSample(projects, 4);
+    const grid = document.getElementById('grid-random');
+    grid.innerHTML = picks.map(p => cardHTML(p)).join('');
+    attachCardHandlers(grid);
+  }
+  document.getElementById('reshuffle-random').addEventListener('click', renderRandom);
 
-function collectVars(code){
-  const vars = {};
-  const patterns = [
-    /(?:public\s+)?(?:float|int)\s+(\w+)\s*=\s*(-?[\d.]+)f?\s*;/g,
-    /(?:public\s+)?string\s+(\w+)\s*=\s*"(.*?)"\s*;/g,
-    /(?:public\s+)?bool\s+(\w+)\s*=\s*(true|false)\s*;/g
-  ];
-  patterns.forEach(re=>{
-    let m;
-    while((m = re.exec(code))){
-      let v = m[2];
-      if(v==='true') v=true; else if(v==='false') v=false;
-      else if(!isNaN(parseFloat(v))) v=parseFloat(v);
-      vars[m[1]] = v;
+  // ================= BROWSE =================
+  function populateFilterOptions(){
+    const statusSel = document.getElementById('f-status');
+    STATUSES.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; statusSel.appendChild(o); });
+    const genreSel = document.getElementById('f-genre');
+    GENRES.forEach(g => { const o=document.createElement('option'); o.value=g; o.textContent=g; genreSel.appendChild(o); });
+    const engineSel = document.getElementById('f-engine');
+    ENGINES.forEach(e => { const o=document.createElement('option'); o.value=e; o.textContent=e; engineSel.appendChild(o); });
+  }
+
+  function renderBrowse(){
+    const search = document.getElementById('f-search').value.trim().toLowerCase();
+    const status = document.getElementById('f-status').value;
+    const genre = document.getElementById('f-genre').value;
+    const engine = document.getElementById('f-engine').value;
+    const sort = document.getElementById('f-sort').value;
+
+    let list = projects.filter(p => {
+      if(search && !p.title.toLowerCase().includes(search)) return false;
+      if(status && p.status !== status) return false;
+      if(genre && p.genre !== genre) return false;
+      if(engine && p.engine !== engine) return false;
+      return true;
+    });
+
+    if(sort === 'latest') list.sort((a,b)=>b.id-a.id);
+    else if(sort === 'viewed') list.sort((a,b)=>b.views-a.views);
+    else if(sort === 'voted') list.sort((a,b)=>b.reviveCount-a.reviveCount);
+    else if(sort === 'az') list.sort((a,b)=>a.title.localeCompare(b.title));
+
+    document.getElementById('browse-count-label').textContent = `${list.length} game${list.length===1?'':'s'} found.`;
+
+    const grid = document.getElementById('grid-browse');
+    document.querySelector('#page-browse .empty-state')?.remove();
+    if(list.length === 0){
+      grid.innerHTML = '';
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.textContent = '👻 Nothing matches those filters. Try widening the search.';
+      grid.after(empty);
+    } else {
+      grid.innerHTML = list.map(p => cardHTML(p)).join('');
+      attachCardHandlers(grid);
     }
+  }
+  ['f-search','f-status','f-genre','f-engine','f-sort'].forEach(id => {
+    document.getElementById(id).addEventListener('input', renderBrowse);
   });
-  return vars;
-}
 
-function evalExpr(expr, vars){
-  const parts = splitConcat(expr);
-  let out = '';
-  for(const p of parts){
-    const trimmed = p.trim();
-    const strMatch = trimmed.match(/^"(.*)"$/);
-    if(strMatch){ out += strMatch[1]; continue; }
-    if(vars[trimmed] !== undefined){ out += vars[trimmed]; continue; }
-    if(/DoubleIt\(7\)/.test(trimmed)){ out += "14"; continue; }
-    if(/AddGold\(5\)/.test(trimmed)){ out += "15"; continue; }
-    if(/myShip\.fuel/.test(trimmed)){ out += "50"; continue; }
-    if(/p\.health/.test(trimmed)){ out += "100"; continue; }
-    if(/transform\.position/.test(trimmed)){ out += "(0.0, 0.0, 0.0)"; continue; }
-    if(/crew\[1\]/.test(trimmed)){ out += "Beck"; continue; }
-    if(/other\.name/.test(trimmed)){ out += "Wall"; continue; }
-    if(trimmed === '' || trimmed === 'i') { out += vars['i']!==undefined?vars['i']:trimmed; continue; }
-    out += trimmed;
-  }
-  return out;
-}
-function splitConcat(expr){
-  const parts = []; let cur=''; let inQuotes=false;
-  for(let i=0;i<expr.length;i++){
-    const c = expr[i];
-    if(c === '"') inQuotes = !inQuotes;
-    if(c === '+' && !inQuotes){ parts.push(cur); cur=''; continue; }
-    cur += c;
-  }
-  parts.push(cur);
-  return parts;
-}
+  // ================= DETAIL =================
+  function renderDetail(p){
+    const key = STATUS_KEYS[p.status] || 'idea';
+    const myReaction = userReactions[p.id];
+    const links = [];
+    if(p.demo) links.push(['🎮 Demo / Download', p.demo]);
+    if(p.video) links.push(['📺 Gameplay Video', p.video]);
+    const isFollowed = followedDevs.has(p.dev);
 
-/* =========================================================
-   RESULT HANDLING
-========================================================= */
-function finishRun(lesson, result){
-  if(result && result.pending) return; // async path (Update loop) will call finishRunAsync
-  evaluateResult(lesson, result);
-}
-function finishRunAsync(lesson, result){
-  evaluateResult(lesson, result);
-}
-
-function evaluateResult(lesson, result){
-  const passed = lesson.check(result);
-  const banner = document.getElementById('resultBanner');
-  if(!banner) return;
-  banner.className = 'result-banner show ' + (passed?'pass':'fail');
-  const continueBtn = document.getElementById('continueBtn');
-
-  if(passed){
-    banner.textContent = "✓ Your code works! Objective complete.";
-    codePassed = true;
-    if(continueBtn) continueBtn.disabled = false;
-    showMascotInline("Nice work — that's correct! Click 'Continue to Quiz' when you're ready.");
-  } else {
-    banner.textContent = "Not quite — check the console output and try again.";
-    showMascotInline("Not passing yet. Try again, or open the hint box below if you're stuck.");
-  }
-}
-
-/* =========================================================
-   STEP 3: QUIZ
-========================================================= */
-function renderQuizHTML(l){
-  const optionsHtml = l.quiz.options.map((opt,i)=>`
-    <button class="quiz-option" data-idx="${i}">${opt}</button>
-  `).join('');
-  return `
-    <div class="quiz-block">
-      <span class="kicker3">QUICK CHECK</span>
-      <h2>One more thing before you move on</h2>
-      <div class="quiz-question">${l.quiz.question}</div>
-      <div class="quiz-options">${optionsHtml}</div>
-      <div class="quiz-feedback" id="quizFeedback"></div>
-      <div class="step-nav">
-        <button class="step-btn ghost" onclick="goToStep(1)">← Back to Code</button>
-        <button class="step-btn" id="quizContinueBtn" style="display:none;" onclick="completeLesson()">Complete Lesson →</button>
+    document.getElementById('detail-content').innerHTML = `
+      <span class="back-link" id="detail-back">← Back to browse</span>
+      <div class="detail-head">
+        <div class="detail-cover" style="${coverStyle(p.genre)}">${coverHTML(p.genre, true)}</div>
+        <div class="detail-info">
+          <div class="case mono">CASE FILE #${String(p.id).padStart(4,'0')}</div>
+          <h2>${escapeHTML(p.title)}</h2>
+          <div class="genre-line">${p.genre}${p.engine ? ' · ' + p.engine : ''}</div>
+          <div class="fields">
+            <div class="field"><div class="k">Status</div><div class="v"><span class="status-chip ${key}" style="position:static; display:inline-block;">${p.status}</span></div></div>
+            <div class="field"><div class="k">Year Started</div><div class="v">${p.year || '—'}</div></div>
+            <div class="field"><div class="k">Developer</div><div class="v">${p.dev ? `<a href="#" class="dev-link" data-dev="${escapeHTML(p.dev)}">${escapeHTML(p.dev)} ↗</a>` : 'Unlisted'}</div></div>
+            <div class="field"><div class="k">Dev Time</div><div class="v">${p.devtime || '—'}</div></div>
+          </div>
+          <div class="detail-actions">
+            <div class="reaction-row">
+              <button class="react-btn rip ${myReaction==='rip'?'active':''}" id="rip-btn">🕊 RIP</button>
+              <button class="react-btn revive ${myReaction==='revive'?'active':''}" id="revive-btn">❤️‍🔥 Revive</button>
+            </div>
+          </div>
+          <div class="revive-count" style="margin-top:10px;">🕊 ${p.ripCount} · ❤️‍🔥 ${p.reviveCount}</div>
+          <div class="detail-actions" style="margin-top:6px;">
+            <button class="btn ${isFollowed ? 'ghost' : 'small'} small" id="detail-follow-btn">${isFollowed ? '✓ Following ' + escapeHTML(p.dev) : '+ Follow ' + escapeHTML(p.dev)}</button>
+            <button class="report-link" id="report-btn">🚩 Report this project</button>
+          </div>
+        </div>
       </div>
-    </div>
-  `;
-}
 
-function wireQuizStep(l){
-  const options = document.querySelectorAll('.quiz-option');
-  options.forEach(btn=>{
-    btn.onclick = ()=>{
-      const idx = parseInt(btn.dataset.idx);
-      options.forEach(b=>b.disabled = true);
-      const feedback = document.getElementById('quizFeedback');
-      if(idx === l.quiz.correct){
-        btn.classList.add('correct');
-        feedback.className = 'quiz-feedback show pass';
-        feedback.textContent = "Correct! " + l.quiz.explanation;
-        document.getElementById('quizContinueBtn').style.display = 'inline-block';
-      } else {
-        btn.classList.add('wrong');
-        options[l.quiz.correct].classList.add('correct');
-        feedback.className = 'quiz-feedback show fail';
-        feedback.textContent = "Not quite. " + l.quiz.explanation;
-        // allow retry
-        setTimeout(()=>{
-          options.forEach(b=>{ b.disabled=false; b.classList.remove('wrong'); b.classList.remove('correct'); });
-          feedback.className = 'quiz-feedback';
-        }, 1800);
-      }
-    };
-  });
-}
+      <div class="prose-block">
+        <h3>📖 About This Project</h3>
+        <p class="story">${escapeHTML(p.story)}</p>
+      </div>
 
-function completeLesson(){
-  completed.add(currentLessonId);
-  const nextId = currentLessonId + 1;
-  if(nextId < lessons.length){
-    enterPractice(nextId);
-  } else {
-    goTo('lessons');
+      ${links.length ? `
+      <div class="media-links">
+        <h3>🔗 Media & Links</h3>
+        <ul>${links.map(([label,url]) => `<li><a href="${escapeHTML(url)}" target="_blank" rel="noopener">${label} ↗</a></li>`).join('')}</ul>
+      </div>` : ''}
+
+      <div class="comments-block">
+        <h3>💬 Discussion <span class="beta-tag">BETA</span></h3>
+        <div class="placeholder-note" style="margin-bottom:18px;">This discussion feature is an early placeholder — comments here are for demo purposes and aren't saved permanently yet.</div>
+        <div id="comments-list"></div>
+        ${isLoggedIn() ? `
+        <form id="comment-form" class="comment-form">
+          <textarea id="comment-input" placeholder="Share your thoughts on this project..." required></textarea>
+          <div class="comment-form-bar">
+            <span class="genre-line">Posting as ${escapeHTML(currentUser.name)}</span>
+            <button type="submit" class="btn cyan small">Post Comment</button>
+          </div>
+        </form>` : `
+        <div class="login-gate" style="margin-top:16px;">
+          <p><b>Log in</b> to join the discussion.</p>
+          <button class="btn small pink" id="comment-login-btn">Log In</button>
+        </div>`}
+      </div>
+    `;
+
+    renderComments(p);
+
+    document.getElementById('detail-back').addEventListener('click', () => { showPage('browse'); renderBrowse(); });
+
+    document.querySelectorAll('.dev-link').forEach(el => {
+      el.addEventListener('click', (e) => { e.preventDefault(); openProfile(el.dataset.dev, p); });
+    });
+
+    document.getElementById('rip-btn').addEventListener('click', () => setReaction(p, 'rip'));
+    document.getElementById('revive-btn').addEventListener('click', () => setReaction(p, 'revive'));
+
+    document.getElementById('detail-follow-btn').addEventListener('click', function(){
+      if(!requireLogin('follow developers')) return;
+      toggleFollow(p.dev);
+      renderDetail(p);
+    });
+
+    document.getElementById('report-btn').addEventListener('click', () => {
+      showToast('🚩 Report received — thanks for flagging this (placeholder, not sent anywhere yet).');
+    });
+
+    const commentLoginBtn = document.getElementById('comment-login-btn');
+    if(commentLoginBtn) commentLoginBtn.addEventListener('click', () => openAuthModal('login'));
+
+    const commentForm = document.getElementById('comment-form');
+    if(commentForm){
+      commentForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        const textEl = document.getElementById('comment-input');
+        const text = textEl.value.trim();
+        if(!text) return;
+        if(!p.comments) p.comments = [];
+        p.comments.push({ name: currentUser.name, text, time: 'just now' });
+        textEl.value = '';
+        renderComments(p);
+        showToast('Comment posted 💬');
+      });
+    }
   }
-}
 
-/* =========================================================
-   INIT
-========================================================= */
-renderLessonsGrid();
+  function setReaction(p, type){
+    if(!requireLogin('mark RIP or Revive')) return;
+    const prev = userReactions[p.id];
+    if(prev === type){
+      // toggle off
+      if(type === 'rip') p.ripCount--; else p.reviveCount--;
+      delete userReactions[p.id];
+    } else {
+      if(prev === 'rip') p.ripCount--;
+      if(prev === 'revive') p.reviveCount--;
+      if(type === 'rip') p.ripCount++; else p.reviveCount++;
+      userReactions[p.id] = type;
+    }
+    renderDetail(p);
+    if(userReactions[p.id] === 'revive') showToast('Marked ❤️‍🔥 Revive — thanks for weighing in!');
+    else if(userReactions[p.id] === 'rip') showToast('Marked 🕊 RIP — rest easy.');
+  }
 
+  function toggleFollow(devName){
+    if(followedDevs.has(devName)){ followedDevs.delete(devName); showToast(`Unfollowed ${devName}`); }
+    else { followedDevs.add(devName); showToast(`Following ${devName} 🔔`); }
+  }
+
+  function renderComments(p){
+    const list = document.getElementById('comments-list');
+    if(!list) return;
+    const comments = p.comments || [];
+    if(comments.length === 0){
+      list.innerHTML = `<div class="empty-state" style="padding:26px;">No comments yet — be the first to say something.</div>`;
+      return;
+    }
+    list.innerHTML = comments.map(c => `
+      <div class="comment">
+        <div class="comment-avatar">${(c.name || 'A').trim().charAt(0).toUpperCase()}</div>
+        <div class="comment-body">
+          <div class="comment-head"><span class="comment-name">${escapeHTML(c.name)}</span><span class="comment-time">${escapeHTML(c.time)}</span></div>
+          <p class="comment-text">${escapeHTML(c.text)}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ================= DEVELOPER PROFILE =================
+  function openProfile(devName, fromProject){
+    const devProjects = projects.filter(pr => pr.dev === devName);
+    const totalRevive = devProjects.reduce((sum, pr) => sum + pr.reviveCount, 0);
+    const isFollowed = followedDevs.has(devName);
+    const bio = DEV_BIOS[devName] || "This developer hasn't added a bio yet. They're out there somewhere, probably debugging something.";
+    const joined = DEV_JOINED[devName] || "2023";
+
+    document.getElementById('detail-content').innerHTML = `
+      <span class="back-link" id="profile-back">← Back to ${escapeHTML(fromProject.title)}</span>
+      <div class="profile-head">
+        <div class="profile-avatar">${devName.trim().charAt(0).toUpperCase()}</div>
+        <div class="profile-info">
+          <h2>${escapeHTML(devName)}</h2>
+          <div class="genre-line">Member since ${joined} · ${devProjects.length} project${devProjects.length===1?'':'s'} filed</div>
+          <p class="profile-bio">${escapeHTML(bio)}</p>
+          <div class="detail-actions">
+            <button class="btn ${isFollowed ? 'ghost' : 'pink'}" id="follow-btn">${isFollowed ? '✓ Following' : '+ Follow'}</button>
+            <span class="revive-count">❤️‍🔥 ${totalRevive} total revive votes across their projects</span>
+          </div>
+        </div>
+      </div>
+      <div class="prose-block" style="margin-top:38px;">
+        <h3>🗃 Their Projects</h3>
+        <div class="card-grid" id="profile-projects" style="margin-top:16px;"></div>
+      </div>
+      <div class="placeholder-note" style="margin-top:30px;">👤 Developer profiles are an early placeholder — bios, real avatars, and account-linked social feeds are coming soon.</div>
+    `;
+
+    const grid = document.getElementById('profile-projects');
+    grid.innerHTML = devProjects.map(p => cardHTML(p)).join('');
+    attachCardHandlers(grid);
+
+    document.getElementById('profile-back').addEventListener('click', () => openProject(fromProject.id));
+    document.getElementById('follow-btn').addEventListener('click', function(){
+      if(!requireLogin('follow developers')) return;
+      toggleFollow(devName);
+      openProfile(devName, fromProject);
+    });
+  }
+
+  // ================= SUBMIT PAGE (gated) =================
+  function renderSubmitPage(){
+    const wrap = document.getElementById('submit-wrap');
+    if(!isLoggedIn()){
+      wrap.innerHTML = `
+        <span class="back-link" data-nav="home">← Back</span>
+        <div class="section-head">
+          <div><h2>⚰️ Submit a Game</h2><p>You'll need an account to submit — it lets you edit or remove your project later from your dashboard.</p></div>
+        </div>
+        <div class="login-gate">
+          <p><b>Log in or sign up</b> to submit a project to the archive.</p>
+          <div style="display:flex; gap:10px;">
+            <button class="btn ghost small" id="submit-login-btn">Log In</button>
+            <button class="btn small" id="submit-signup-btn">Sign Up</button>
+          </div>
+        </div>
+      `;
+      wrap.querySelector('[data-nav="home"]').addEventListener('click', (e)=>{ e.preventDefault(); showPage('home'); });
+      document.getElementById('submit-login-btn').addEventListener('click', () => openAuthModal('login'));
+      document.getElementById('submit-signup-btn').addEventListener('click', () => openAuthModal('signup'));
+      return;
+    }
+
+    wrap.innerHTML = `
+      <span class="back-link" data-nav="home">← Back</span>
+      <div class="section-head">
+        <div><h2>⚰️ Submit a Game</h2><p>Tell us what it was, what happened, and why it mattered. Takes about five minutes.</p></div>
+      </div>
+      <form class="form-wrap" id="submit-form">
+        <div class="form-section">
+          <div class="fs-title">🎮 The Basics</div>
+          <div class="form-row"><label for="in-title">Game Title *</label><input type="text" id="in-title" placeholder="Shadow of Kage" required></div>
+          <div class="form-row"><label for="in-cover">Cover Image URL</label><input type="url" id="in-cover" placeholder="https://i.imgur.com/..."><div class="hint">No image yet? No problem — we'll generate a colorful placeholder cover.</div></div>
+          <div class="form-row"><label for="in-desc">Description / Story *</label><textarea id="in-desc" placeholder="Tell us about your game, its history, what happened, and anything you want players to know." required></textarea></div>
+          <div class="two-col">
+            <div class="form-row"><label for="in-genre">Genre *</label>
+              <select id="in-genre" required><option value="">Choose one</option>${GENRES.map(g=>`<option>${g}</option>`).join('')}</select>
+            </div>
+            <div class="form-row"><label for="in-status">Project Status *</label>
+              <select id="in-status" required><option value="">Choose one</option>${STATUSES.map(s=>`<option>${s}</option>`).join('')}</select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="fs-title">🖼 Media (optional)</div>
+          <div class="form-row"><label>Screenshot URLs</label><div id="screenshot-list"></div><button type="button" class="add-link" id="add-screenshot">+ Add another screenshot link</button></div>
+          <div class="form-row"><label for="in-video">Gameplay Video URL</label><input type="url" id="in-video" placeholder="https://youtube.com/..."></div>
+          <div class="form-row"><label for="in-demo">Demo Download URL</label><input type="url" id="in-demo" placeholder="itch.io, GitHub, Google Drive..."></div>
+        </div>
+
+        <div class="form-section">
+          <div class="fs-title">👥 Credits & Details (optional)</div>
+          <div class="two-col">
+            <div class="form-row"><label for="in-dev">Developer Name</label><input type="text" id="in-dev" placeholder="Your name or handle" value="${escapeHTML(currentUser.name)}"></div>
+            <div class="form-row"><label for="in-team">Team Name</label><input type="text" id="in-team" placeholder="Studio or team name"></div>
+          </div>
+          <div class="two-col">
+            <div class="form-row"><label for="in-engine">Engine Used</label>
+              <select id="in-engine"><option value="">Not specified</option>${ENGINES.map(e=>`<option>${e}</option>`).join('')}</select>
+            </div>
+            <div class="form-row"><label for="in-devtime">Development Time</label><input type="text" id="in-devtime" placeholder="e.g. 8 months"></div>
+          </div>
+          <div class="form-row"><label for="in-year">Year Started</label><input type="text" id="in-year" placeholder="e.g. 2023" style="max-width:160px;"></div>
+        </div>
+
+        <div class="form-section">
+          <div class="fs-title">🔗 Social Links (optional)</div>
+          <div class="two-col">
+            <div class="form-row"><label for="in-website">Website</label><input type="url" id="in-website" placeholder="https://..."></div>
+            <div class="form-row"><label for="in-twitter">Twitter / X</label><input type="url" id="in-twitter" placeholder="https://x.com/..."></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="fs-title">✅ Rights Confirmation</div>
+          <div class="confirm-box" id="confirm-box">
+            <input type="checkbox" id="in-confirm" required>
+            <div class="ctext">
+              <b>I confirm this is my own project, or I have permission to share it.</b>
+              By checking this box you take responsibility for the accuracy of that claim. If a rights holder later disputes this submission, we will remove it upon a valid request.
+              <span class="fine">See our <a href="#" data-nav="policy">Terms & Takedown Policy</a> for details. This confirmation is logged with your submission.</span>
+            </div>
+          </div>
+          <div class="confirm-error-msg" id="confirm-error-msg">⚠️ You must check this box before submitting.</div>
+        </div>
+
+        <div class="submit-bar">
+          <span class="mono" style="font-size:12px; color:var(--ink-dim);">* Required fields</span>
+          <button type="submit" class="btn pink">⚰️ Bury This Game</button>
+        </div>
+      </form>
+    `;
+
+    wrap.querySelector('[data-nav="home"]').addEventListener('click', (e)=>{ e.preventDefault(); showPage('home'); });
+    wrap.querySelectorAll('[data-nav="policy"]').forEach(el => el.addEventListener('click', (e)=>{ e.preventDefault(); showPage('policy'); }));
+
+    function addScreenshotRow(){
+      const row = document.createElement('div');
+      row.className = 'multi-url-row';
+      row.innerHTML = `<input type="url" placeholder="https://imgur.com/..."> <button type="button" class="remove-link" aria-label="Remove">✕</button>`;
+      row.querySelector('.remove-link').addEventListener('click', () => row.remove());
+      document.getElementById('screenshot-list').appendChild(row);
+    }
+    document.getElementById('add-screenshot').addEventListener('click', addScreenshotRow);
+    addScreenshotRow();
+
+    document.getElementById('in-confirm').addEventListener('change', function(){
+      if(this.checked){
+        document.getElementById('confirm-box').classList.remove('error');
+        document.getElementById('confirm-error-msg').classList.remove('show');
+      }
+    });
+
+    document.getElementById('submit-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      const confirmBox = document.getElementById('in-confirm');
+      const confirmWrap = document.getElementById('confirm-box');
+      const confirmError = document.getElementById('confirm-error-msg');
+      if(!confirmBox.checked){
+        confirmWrap.classList.remove('error'); void confirmWrap.offsetWidth; confirmWrap.classList.add('error');
+        confirmError.classList.add('show');
+        confirmWrap.scrollIntoView({ behavior:'smooth', block:'center' });
+        showToast('⚠️ Please confirm ownership before submitting.');
+        return;
+      }
+      const title = document.getElementById('in-title').value.trim();
+      const desc = document.getElementById('in-desc').value.trim();
+      const genre = document.getElementById('in-genre').value;
+      const status = document.getElementById('in-status').value;
+      if(!title || !desc || !genre || !status){ showToast('Please fill in all required fields.'); return; }
+
+      const newProject = {
+        id: Math.max(...projects.map(p=>p.id)) + 1,
+        title, genre, status,
+        engine: document.getElementById('in-engine').value,
+        dev: document.getElementById('in-dev').value.trim() || currentUser.name,
+        devtime: document.getElementById('in-devtime').value.trim(),
+        year: document.getElementById('in-year').value.trim(),
+        views: 0, ripCount: 0, reviveCount: 0,
+        story: desc,
+        video: document.getElementById('in-video').value.trim(),
+        demo: document.getElementById('in-demo').value.trim(),
+        ownerEmail: currentUser.email,
+        confirmedAt: new Date().toISOString()
+      };
+      projects.unshift(newProject);
+      mySubmissions.unshift(newProject.id);
+      showToast('Filed! Your game has joined the archive. 🪦');
+      renderHome();
+      openProject(newProject.id);
+    });
+  }
+
+  // ================= DASHBOARD =================
+  function renderDashboard(){
+    const wrap = document.getElementById('dashboard-wrap');
+    if(!isLoggedIn()){
+      wrap.innerHTML = `
+        <div class="login-gate">
+          <p><b>Log in</b> to view your dashboard.</p>
+          <button class="btn small pink" id="dash-login-btn">Log In</button>
+        </div>
+      `;
+      document.getElementById('dash-login-btn').addEventListener('click', () => openAuthModal('login'));
+      return;
+    }
+
+    const myProjects = projects.filter(p => mySubmissions.includes(p.id));
+    const totalRevive = myProjects.reduce((s,p)=>s+p.reviveCount, 0);
+
+    wrap.innerHTML = `
+      <div class="section-head">
+        <div><h2>👤 Your Dashboard</h2><p>Welcome, ${escapeHTML(currentUser.name)}. Manage your submissions and following.</p></div>
+        <button class="btn ghost small" id="dash-logout">Log Out</button>
+      </div>
+      <div class="dash-stats">
+        <div class="dash-stat"><div class="num">${myProjects.length}</div><div class="lab">Projects Filed</div></div>
+        <div class="dash-stat"><div class="num">${totalRevive}</div><div class="lab">Revive Votes Received</div></div>
+        <div class="dash-stat"><div class="num">${followedDevs.size}</div><div class="lab">Developers Followed</div></div>
+      </div>
+
+      <h3 style="font-size:20px; margin-bottom:16px;">🗂 Your Submissions</h3>
+      <div id="dash-my-projects"></div>
+
+      <h3 style="font-size:20px; margin:34px 0 16px;">🔔 Following</h3>
+      <div id="dash-following-list"></div>
+    `;
+
+    document.getElementById('dash-logout').addEventListener('click', logout);
+
+    const myProjectsWrap = document.getElementById('dash-my-projects');
+    if(myProjects.length === 0){
+      myProjectsWrap.innerHTML = `<div class="empty-state">You haven't submitted anything yet. <span style="display:block; margin-top:8px;"><button class="btn small pink" id="dash-submit-btn">⚰️ Submit a Game</button></span></div>`;
+      document.getElementById('dash-submit-btn').addEventListener('click', () => { showPage('submit'); renderSubmitPage(); });
+    } else {
+      myProjectsWrap.innerHTML = myProjects.map(p => `
+        <div class="dash-row">
+          <div class="dash-cover" style="${coverStyle(p.genre)}">${(GENRE_STYLE[p.genre]||GENRE_STYLE.Other).icon}</div>
+          <div class="dash-info">
+            <h5>${escapeHTML(p.title)}</h5>
+            <div class="meta">${p.status} · 👁 ${p.views} · 🕊 ${p.ripCount} · ❤️‍🔥 ${p.reviveCount}</div>
+          </div>
+          <div class="dash-actions">
+            <button class="btn tiny ghost" data-view="${p.id}">View</button>
+            <button class="btn tiny" data-edit="${p.id}">Edit</button>
+            <button class="btn tiny danger" data-delete="${p.id}">Delete</button>
+          </div>
+        </div>
+      `).join('');
+      myProjectsWrap.querySelectorAll('[data-view]').forEach(btn => btn.addEventListener('click', () => { showPage('detail'); openProject(Number(btn.dataset.view)); }));
+      myProjectsWrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => openEditModal(Number(btn.dataset.edit))));
+      myProjectsWrap.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', () => {
+        const id = Number(btn.dataset.delete);
+        const proj = projects.find(p=>p.id===id);
+        if(confirm(`Delete "${proj.title}" permanently? This can't be undone.`)){
+          projects = projects.filter(p => p.id !== id);
+          mySubmissions = mySubmissions.filter(pid => pid !== id);
+          showToast('Project deleted.');
+          renderDashboard();
+          renderHome();
+        }
+      }));
+    }
+
+    const followWrap = document.getElementById('dash-following-list');
+    if(followedDevs.size === 0){
+      followWrap.innerHTML = `<div class="empty-state">You're not following any developers yet. Visit a project page and hit Follow.</div>`;
+    } else {
+      followWrap.innerHTML = [...followedDevs].map(dev => {
+        const count = projects.filter(p => p.dev === dev).length;
+        return `
+          <div class="dash-row">
+            <div class="dash-cover" style="background:linear-gradient(135deg, var(--purple), var(--pink)); color:white; font-family:'Baloo 2',sans-serif; font-weight:800;">${dev.charAt(0).toUpperCase()}</div>
+            <div class="dash-info"><h5>${escapeHTML(dev)}</h5><div class="meta">${count} project${count===1?'':'s'} filed</div></div>
+            <div class="dash-actions"><button class="btn tiny danger" data-unfollow="${escapeHTML(dev)}">Unfollow</button></div>
+          </div>
+        `;
+      }).join('');
+      followWrap.querySelectorAll('[data-unfollow]').forEach(btn => btn.addEventListener('click', () => {
+        followedDevs.delete(btn.dataset.unfollow);
+        showToast(`Unfollowed ${btn.dataset.unfollow}`);
+        renderDashboard();
+      }));
+    }
+  }
+
+  // simple inline edit via prompt-based modal reuse (keeps this placeholder lightweight)
+  function openEditModal(id){
+    const p = projects.find(x => x.id === id);
+    if(!p) return;
+    const newTitle = prompt('Edit title:', p.title);
+    if(newTitle === null) return;
+    const newStory = prompt('Edit description/story:', p.story);
+    if(newStory === null) return;
+    p.title = newTitle.trim() || p.title;
+    p.story = newStory.trim() || p.story;
+    showToast('Project updated.');
+    renderDashboard();
+  }
+
+  // ================= TOAST =================
+  let toastTimer;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 2800);
+  }
+
+  // ================= INIT =================
+  populateFilterOptions();
+  updateHeaderForAuth();
+  renderHome();
+  renderBrowse();
+
+})();
 </script>
 
 </body>
