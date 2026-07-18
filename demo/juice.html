@@ -1,871 +1,2185 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SpaceCode — تعلّم البرمجة بالعربية</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Kaze Clan</title>
 <style>
   :root{
-    --space:#080B14; --space-2:#0D1220; --space-3:#131A2E;
-    --panel:#101828;
-    --cyan:#4CE0D2; --cyan-bright:#7BF5E8;
-    --magenta:#E24CC7;
-    --amber:#F2B84B;
-    --text:#DCE6F5; --text-dim:#8695B5;
-    --danger:#FF6B6B; --success:#4CE08A;
-    --radius:12px;
-    --glow-cyan: 0 0 24px rgba(76,224,210,.35);
+    --ink:#0e0d0c;
+    --ink2:#17150f;
+    --card:#1c1913;
+    --card2:#241f17;
+    --line:rgba(232,226,213,.09);
+    --text:#e8e2d5;
+    --text-dim:#a89f8c;
+    --text-faint:#6b6455;
+    --seal:#a8352e;
+    --seal-bright:#c94b3f;
+    --gold:#b8965a;
+    --gold-bright:#d4b378;
+    --indigo:#4a5a72;
+    --indigo-bright:#6b83a3;
+    --moss:#5a6e4a;
+    --moss-bright:#7d9968;
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    background:var(--space);
-    color:var(--text);
-    font-family:'Tajawal',sans-serif;
-    line-height:1.7;
-    position:relative;
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:var(--ink); }
+  body{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:var(--text); user-select:none; touch-action:none; }
+  .display{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-weight:800; letter-spacing:.02em; text-transform:uppercase; }
+
+  #world-wrap{ position:fixed; inset:0; background:#08070a; overflow:hidden; }
+  #world{ display:block; cursor:grab; }
+  #world.grabbing{ cursor:grabbing; }
+  #vfx-canvas{ position:fixed; inset:0; z-index:41; pointer-events:none; }
+
+  /* ============ HUD ============ */
+  #hud{
+    position:fixed; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between;
+    padding:12px 12px 0; z-index:50; pointer-events:none;
   }
-  code, pre, .mono, textarea{font-family:'JetBrains Mono',monospace;direction:ltr;text-align:left;unicode-bidi:isolate;}
-  a{color:inherit;text-decoration:none;}
-  ::selection{background:var(--cyan);color:var(--space);}
-  .hidden{display:none !important;}
-
-  /* starfield background */
-  #starfield{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-  .star{position:absolute;background:#fff;border-radius:50%;opacity:.6;animation:twinkle 4s ease-in-out infinite;}
-  @keyframes twinkle{0%,100%{opacity:.2;}50%{opacity:.9;}}
-  body::before{
-    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-    background:radial-gradient(ellipse at 20% 0%, rgba(76,224,210,.08), transparent 50%),
-               radial-gradient(ellipse at 80% 100%, rgba(226,76,199,.07), transparent 50%);
+  .hud-pills{ display:flex; gap:8px; pointer-events:auto; flex-wrap:wrap; }
+  .pill{
+    background:rgba(14,13,12,.92); backdrop-filter:blur(6px); border:1px solid var(--line);
+    border-radius:8px; padding:6px 11px 6px 8px; font-size:12.5px; font-weight:700;
+    display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,.4);
   }
-  .wrap{max-width:1140px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
-
-  .eyebrow{color:var(--cyan);font-family:'JetBrains Mono',monospace;direction:ltr;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;}
-  .eyebrow::before{content:'';width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);}
-
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:8px;font-weight:700;font-size:15px;border:none;cursor:pointer;transition:.15s;font-family:'Tajawal',sans-serif;}
-  .btn:hover{transform:translateY(-2px);}
-  .btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
-  .btn-primary{background:linear-gradient(135deg,var(--cyan),var(--cyan-bright));color:#04231f;box-shadow:0 0 30px -6px rgba(76,224,210,.6);}
-  .btn-ghost{background:rgba(255,255,255,.03);color:var(--text);border:1.5px solid rgba(220,230,245,.18);}
-  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
-  .btn-sm{padding:9px 18px;font-size:13.5px;}
-
-  /* ---- nav / tabs ---- */
-  nav{position:sticky;top:0;z-index:50;background:rgba(8,11,20,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(76,224,210,.12);}
-  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:19px;cursor:pointer;font-family:'JetBrains Mono',monospace;direction:ltr;}
-  .logo-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--magenta));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 18px rgba(76,224,210,.4);}
-  .tabs{display:flex;gap:4px;background:rgba(255,255,255,.03);padding:4px;border-radius:10px;border:1px solid rgba(255,255,255,.06);}
-  .tab-btn{background:none;border:none;color:var(--text-dim);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;padding:9px 18px;border-radius:7px;cursor:pointer;transition:.15s;}
-  .tab-btn:hover{color:var(--text);}
-  .tab-btn.active{background:var(--panel);color:var(--cyan);box-shadow:inset 0 0 0 1px rgba(76,224,210,.3);}
-  .nav-progress{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);}
-  .nav-progress-bar{width:100px;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
-  .nav-progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--magenta));border-radius:3px;transition:width .3s;}
-  @media (max-width:760px){ .tabs{display:none;} }
-
-  /* ---- mascot ---- */
-  .droid{
-    width:64px;height:64px;flex-shrink:0;position:relative;
+  .pill .ico{ font-size:14px; }
+  .pill.gold{ color:var(--gold-bright); }
+  .pill.food{ color:var(--moss-bright); }
+  .pill.rep{ color:var(--indigo-bright); }
+  #menu-btn{
+    pointer-events:auto; background:var(--seal); color:#1a0a08; border:1px solid rgba(0,0,0,.3); border-radius:9px;
+    width:44px; height:44px; font-size:18px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:0 3px 10px rgba(168,53,46,.4); flex-shrink:0;
   }
-  .droid svg{width:100%;height:100%;filter:drop-shadow(0 0 12px rgba(76,224,210,.5));}
-  .droid.small{width:40px;height:40px;}
-  .speech-bubble{
-    background:var(--panel);border:1px solid rgba(76,224,210,.3);border-radius:12px;
-    padding:14px 18px;position:relative;font-size:14px;color:var(--text);flex:1;
+  #menu-btn:active{ transform:scale(.94); }
+
+  /* ============ CLOCK ============ */
+  #clock-widget{
+    position:fixed; top:12px; right:68px; z-index:151; width:38px; height:38px;
+    pointer-events:auto; cursor:pointer;
   }
-  .droid-row{display:flex;gap:14px;align-items:flex-start;}
-
-  /* ==================== HOME ==================== */
-  .hero{padding:70px 0 90px;}
-  .hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:50px;align-items:start;}
-  .hero h1{font-size:44px;font-weight:900;line-height:1.3;margin:16px 0 16px;}
-  .hero h1 span{color:var(--cyan);text-shadow:0 0 24px rgba(76,224,210,.4);}
-  .hero p.lead{font-size:16.5px;color:var(--text-dim);max-width:480px;margin-bottom:26px;}
-  .hero-cta{display:flex;gap:14px;margin-bottom:34px;flex-wrap:wrap;}
-  .trust-row{display:flex;gap:22px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);}
-  .trust-row b{color:var(--cyan);}
-
-  .terminal-card{background:var(--panel);border-radius:var(--radius);border:1px solid rgba(76,224,210,.2);box-shadow:0 0 50px -12px rgba(76,224,210,.15), 0 30px 60px -20px rgba(0,0,0,.6);overflow:hidden;}
-  .terminal-titlebar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:rgba(0,0,0,.25);border-bottom:1px solid rgba(76,224,210,.15);}
-  .dot{width:11px;height:11px;border-radius:50%;}
-  .dot-r{background:#ff6b6b;} .dot-y{background:#f2b84b;} .dot-g{background:#4ce08a;}
-  .terminal-filename{margin-inline-start:10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);}
-  .demo-instructions{padding:16px 18px 4px;font-size:13.5px;color:var(--text-dim);border-bottom:1px dashed rgba(76,224,210,.15);margin-bottom:2px;}
-  .demo-instructions b{color:var(--cyan);}
-  #hero-code{width:100%;min-height:170px;background:transparent;color:var(--text);border:none;outline:none;resize:vertical;padding:16px 18px;font-size:13.5px;line-height:1.7;}
-  .editor-actions{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid rgba(76,224,210,.1);background:rgba(0,0,0,.2);}
-  .run-btn{background:linear-gradient(135deg,var(--cyan),var(--cyan-bright));color:#04231f;border:none;padding:9px 20px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;}
-  .run-btn:hover{box-shadow:0 0 20px rgba(76,224,210,.5);}
-  .run-btn:disabled{opacity:.4;cursor:wait;box-shadow:none;}
-  .pyodide-status{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);}
-  .output-pane{background:#050810;padding:13px 18px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--success);min-height:56px;max-height:160px;overflow:auto;border-top:1px solid rgba(76,224,210,.1);white-space:pre-wrap;}
-  .output-pane.err{color:var(--danger);}
-  .output-pane .placeholder{color:rgba(220,230,245,.25);}
-
-  section{padding:80px 0;position:relative;z-index:1;}
-  .section-head{max-width:640px;margin-bottom:44px;}
-  .section-head h2{font-size:30px;font-weight:900;margin-top:12px;}
-  .section-head p{color:var(--text-dim);font-size:15.5px;margin-top:12px;}
-
-  .why{background:linear-gradient(180deg,transparent,rgba(76,224,210,.03),transparent);}
-  .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-  .why-card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:24px;transition:.2s;}
-  .why-card:hover{border-color:var(--cyan);transform:translateY(-4px);box-shadow:var(--glow-cyan);}
-  .why-icon{width:42px;height:42px;border-radius:9px;background:rgba(76,224,210,.1);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:14px;}
-  .why-card h3{font-size:16.5px;font-weight:700;margin-bottom:7px;}
-  .why-card p{color:var(--text-dim);font-size:13.5px;}
-
-  /* course grid */
-  .course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-  .lesson-card{background:var(--panel);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:20px;cursor:pointer;transition:.2s;position:relative;}
-  .lesson-card:not(.locked):hover{border-color:var(--cyan);transform:translateY(-3px);box-shadow:var(--glow-cyan);}
-  .lesson-card.locked{opacity:.4;cursor:not-allowed;}
-  .lesson-card.done{border-color:var(--amber);}
-  .lesson-num{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--magenta);direction:ltr;}
-  .lesson-card.done .lesson-num{color:var(--amber);}
-  .lesson-card h4{font-size:16px;font-weight:700;margin:9px 0 7px;}
-  .lesson-card p{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
-  .lesson-status{font-size:11px;font-family:'JetBrains Mono',monospace;display:inline-flex;align-items:center;gap:6px;color:var(--cyan);}
-  .lesson-status.done-status{color:var(--amber);}
-  .lesson-status.locked-status{color:rgba(220,230,245,.3);}
-  .lesson-steps-count{position:absolute;top:18px;left:20px;font-size:10.5px;color:rgba(220,230,245,.3);font-family:'JetBrains Mono',monospace;}
-
-  /* next-step / affiliate section (shown only on final lesson completion) */
-  .next-step-box{background:var(--panel);border:1px solid rgba(242,184,75,.3);border-radius:var(--radius);padding:36px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
-  .next-step-box .content{flex:1;min-width:260px;text-align:right;}
-  .next-step-box h3{font-size:20px;margin-bottom:10px;}
-  .next-step-box p{color:var(--text-dim);font-size:14.5px;}
-  .badge-honest{display:inline-block;background:rgba(242,184,75,.14);color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:5px;margin-bottom:12px;}
-
-  /* freebies section */
-  .freebies-section{background:linear-gradient(180deg,transparent,rgba(226,76,199,.04),transparent);}
-  .freebie-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
-  .freebie-card{background:var(--panel);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;gap:14px;transition:.2s;}
-  .freebie-card:hover{border-color:var(--magenta);box-shadow:0 0 24px -8px rgba(226,76,199,.35);transform:translateY(-3px);}
-  .freebie-icon{font-size:30px;width:52px;height:52px;background:rgba(226,76,199,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;}
-  .freebie-content h4{font-size:16px;font-weight:700;margin-bottom:6px;}
-  .freebie-content p{font-size:13.5px;color:var(--text-dim);}
-  .freebie-btn{align-self:flex-start;}
-  @media (max-width:700px){ .freebie-grid{grid-template-columns:1fr;} }
-
-  footer{padding:40px 0;border-top:1px solid rgba(255,255,255,.06);position:relative;z-index:1;}
-  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
-  footer p{color:var(--text-dim);font-size:12.5px;}
-
-  /* ==================== ABOUT VIEW ==================== */
-  .about-content{padding:70px 0;max-width:760px;margin:0 auto;}
-  .about-content h2{font-size:32px;margin-bottom:18px;}
-  .about-content p{color:var(--text-dim);font-size:15.5px;margin-bottom:18px;}
-  .about-content .droid-row{margin:30px 0;}
-
-  /* ==================== LESSON PLAYER ==================== */
-  #view-lesson{padding:32px 0 80px;}
-  .lesson-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:14px;}
-  .lesson-header-left h2{font-size:23px;font-weight:800;}
-  .lesson-header-left .eyebrow{margin-bottom:6px;}
-  .step-dots{display:flex;gap:7px;}
-  .step-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.1);transition:.2s;}
-  .step-dot.active{background:var(--cyan);width:22px;border-radius:5px;box-shadow:0 0 8px var(--cyan);}
-  .step-dot.completed{background:var(--amber);}
-
-  .lesson-shell{display:grid;grid-template-columns:380px 1fr;gap:0;border:1px solid rgba(76,224,210,.15);border-radius:14px;overflow:hidden;box-shadow:0 30px 70px -30px rgba(0,0,0,.7);min-height:520px;}
-  .lesson-instructions{background:var(--panel);padding:30px 26px;border-inline-end:1px solid rgba(76,224,210,.1);overflow-y:auto;}
-  .lesson-step-tag{display:inline-block;background:rgba(76,224,210,.12);color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:5px;margin-bottom:14px;direction:ltr;}
-  .lesson-instructions h3{font-size:20px;font-weight:700;margin-bottom:14px;}
-  .lesson-instructions p{color:var(--text-dim);font-size:14px;margin-bottom:14px;}
-  .lesson-instructions ul{margin:0 0 16px 0;padding-inline-start:20px;color:var(--text-dim);font-size:13.5px;}
-  .lesson-instructions li{margin-bottom:7px;}
-  .lesson-instructions code{background:rgba(76,224,210,.1);color:var(--cyan-bright);padding:1px 6px;border-radius:4px;font-size:12.5px;}
-  .hint-toggle{background:none;border:1px solid rgba(226,76,199,.4);color:var(--magenta);border-radius:7px;padding:8px 14px;font-size:13px;cursor:pointer;margin-top:6px;font-family:'Tajawal',sans-serif;}
-  .hint-toggle:hover{background:rgba(226,76,199,.1);}
-  .hint-box{background:rgba(226,76,199,.08);border:1px solid rgba(226,76,199,.3);border-radius:8px;padding:13px 15px;font-size:13px;color:#f0a8e2;margin-top:10px;}
-
-  .lesson-editor-area{display:flex;flex-direction:column;background:#0A0E1A;}
-  .lesson-editor-area textarea{flex:1;min-height:240px;background:#0A0E1A;color:var(--text);border:none;outline:none;resize:none;padding:22px;font-size:13.5px;line-height:1.7;}
-  .check-result{padding:12px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;border-top:1px solid rgba(76,224,210,.1);}
-  .check-result.pass{background:rgba(76,224,138,.08);color:var(--success);}
-  .check-result.fail{background:rgba(255,107,107,.08);color:var(--danger);}
-  .check-result.idle{background:transparent;color:var(--text-dim);}
-
-  .lesson-nav-buttons{display:flex;justify-content:space-between;margin-top:20px;}
-
-  .completion-banner{background:linear-gradient(135deg,rgba(242,184,75,.1),rgba(76,224,210,.1));border:1px solid var(--amber);border-radius:14px;padding:36px;text-align:center;margin-top:20px;}
-  .completion-banner h3{font-size:22px;margin-bottom:10px;}
-  .completion-banner p{color:var(--text-dim);margin-bottom:20px;}
-
-  @media (max-width:880px){
-    .hero-grid{grid-template-columns:1fr;}
-    .why-grid{grid-template-columns:1fr;}
-    .course-grid{grid-template-columns:1fr 1fr;}
-    .lesson-shell{grid-template-columns:1fr;}
-    .lesson-instructions{border-inline-end:none;border-bottom:1px solid rgba(76,224,210,.1);}
-    .hero h1{font-size:32px;}
+  #clock-ring{ position:absolute; inset:0; width:38px; height:38px; }
+  #clock-arc{ transition:stroke-dashoffset 1s linear; }
+  #clock-center-txt{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:10px; font-weight:800; color:var(--gold-bright); pointer-events:none;
   }
-  @media (max-width:560px){ .course-grid{grid-template-columns:1fr;} }
+  #clock-detail{
+    position:fixed; top:56px; right:12px; z-index:151; background:rgba(14,13,12,.97); backdrop-filter:blur(8px);
+    border:1px solid var(--line); border-radius:10px; padding:10px 14px; box-shadow:0 6px 20px rgba(0,0,0,.5);
+    display:none; flex-direction:column; gap:6px; min-width:170px;
+  }
+  #clock-detail.show{ display:flex; }
+  #clock-detail-day{ font-size:14px; font-weight:800; color:var(--text); }
+  #clock-detail-sub{ font-size:10.5px; color:var(--text-dim); }
+  #clock-auto-row{ display:flex; align-items:center; gap:7px; font-size:11px; color:var(--text-dim); margin-top:4px; padding-top:8px; border-top:1px solid var(--line); cursor:pointer; }
+  #clock-auto-row input{ accent-color:var(--seal); width:15px; height:15px; }
+
+  /* ============ NOTIFICATION BELL (replaces intrusive toasts) ============ */
+  #bell-btn{
+    position:fixed; top:12px; right:118px; z-index:151; background:rgba(14,13,12,.92); border:1px solid var(--line);
+    border-radius:9px; width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+    font-size:16px; cursor:pointer; pointer-events:auto;
+  }
+  #bell-badge{
+    position:absolute; top:-5px; right:-5px; background:var(--seal-bright); color:#fff; font-size:9px; font-weight:800;
+    min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 3px;
+    border:2px solid var(--ink); display:none;
+  }
+  #bell-badge.show{ display:flex; }
+
+  /* ============ Quiet corner status pings (auto-dismiss, small, never block) ============ */
+  #ping-feed{ position:fixed; top:60px; right:12px; z-index:56; display:flex; flex-direction:column; align-items:flex-end; gap:5px; pointer-events:none; max-width:220px; }
+  .ping{
+    background:rgba(14,13,12,.95); border:1px solid var(--line); border-left:3px solid var(--gold);
+    border-radius:6px; padding:6px 10px; font-size:11px; font-weight:600; box-shadow:0 3px 10px rgba(0,0,0,.4);
+    animation:pingIn .25s ease, pingOut .3s ease 3.2s forwards; text-align:right; color:var(--text-dim);
+  }
+  .ping.good{ border-left-color:var(--moss-bright); }
+  .ping.bad{ border-left-color:var(--seal-bright); }
+  @keyframes pingIn{ from{opacity:0; transform:translateX(10px);} to{opacity:1; transform:translateX(0);} }
+  @keyframes pingOut{ to{opacity:0; transform:translateX(10px);} }
+
+  /* ============ ONBOARDING ============ */
+  #onboard-hint{
+    position:fixed; left:16px; right:64px; bottom:96px; z-index:152; background:var(--gold-bright); color:#2a1d0a;
+    border-radius:10px; padding:11px 14px; font-size:12px; font-weight:700; box-shadow:0 6px 20px rgba(184,150,90,.3);
+    display:none; align-items:center; gap:10px;
+  }
+  #onboard-hint.show{ display:flex; }
+  #onboard-hint .close-hint{ margin-left:auto; background:rgba(0,0,0,.15); border:none; width:20px; height:20px; border-radius:6px; color:#2a1d0a; font-size:11px; cursor:pointer; flex-shrink:0; }
+
+  /* ============ BOTTOM NAV ============ */
+  #tabbar{
+    position:fixed; left:10px; right:10px; bottom:10px; display:flex; background:rgba(14,13,12,.96);
+    backdrop-filter:blur(10px); border-radius:12px; z-index:150; padding:5px; gap:3px;
+    box-shadow:0 6px 20px rgba(0,0,0,.5); border:1px solid var(--line);
+  }
+  .tab-btn{
+    flex:1; background:none; border:none; color:var(--text-faint); font-family:inherit;
+    padding:8px 4px 6px; font-size:9.5px; font-weight:700; letter-spacing:.02em;
+    display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;
+    border-radius:8px; position:relative;
+  }
+  .tab-btn .ico{ font-size:18px; }
+  .tab-btn.active{ color:var(--ink); background:var(--gold-bright); }
+  .tab-btn .badge{
+    position:absolute; top:2px; right:14%; background:var(--seal-bright); color:#fff; font-size:9px;
+    min-width:15px; height:15px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    padding:0 3px; font-weight:800; border:2px solid var(--ink);
+  }
+
+  #zoom-controls{ position:fixed; right:12px; bottom:96px; z-index:151; display:flex; flex-direction:column; gap:8px; }
+  .zoom-btn{ width:38px; height:38px; border-radius:9px; background:rgba(14,13,12,.92); border:1px solid var(--line); color:var(--text); font-size:17px; font-weight:800; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  #advance-btn{
+    width:38px; height:38px; border-radius:9px; background:var(--gold-bright); color:#2a1d0a;
+    border:none; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 10px rgba(184,150,90,.35);
+  }
+  #advance-btn:active{ transform:scale(.94); }
+  #advance-btn:disabled{ opacity:.5; }
+
+  /* ============ PANEL ============ */
+  #panel-backdrop{ position:fixed; inset:0; background:rgba(4,4,3,.7); z-index:100; display:none; backdrop-filter:blur(2px); }
+  #panel-backdrop.show{ display:block; }
+  .panel{
+    position:fixed; left:8px; right:8px; bottom:78px; top:66px; background:var(--ink2);
+    border-radius:14px; z-index:101; display:none; flex-direction:column;
+    transform:translateY(24px); opacity:0; transition:transform .22s ease, opacity .18s;
+    box-shadow:0 20px 60px rgba(0,0,0,.6); border:1px solid var(--line); overflow:hidden;
+  }
+  .panel.show{ display:flex; transform:translateY(0); opacity:1; }
+  .panel-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px; flex-shrink:0; border-bottom:1px solid var(--line); }
+  .panel-head h2{ margin:0; font-size:16px; color:var(--text); display:flex; align-items:center; gap:8px; font-weight:800; letter-spacing:.01em; }
+  .panel-close{ background:var(--card); border:none; color:var(--text-dim); width:30px; height:30px; border-radius:8px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .panel-body{ flex:1; overflow-y:auto; padding:12px 14px 20px; -webkit-overflow-scrolling:touch; }
+  .panel-sub{ font-size:11.5px; color:var(--text-dim); padding:8px 16px 4px; line-height:1.4; }
+
+  .btn{ background:var(--seal); color:#fff; border:none; border-radius:9px; padding:10px 14px; font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+  .btn:active{ transform:scale(.97); }
+  .btn:disabled{ background:#2a2721; color:#585245; cursor:not-allowed; }
+  .btn.gold{ background:var(--gold-bright); color:#2a1d0a; }
+  .btn.ghost{ background:var(--card); color:var(--text-dim); border:1px solid var(--line); }
+  .btn.small{ padding:7px 11px; font-size:11px; border-radius:8px; }
+  .btn.block{ width:100%; }
+
+  /* ============ STORY FEED (bell panel) ============ */
+  .story-entry{ padding:11px 0; border-bottom:1px solid var(--line); }
+  .story-entry:last-child{ border-bottom:none; }
+  .story-entry .se-day{ font-size:9.5px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:.05em; }
+  .story-entry .se-text{ font-size:12.5px; line-height:1.55; color:var(--text); margin-top:3px; }
+  .story-entry.event .se-text{ font-style:italic; color:var(--text-dim); }
+  .story-entry.good .se-text{ color:var(--moss-bright); }
+  .story-entry.bad .se-text{ color:var(--seal-bright); }
+
+  /* ============ MISSION CARDS ============ */
+  .m-card{ background:var(--card); border-radius:10px; margin-bottom:10px; overflow:hidden; border:1px solid var(--line); }
+  .m-card.story{ border-color:rgba(184,150,90,.35); background:linear-gradient(135deg, rgba(184,150,90,.06), var(--card)); }
+  .m-top{ padding:12px 12px 6px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .m-type-badge{ font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--gold-bright); background:rgba(184,150,90,.12); padding:3px 7px; border-radius:5px; display:inline-block; margin-bottom:5px; }
+  .m-title{ font-size:14.5px; color:var(--text); font-weight:800; margin:2px 0; }
+  .m-lord{ font-size:11px; color:var(--text-dim); }
+  .m-reward{ text-align:right; flex-shrink:0; }
+  .m-reward .gold-amt{ font-size:14px; font-weight:800; color:var(--gold-bright); }
+  .m-reward .rep-amt{ font-size:10.5px; color:var(--indigo-bright); font-weight:700; }
+  .m-story{ font-size:12px; line-height:1.5; color:var(--text-dim); padding:2px 12px 9px; font-style:italic; }
+  .m-danger-row{ padding:0 12px 9px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .danger-pill{ font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:6px; }
+  .danger-pill.low{ background:rgba(125,153,104,.18); color:var(--moss-bright); }
+  .danger-pill.med{ background:rgba(184,150,90,.18); color:var(--gold-bright); }
+  .danger-pill.high{ background:rgba(201,75,63,.18); color:var(--seal-bright); }
+  .danger-pill.extreme{ background:rgba(107,131,163,.22); color:var(--indigo-bright); }
+  .travel-pill{ font-size:10.5px; color:var(--text-dim); background:rgba(232,226,213,.06); padding:3px 9px; border-radius:6px; }
+  .m-deadline{ font-size:10px; color:var(--seal-bright); padding:0 12px 7px; font-weight:600; }
+  .m-actions{ padding:3px 12px 12px; display:flex; gap:8px; }
+
+  /* ============ NINJA SILHOUETTE ART ============ */
+  .avatar{ border-radius:8px; display:inline-block; flex-shrink:0; }
+  .avatar.pixelated{ image-rendering:pixelated; image-rendering:crisp-edges; }
+
+  .pick-ninja-card{ display:flex; align-items:center; gap:11px; padding:9px; border-radius:9px; margin-bottom:7px; background:var(--card); border:1.5px solid transparent; cursor:pointer; }
+  .pick-ninja-card.selected{ border-color:var(--gold-bright); background:var(--card2); }
+  .pick-ninja-card.disabled{ opacity:.4; }
+  .pn-info{ flex:1; min-width:0; }
+  .pn-name{ font-size:13px; font-weight:800; color:var(--text); }
+  .pn-meta{ font-size:10px; color:var(--text-dim); }
+  .pn-check{ width:22px; height:22px; border-radius:6px; border:1.5px solid var(--text-faint); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--gold-bright); }
+  .pick-ninja-card.selected .pn-check{ border-color:var(--gold-bright); background:rgba(212,179,120,.15); }
+
+  .chance-box{ background:var(--card); border-radius:10px; padding:13px; margin:11px 0; }
+  .chance-meter-bg{ height:9px; border-radius:5px; background:rgba(232,226,213,.08); overflow:hidden; margin:7px 0 3px; }
+  .chance-meter-fill{ height:100%; border-radius:5px; transition:width .3s; }
+  .chance-txt{ font-size:12.5px; font-weight:700; text-align:center; }
+  .chance-sub{ font-size:10.5px; color:var(--text-dim); text-align:center; margin-top:2px; }
+
+  /* ============ NINJA ROSTER CARDS ============ */
+  .ninja-card{ background:var(--card); border-radius:10px; margin-bottom:10px; padding:13px; }
+  .nc-top{ display:flex; gap:11px; align-items:center; }
+  .nc-info{ flex:1; min-width:0; }
+  .nc-name-row{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .nc-name{ font-size:15px; font-weight:800; color:var(--text); }
+  .lvl-pill{ font-size:9.5px; font-weight:800; background:var(--gold-bright); color:#2a1d0a; padding:2px 6px; border-radius:5px; }
+  .status-pill{ font-size:9.5px; font-weight:700; padding:3px 7px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; margin-top:3px; }
+  .status-pill.ready{ background:rgba(125,153,104,.18); color:var(--moss-bright); }
+  .status-pill.busy{ background:rgba(184,150,90,.18); color:var(--gold-bright); }
+  .status-pill.hurt{ background:rgba(201,75,63,.18); color:var(--seal-bright); }
+  .nc-role{ font-size:10.5px; color:var(--text-dim); }
+  .nc-bio{ font-size:11px; color:var(--text-dim); font-style:italic; margin:9px 0; line-height:1.5; }
+
+  .bar-row{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .bar-label{ font-size:9px; width:50px; color:var(--text-faint); font-weight:700; text-transform:uppercase; flex-shrink:0; }
+  .bar-bg{ flex:1; height:7px; background:rgba(232,226,213,.06); border-radius:4px; overflow:hidden; }
+  .bar-fill{ height:100%; border-radius:4px; }
+  .bar-num{ font-size:9px; width:18px; text-align:right; color:var(--text-faint); flex-shrink:0; }
+
+  .recovery-box{ background:rgba(201,75,63,.08); border-radius:9px; padding:11px; margin:9px 0; }
+  .recovery-label{ font-size:10.5px; font-weight:700; color:var(--seal-bright); margin-bottom:6px; display:flex; justify-content:space-between; }
+  .recovery-bar-bg{ height:8px; background:rgba(232,226,213,.08); border-radius:4px; overflow:hidden; }
+  .recovery-bar-fill{ height:100%; background:linear-gradient(90deg, var(--seal-bright), var(--gold-bright)); border-radius:4px; transition:width .4s; }
+
+  .travel-box{ background:rgba(107,131,163,.1); border-radius:9px; padding:11px; margin:9px 0; }
+  .travel-label{ font-size:10.5px; font-weight:700; color:var(--indigo-bright); margin-bottom:6px; display:flex; justify-content:space-between; }
+  .travel-bar-bg{ height:8px; background:rgba(232,226,213,.08); border-radius:4px; overflow:hidden; }
+  .travel-bar-fill{ height:100%; background:linear-gradient(90deg, var(--indigo), var(--indigo-bright)); border-radius:4px; transition:width .4s; }
+
+  /* ============ BUILDING POPUP ============ */
+  .bp-resource-strip{ display:flex; gap:7px; margin-bottom:13px; }
+  .bp-res{ flex:1; background:var(--card); border-radius:9px; padding:9px 6px; text-align:center; }
+  .bp-res .r-num{ font-size:16px; font-weight:800; color:var(--gold-bright); }
+  .bp-res .r-lbl{ font-size:8px; color:var(--text-faint); font-weight:700; text-transform:uppercase; }
+
+  .queue-card{ display:flex; align-items:center; gap:11px; padding:11px; border-radius:9px; background:linear-gradient(135deg, rgba(184,150,90,.1), rgba(184,150,90,.03)); border:1px solid rgba(184,150,90,.2); margin-bottom:9px; }
+  .queue-ico{ font-size:20px; }
+  .queue-info{ flex:1; }
+  .queue-name{ font-size:12.5px; font-weight:800; color:var(--text); }
+  .queue-bar-bg{ height:6px; background:rgba(232,226,213,.1); border-radius:3px; overflow:hidden; margin-top:5px; }
+  .queue-bar-fill{ height:100%; background:var(--gold-bright); border-radius:3px; transition:width .4s; }
+  .queue-days{ font-size:10px; color:var(--text-dim); margin-top:3px; }
+
+  .craft-row{ display:flex; align-items:center; gap:11px; padding:11px; border-radius:9px; background:var(--card); margin-bottom:7px; cursor:pointer; }
+  .craft-row.unavail{ opacity:.4; }
+  .cr-ico{ font-size:20px; width:28px; text-align:center; }
+  .cr-info{ flex:1; }
+  .cr-name{ font-size:12.5px; font-weight:800; color:var(--text); }
+  .cr-meta{ font-size:10px; color:var(--text-dim); }
+  .cr-arrow{ font-size:16px; color:var(--text-faint); }
+
+  .stock-grid{ display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  .stock-item{ background:var(--card); border-radius:8px; padding:9px; display:flex; align-items:center; gap:7px; }
+  .stock-ico{ font-size:16px; }
+  .stock-name{ font-size:10px; color:var(--text-dim); flex:1; }
+  .stock-qty{ font-size:13px; font-weight:800; color:var(--text); }
+
+  /* ============ FACTIONS ============ */
+  .faction-card{ background:var(--card); border-radius:10px; padding:13px; margin-bottom:10px; }
+  .fc-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+  .fc-name{ font-size:14px; font-weight:800; }
+  .fc-title{ font-size:10px; color:var(--text-dim); }
+  .fc-label{ font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:6px; }
+  .standing-bg{ height:8px; background:rgba(232,226,213,.07); border-radius:4px; overflow:hidden; position:relative; margin:7px 0; }
+  .standing-mid{ position:absolute; left:50%; top:0; bottom:0; width:1px; background:rgba(232,226,213,.15); }
+  .standing-fill{ height:100%; position:absolute; top:0; border-radius:4px; }
+  .fc-desc{ font-size:11px; color:var(--text-dim); line-height:1.5; font-style:italic; }
+  .threat-box{ margin-top:9px; font-size:11px; color:var(--seal-bright); background:rgba(201,75,63,.1); border-radius:8px; padding:9px 11px; font-weight:600; display:flex; gap:7px; align-items:flex-start; }
+  .closed-box{ margin-top:9px; font-size:11px; color:var(--text-faint); background:rgba(232,226,213,.04); border-radius:8px; padding:9px 11px; font-weight:600; }
+
+  /* ============ MODAL SHEET ============ */
+  #modal-backdrop{ position:fixed; inset:0; background:rgba(4,4,3,.78); z-index:200; display:none; align-items:flex-end; justify-content:center; backdrop-filter:blur(2px); }
+  #modal-backdrop.show{ display:flex; }
+  #modal{ background:var(--ink2); border-radius:16px 16px 0 0; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; padding:16px; padding-bottom:26px; box-shadow:0 -10px 40px rgba(0,0,0,.6); }
+  #modal h2{ margin:0 0 4px; font-size:16px; font-weight:800; color:var(--text); }
+  #modal .modal-sub{ font-size:11px; color:var(--text-dim); margin-bottom:13px; }
+  .modal-section-label{ font-size:10.5px; font-weight:800; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em; margin:13px 0 6px; }
+
+  /* ============ MAP VIEW ============ */
+  #map-canvas{ width:100%; border-radius:10px; background:#0a0908; display:block; margin-bottom:10px; }
+  .map-legend{ display:flex; gap:10px; flex-wrap:wrap; font-size:10px; color:var(--text-dim); padding:0 2px; }
+  .map-legend span{ display:flex; align-items:center; gap:4px; }
+  .map-legend .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+  /* ============ GAME OVER ============ */
+  #gameover{ position:fixed; inset:0; background:rgba(4,3,3,.97); z-index:500; display:none; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:30px; }
+  #gameover.show{ display:flex; }
+  #gameover h1{ font-size:26px; color:var(--seal-bright); margin-bottom:10px; font-weight:800; }
+  #gameover p{ font-size:13px; color:var(--text-dim); max-width:340px; line-height:1.7; margin-bottom:22px; }
+
+  /* ============ MAIN MENU ============ */
+  #main-menu{ position:fixed; inset:0; z-index:1000; background:radial-gradient(ellipse at 50% 15%, #241f17, var(--ink)); display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:30px; }
+  #main-menu h1{ font-size:38px; color:var(--text); margin-bottom:2px; font-weight:800; letter-spacing:.03em; }
+  #main-menu .sub{ color:var(--gold-bright); font-size:11px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:30px; font-weight:700; }
+  .seal-mark{ width:64px; height:64px; margin-bottom:18px; }
+  .menu-btn-row{ display:flex; flex-direction:column; gap:10px; width:100%; max-width:280px; }
+  .menu-main-btn{ background:var(--seal); color:#fff; border:none; border-radius:10px; padding:14px; font-family:inherit; font-size:14px; font-weight:800; cursor:pointer; }
+  .menu-main-btn.gold{ background:var(--gold-bright); color:#2a1d0a; }
+  .menu-main-btn.ghost{ background:var(--card); color:var(--text-dim); border:1px solid var(--line); }
+  .menu-main-btn:active{ transform:scale(.97); }
+
+  /* ============ INTRO STORY SCREEN ============ */
+  #intro-screen{ position:fixed; inset:0; z-index:999; background:var(--ink); display:none; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:30px; }
+  #intro-screen.show{ display:flex; }
+  #intro-screen .intro-body{ font-size:13.5px; color:var(--text-dim); max-width:400px; line-height:1.85; margin-bottom:24px; text-align:left; }
+  #intro-screen .intro-body b{ color:var(--gold-bright); }
+  #intro-screen h2{ font-size:20px; color:var(--text); margin-bottom:18px; font-weight:800; }
+
+  /* ============ RESOLUTION MODAL ============ */
+  #resolution-modal-backdrop{ position:fixed; inset:0; background:rgba(4,4,3,.88); z-index:400; display:none; align-items:center; justify-content:center; padding:20px; }
+  #resolution-modal-backdrop.show{ display:flex; }
+  #resolution-modal{ background:var(--ink2); border-radius:16px; max-width:420px; width:100%; max-height:82vh; overflow-y:auto; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.6); border:1px solid var(--line); }
+  #resolution-modal h2{ margin:0 0 13px; font-size:16px; font-weight:800; text-align:center; color:var(--gold-bright); }
+  .res-card{ border-radius:9px; padding:11px 13px; font-size:12px; line-height:1.6; margin-bottom:9px; background:var(--card); }
+  .res-card.good{ background:rgba(125,153,104,.12); border:1px solid rgba(125,153,104,.25); }
+  .res-card.bad{ background:rgba(201,75,63,.12); border:1px solid rgba(201,75,63,.25); }
+  .res-card.story{ background:rgba(184,150,90,.12); border:1px solid rgba(184,150,90,.3); }
+
+  ::-webkit-scrollbar{ width:5px; }
+  ::-webkit-scrollbar-thumb{ background:var(--text-faint); border-radius:3px; }
 </style>
 </head>
 <body>
 
-<div id="starfield"></div>
-
-<nav>
-  <div class="wrap">
-    <div class="logo" onclick="showTab('home')"><span class="logo-mark">🛰️</span>SpaceCode</div>
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="home" onclick="showTab('home')">الرئيسية</button>
-      <button class="tab-btn" data-tab="course" onclick="showTab('course')">المسار</button>
-      <button class="tab-btn" data-tab="about" onclick="showTab('about')">من نحن</button>
-    </div>
-    <div class="nav-progress">
-      <span id="nav-progress-text">0 / 18</span>
-      <div class="nav-progress-bar"><div class="nav-progress-fill" id="nav-progress-fill" style="width:0%"></div></div>
-    </div>
-  </div>
-</nav>
-
-<!-- ==================== HOME VIEW ==================== -->
-<div id="view-home">
-  <header class="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <span class="eyebrow">MISSION CONTROL — FIRST LAUNCH</span>
-        <h1>لا تقرأ عن البرمجة... <span>اكتبها الآن</span></h1>
-        <p class="lead">بعد 30 ثانية من الآن، ستكون قد كتبت أول برنامج فعلي بلغة بايثون. نأخذ بيدك من الصفر عبر أساسيات بايثون خطوة بخطوة، حتى تصل إلى نقطة تكون فيها جاهزًا فعلاً للانطلاق نحو مشاريع ومصادر أعمق. لا تسجيل، لا تثبيت — فقط جرّب في الأسفل.</p>
-        <div class="hero-cta">
-          <a href="#try" class="btn btn-primary" onclick="scrollToTry(event)">🚀 جرّب الآن مجانًا</a>
-          <button class="btn btn-ghost" onclick="showTab('course')">استعرض المسار الكامل</button>
-        </div>
-        <div class="trust-row">
-          <span>🧑‍🚀 <b>+ مجاني</b> بالكامل</span>
-          <span>⚡ <b>بدون تثبيت</b> أي برنامج</span>
-          <span>🌍 <b>بالعربية</b> بالكامل</span>
-        </div>
-
-        <div class="droid-row" style="margin-top:36px;">
-          <div class="droid">
-            <svg viewBox="0 0 100 100"><g id="droid-face-hero"></g></svg>
-          </div>
-          <div class="speech-bubble">
-            أنا <b style="color:var(--cyan)">نيون</b> 👋، رفيقك في هذه الرحلة. مهمتي إرشادك خطوة بخطوة حتى تكتب أول كود حقيقي بنفسك، وتصبح جاهزًا للانطلاق أبعد من هنا. جاهز؟
-          </div>
-        </div>
-      </div>
-
-      <div class="terminal-card" id="try">
-        <div class="terminal-titlebar">
-          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-          <span class="terminal-filename">mission_01.py</span>
-        </div>
-        <div class="demo-instructions">
-          🎯 <b>مهمتك:</b> اكتب اسمك مكان <code style="background:rgba(76,224,210,.1);padding:1px 5px;border-radius:4px;">"YOUR NAME"</code> في السطر الأول، ثم اضغط <b>Run</b> لترى الرسالة.
-        </div>
-        <textarea id="hero-code" spellcheck="false">name = "YOUR NAME"
-
-print(f"🚀 Welcome aboard, Commander {name}!")
-print("Your coding mission starts now.")</textarea>
-        <div class="editor-actions">
-          <button id="hero-run" class="run-btn" disabled><span>▶</span> <span id="hero-run-label">تحميل المُفسّر...</span></button>
-          <span class="pyodide-status" id="hero-status">Pyodide: loading…</span>
-        </div>
-        <div class="output-pane" id="hero-output"><span class="placeholder">سيظهر ناتج الكود هنا بعد الضغط على Run</span></div>
-      </div>
-    </div>
-  </header>
-
-  <section class="why" id="why">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">WHY PYTHON</span>
-        <h2>لماذا بايثون أول محطة؟</h2>
-        <p>بايثون هي أنسب لغة لأول تجربة برمجية: صياغتها قريبة من اللغة الطبيعية، ومستخدمة فعليًا في الذكاء الاصطناعي وتحليل البيانات وتطوير الويب.</p>
-      </div>
-      <div class="why-grid">
-        <div class="why-card"><div class="why-icon">🪐</div><h3>صياغة بسيطة وواضحة</h3><p>أقرب لغات البرمجة للقراءة الطبيعية، ما يجعل التركيز على المنطق لا على تعقيد الرموز.</p></div>
-        <div class="why-card"><div class="why-icon">⚙️</div><h3>تُستخدم في كل مكان</h3><p>من الذكاء الاصطناعي إلى الأتمتة وتحليل البيانات وتطوير الويب — مهارة واحدة، استخدامات لا تنتهي.</p></div>
-        <div class="why-card"><div class="why-icon">💻</div><h3>تشغيل فوري من المتصفح</h3><p>كل دروسنا تعمل مباشرة في متصفحك عبر محرك بايثون حقيقي — بدون تثبيت أي شيء.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="course-preview">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">THE MISSION PATH</span>
-        <h2>18 مهمة تفصلك عن الأساسيات</h2>
-        <p>مسار متسلسل يبني معرفتك خطوة بخطوة. كل مهمة تُفتح بعد إتمام التي قبلها.</p>
-      </div>
-      <div class="course-grid" id="course-grid-preview"></div>
-      <div style="text-align:center;margin-top:28px;">
-        <button class="btn btn-ghost" onclick="showTab('course')">عرض كل المسار ←</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="freebies-section">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">FREE RESOURCES</span>
-        <h2>هدايا مجانية لتسريع رحلتك</h2>
-        <p>موارد قابلة للتحميل تساعدك أثناء التدرّب — احتفظ بها بجانبك في كل مهمة.</p>
-      </div>
-      <div class="freebie-grid">
-        <div class="freebie-card">
-          <div class="freebie-icon">📄</div>
-          <div class="freebie-content">
-            <h4>ورقة غش بايثون للمبتدئين</h4>
-            <p>ملخص من صفحة واحدة لكل الأساسيات: المتغيرات، الشروط، الحلقات، والدوال.</p>
-          </div>
-          <a href="#" class="btn btn-ghost btn-sm freebie-btn">تحميل PDF ⬇</a>
-        </div>
-        <div class="freebie-card">
-          <div class="freebie-icon">🗂️</div>
-          <div class="freebie-content">
-            <h4>قائمة مراجعة المسار</h4>
-            <p>تتبّع تقدّمك عبر المهام الـ18 بنسخة قابلة للطباعة.</p>
-          </div>
-          <a href="#" class="btn btn-ghost btn-sm freebie-btn">تحميل PDF ⬇</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="wrap">
-      <div class="logo" style="font-size:16px;"><span class="logo-mark" style="width:26px;height:26px;font-size:13px;">🛰️</span>SpaceCode</div>
-      <p>SpaceCode — منصة تعليمية لتعلّم أساسيات البرمجة بالعربية.</p>
-    </div>
-  </footer>
-</div>
-
-<!-- ==================== COURSE (FULL PATH) VIEW ==================== -->
-<div id="view-course" class="hidden">
-  <section style="padding-top:56px;">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">THE MISSION PATH</span>
-        <h2>المسار الكامل</h2>
-        <p>18 مهمة، من أول متغيّر حتى مقدمة في الأصناف. أكمل كل مهمة لتفتح التي تليها.</p>
-      </div>
-      <div class="course-grid" id="course-grid-full"></div>
-    </div>
-  </section>
-  <footer>
-    <div class="wrap">
-      <div class="logo" style="font-size:16px;"><span class="logo-mark" style="width:26px;height:26px;font-size:13px;">🛰️</span>SpaceCode</div>
-      <p>SpaceCode — منصة تعليمية لتعلّم أساسيات البرمجة بالعربية.</p>
-    </div>
-  </footer>
-</div>
-
-<!-- ==================== ABOUT VIEW ==================== -->
-<div id="view-about" class="hidden">
-  <div class="wrap about-content">
-    <span class="eyebrow">ABOUT SPACECODE</span>
-    <h2>من نحن؟</h2>
-    <p>SpaceCode منصة تعليمية بُنيت لفكرة بسيطة: تعلّم البرمجة يجب ألا يبدأ بحاجز اللغة. نقدّم لك أولى خطواتك في بايثون بشرح عربي واضح، وتمارين حقيقية تُنفَّذ في متصفحك مباشرة.</p>
-    <p>نحن لسنا بديلاً عن دورة احترافية شاملة — بل نقطة انطلاق صادقة. هدفنا أن نأخذ بيدك من الصفر حتى تصبح مرتاحًا بما يكفي لتكمل رحلتك في مصادر أعمق.</p>
-    <div class="droid-row">
-      <div class="droid"><svg viewBox="0 0 100 100"><g id="droid-face-about"></g></svg></div>
-      <div class="speech-bubble">أنا نيون، الدرويد المرافق لك في كل مهمة. سأعطيك تلميحات عندما تحتاجها، وأحتفل معك بكل مهمة تُنجزها 🎉</div>
-    </div>
-    <p style="margin-top:30px;">نبدأ ببايثون فقط حاليًا، وسنضيف لغات ومسارات أخرى تدريجيًا بناءً على ما يحتاجه متعلمونا.</p>
-  </div>
-  <footer>
-    <div class="wrap">
-      <div class="logo" style="font-size:16px;"><span class="logo-mark" style="width:26px;height:26px;font-size:13px;">🛰️</span>SpaceCode</div>
-      <p>SpaceCode — منصة تعليمية لتعلّم أساسيات البرمجة بالعربية.</p>
-    </div>
-  </footer>
-</div>
-
-<!-- ==================== LESSON PLAYER VIEW ==================== -->
-<div id="view-lesson" class="hidden">
-  <div class="wrap">
-    <div class="lesson-header">
-      <div class="lesson-header-left">
-        <span class="eyebrow" id="lesson-eyebrow">MISSION 1</span>
-        <h2 id="lesson-title">عنوان المهمة</h2>
-      </div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        <div class="step-dots" id="step-dots"></div>
-        <button class="btn btn-ghost btn-sm" onclick="showTab('course')">→ العودة للمسار</button>
-      </div>
-    </div>
-
-    <div id="lesson-active-content">
-      <div class="droid-row" style="margin-bottom:16px;" id="droid-instruction-row">
-        <div class="droid small"><svg viewBox="0 0 100 100"><g id="droid-face-lesson"></g></svg></div>
-        <div class="speech-bubble" id="droid-speech">لنبدأ هذه المهمة!</div>
-      </div>
-      <div class="lesson-shell">
-        <div class="lesson-instructions" id="lesson-instructions"></div>
-        <div class="lesson-editor-area">
-          <textarea id="lesson-code" spellcheck="false"></textarea>
-          <div class="editor-actions">
-            <button id="lesson-run" class="run-btn" disabled><span>▶</span> <span id="lesson-run-label">تحميل المُفسّر...</span></button>
-            <button id="lesson-check" class="btn btn-ghost btn-sm" disabled>تحقق من الحل</button>
-          </div>
-          <div class="output-pane" id="lesson-output"><span class="placeholder">سيظهر ناتج الكود هنا بعد الضغط على Run</span></div>
-          <div class="check-result idle" id="lesson-check-result">لم يتم التحقق بعد — نفّذ الكود ثم اضغط "تحقق من الحل".</div>
-        </div>
-      </div>
-      <div class="lesson-nav-buttons">
-        <button class="btn btn-ghost" id="prev-step-btn" onclick="prevStep()">→ السابق</button>
-        <button class="btn btn-primary" id="next-step-btn" onclick="nextStep()" disabled>التالي ←</button>
-      </div>
-    </div>
-
-    <div id="lesson-complete-banner" class="completion-banner hidden">
-      <h3 id="complete-banner-title">🎉 مهمة مُنجزة!</h3>
-      <p id="next-lesson-preview"></p>
-      <button class="btn btn-primary" id="next-mission-btn" onclick="goToNextLesson()">المهمة التالية ←</button>
-
-      <div id="final-cta-box" class="next-step-box hidden" style="margin-top:24px;text-align:right;">
-        <div class="droid small" style="width:56px;height:56px;flex-shrink:0;">
-          <svg viewBox="0 0 100 100"><g id="droid-face-final"></g></svg>
-        </div>
-        <div class="content">
-          <span class="badge-honest">الخطوة التالية</span>
-          <h3>أكملت أساسيات بايثون — والآن؟</h3>
-          <p>وصلت إلى مكان ممتاز: تعرف المتغيرات، الشروط، الحلقات، والدوال. من هنا، أفضل استثمار لوقتك هو دورة شاملة تأخذك إلى مشاريع حقيقية ومفاهيم متقدمة.</p>
-        </div>
-        <a href="#" class="btn btn-primary">استكشف الدورة المتقدمة ←</a>
-      </div>
-    </div>
+<!-- ============ MAIN MENU ============ -->
+<div id="main-menu">
+  <svg class="seal-mark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#a8352e" stroke-width="4"/><text x="50" y="66" font-size="44" text-anchor="middle" fill="#a8352e" font-family="serif">風</text></svg>
+  <h1 class="display">The Kaze Clan</h1>
+  <div class="sub">A Clan Ledger</div>
+  <div class="menu-btn-row">
+    <button class="menu-main-btn gold" id="menu-continue" style="display:none;">Continue</button>
+    <button class="menu-main-btn" id="menu-new">New Clan</button>
+    <button class="menu-main-btn ghost" id="menu-howto">How to Play</button>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
+<!-- ============ INTRO STORY ============ -->
+<div id="intro-screen">
+  <h2>Kurogawa Valley</h2>
+  <div class="intro-body">
+    Your father's clan was destroyed years ago. Four of his students remain — <b>Kaze</b>, <b>Ren</b>, <b>Sora</b>, and <b>Taro</b> — along with the family seal, now yours. They still go by his name.<br><br>
+    Word is spreading that <b>Lord Kurogane</b> is dying, and his steward is managing the household a little too well. Lords, merchants, and monks alike will pay outsiders like you for the work they can't be seen doing themselves.<br><br>
+    <b>Your task:</b> keep your people fed, rested, and armed. Take the jobs worth the risk. Build a name — or lose everything trying.
+  </div>
+  <button class="menu-main-btn gold" id="intro-start" style="max-width:240px;">Take up the seal</button>
+</div>
+
+<div id="world-wrap"><canvas id="world"></canvas></div>
+<canvas id="vfx-canvas"></canvas>
+
+<div id="zoom-controls">
+  <div class="zoom-btn" id="zoom-in">+</div>
+  <div class="zoom-btn" id="zoom-out">–</div>
+  <button id="advance-btn" title="Skip to next day">⏭</button>
+</div>
+
+<div id="hud">
+  <div class="hud-pills">
+    <div class="pill gold"><span class="ico">⛁</span><span id="hud-gold">0</span></div>
+    <div class="pill food"><span class="ico">🌾</span><span id="hud-food">0</span></div>
+    <div class="pill rep"><span class="ico">⛩</span><span id="hud-rep">0</span></div>
+  </div>
+  <div id="menu-btn">☰</div>
+</div>
+
+<div id="bell-btn">🔔<span id="bell-badge"></span></div>
+<div id="clock-widget">
+  <svg id="clock-ring" viewBox="0 0 40 40">
+    <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(232,226,213,.1)" stroke-width="3"/>
+    <circle id="clock-arc" cx="20" cy="20" r="17" fill="none" stroke="#b8965a" stroke-width="3" stroke-linecap="round" stroke-dasharray="106.8" stroke-dashoffset="106.8" transform="rotate(-90 20 20)"/>
+  </svg>
+  <span id="clock-center-txt">1</span>
+</div>
+<div id="clock-detail">
+  <div id="clock-detail-day">Day 1</div>
+  <div id="clock-detail-sub">Kurogawa Valley</div>
+  <label id="clock-auto-row"><input type="checkbox" id="clock-auto-toggle" checked> Auto-advance time</label>
+</div>
+
+<div id="ping-feed"></div>
+
+<div id="onboard-hint">
+  <span>☞</span>
+  <span id="onboard-hint-text">Tap the Mission Board below to see what work is available</span>
+  <button class="close-hint" id="hint-close">✕</button>
+</div>
+
+<div id="panel-backdrop"></div>
+
+<div class="panel" id="panel-missions">
+  <div class="panel-head"><h2>Mission Board</h2><button class="panel-close">✕</button></div>
+  <div class="panel-sub" id="missions-rank-sub"></div>
+  <div class="panel-body" id="missions-list"></div>
+</div>
+
+<div class="panel" id="panel-roster">
+  <div class="panel-head"><h2>The Family</h2><button class="panel-close">✕</button></div>
+  <div class="panel-sub">Anyone home and rested defends the village automatically.</div>
+  <div class="panel-body" id="roster-list"></div>
+</div>
+
+<div class="panel" id="panel-factions">
+  <div class="panel-head"><h2>The Valley</h2><button class="panel-close">✕</button></div>
+  <div class="panel-sub">Standing runs from open war to trusted ally.</div>
+  <div class="panel-body" id="factions-list"></div>
+</div>
+
+<div class="panel" id="panel-map">
+  <div class="panel-head"><h2>Kurogawa Valley</h2><button class="panel-close">✕</button></div>
+  <div class="panel-sub">Distance decides how long a mission takes.</div>
+  <div class="panel-body" id="map-body"></div>
+</div>
+
+<div class="panel" id="panel-story">
+  <div class="panel-head"><h2>Clan Record</h2><button class="panel-close">✕</button></div>
+  <div class="panel-sub">Everything that has happened, in order.</div>
+  <div class="panel-body" id="story-list"></div>
+</div>
+
+<div id="tabbar">
+  <button class="tab-btn active" data-tab="missions"><span class="ico">⛁</span>Missions<span class="badge" id="badge-missions" style="display:none;"></span></button>
+  <button class="tab-btn" data-tab="roster"><span class="ico">卍</span>Family</button>
+  <button class="tab-btn" data-tab="map"><span class="ico">⛰</span>Map</button>
+  <button class="tab-btn" data-tab="factions"><span class="ico">⚔</span>Valley</button>
+</div>
+
+<div id="modal-backdrop"><div id="modal"></div></div>
+
+<div id="resolution-modal-backdrop">
+  <div id="resolution-modal">
+    <h2 id="res-title">Report</h2>
+    <div id="res-entries"></div>
+    <button class="btn gold block" id="res-continue" style="margin-top:4px;">Continue</button>
+  </div>
+</div>
+
+<div id="gameover">
+  <h1 class="display" id="go-title">The Village Falls</h1>
+  <p id="go-text"></p>
+  <button class="btn gold" onclick="location.reload()" style="padding:13px 26px; border-radius:10px;">Begin a new clan</button>
+</div>
+
 <script>
+(function(){
+"use strict";
+
 /* ============================================================
-   DROID MASCOT (inline SVG, big-eyed robot, simple expressions)
+   SAVE / LOAD
    ============================================================ */
-function droidSVG(expression){
-  // expression: 'idle' | 'happy' | 'thinking' | 'sad'
-  let mouth = '';
-  if(expression==='happy') mouth = `<path d="M35 71 Q50 82 65 71" stroke="#04141f" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
-  else if(expression==='sad') mouth = `<path d="M36 76 Q50 67 64 76" stroke="#04141f" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
-  else if(expression==='thinking') mouth = `<circle cx="52" cy="73" r="3.2" fill="#04141f"/>`;
-  else mouth = `<path d="M40 72 Q50 75 60 72" stroke="#04141f" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-
-  // eyebrow tilt for thinking/sad adds personality without changing eye shape
-  const browL = expression==='thinking' ? `<line x1="24" y1="30" x2="38" y2="26" stroke="#04141f" stroke-width="3" stroke-linecap="round"/>` : '';
-  const browR = expression==='thinking' ? `<line x1="62" y1="26" x2="76" y2="30" stroke="#04141f" stroke-width="3" stroke-linecap="round"/>` : '';
-
-  return `
-    <defs>
-      <linearGradient id="droidBody" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#8FF0E6"/>
-        <stop offset="55%" stop-color="#4CE0D2"/>
-        <stop offset="100%" stop-color="#279489"/>
-      </linearGradient>
-      <linearGradient id="droidVisor" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0B1E24"/>
-        <stop offset="100%" stop-color="#04141f"/>
-      </linearGradient>
-      <radialGradient id="eyeGlow" cx="50%" cy="45%" r="60%">
-        <stop offset="0%" stop-color="#FFFFFF"/>
-        <stop offset="35%" stop-color="#9FF7EE"/>
-        <stop offset="100%" stop-color="#28C8B8"/>
-      </radialGradient>
-    </defs>
-
-    <!-- antenna -->
-    <line x1="50" y1="6" x2="50" y2="16" stroke="#5CC7BB" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="50" cy="5" r="4.5" fill="var(--magenta)"/>
-
-    <!-- ears -->
-    <rect x="10" y="40" width="8" height="18" rx="4" fill="#5CC7BB"/>
-    <rect x="82" y="40" width="8" height="18" rx="4" fill="#5CC7BB"/>
-
-    <!-- head -->
-    <rect x="16" y="14" width="68" height="64" rx="24" fill="url(#droidBody)"/>
-    <rect x="16" y="14" width="68" height="64" rx="24" fill="none" stroke="#BFFAF3" stroke-width="1" opacity="0.5"/>
-
-    <!-- visor (big rounded eye area) -->
-    <rect x="26" y="30" width="48" height="30" rx="15" fill="url(#droidVisor)"/>
-
-    <!-- big eyes -->
-    <circle cx="40" cy="45" r="10.5" fill="url(#eyeGlow)"/>
-    <circle cx="60" cy="45" r="10.5" fill="url(#eyeGlow)"/>
-    <circle cx="43" cy="41" r="3" fill="#ffffff"/>
-    <circle cx="63" cy="41" r="3" fill="#ffffff"/>
-    ${browL}${browR}
-
-    <!-- mouth panel -->
-    ${mouth}
-
-    <!-- cheek lights -->
-    <circle cx="24" cy="62" r="2.6" fill="var(--magenta)" opacity="0.85"/>
-    <circle cx="76" cy="62" r="2.6" fill="var(--amber)" opacity="0.85"/>
-  `;
+const SAVE_KEY = 'kazeclan_save_v1';
+function saveGame(){
+  try{
+    const payload = JSON.stringify(state);
+    localStorage.setItem(SAVE_KEY, payload);
+  }catch(e){ /* storage unavailable, fail silently */ }
 }
-function setDroidExpression(elId, expr){
-  const el=document.getElementById(elId);
-  if(el) el.innerHTML = droidSVG(expr);
+function loadGame(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
 }
-function initAllDroids(){
-  ['droid-face-hero','droid-face-about','droid-face-lesson','droid-face-final'].forEach(id=>{
-    if(document.getElementById(id)) setDroidExpression(id,'idle');
-  });
+function hasSave(){
+  try{ return !!localStorage.getItem(SAVE_KEY); }catch(e){ return false; }
+}
+function clearSave(){
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
 }
 
 /* ============================================================
-   STARFIELD
+   AUDIO (lightweight, same engine as before)
    ============================================================ */
-function initStarfield(){
-  const field=document.getElementById('starfield');
-  const count = 80;
-  for(let i=0;i<count;i++){
-    const s=document.createElement('div');
-    s.className='star';
-    const size = Math.random()*2+1;
-    s.style.width=size+'px';
-    s.style.height=size+'px';
-    s.style.left=Math.random()*100+'%';
-    s.style.top=Math.random()*100+'%';
-    s.style.animationDelay=(Math.random()*4)+'s';
-    field.appendChild(s);
+const Audio_ = (function(){
+  let ctx=null, enabled=true, master=null, musicGain=null, musicOn=true, musicTimer=null, musicStep=0;
+  function init(){
+    if(ctx) return;
+    try{
+      ctx = new (window.AudioContext||window.webkitAudioContext)();
+      master = ctx.createGain(); master.gain.value=0.32; master.connect(ctx.destination);
+      musicGain = ctx.createGain(); musicGain.gain.value=0.14; musicGain.connect(ctx.destination);
+    }catch(e){ enabled=false; }
   }
-}
+  function tone(freq,dur,type,gainStart,delay){
+    if(!enabled||!ctx) return;
+    const t0=ctx.currentTime+(delay||0);
+    const osc=ctx.createOscillator(), g=ctx.createGain();
+    osc.type=type||'sine'; osc.frequency.setValueAtTime(freq,t0);
+    g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(gainStart||0.5,t0+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001,t0+dur);
+    osc.connect(g); g.connect(master); osc.start(t0); osc.stop(t0+dur+0.02);
+  }
+  function pianoNote(freq,dur,delay,vel){
+    if(!enabled||!ctx||!musicOn) return;
+    const t0=ctx.currentTime+(delay||0);
+    const o1=ctx.createOscillator(), o2=ctx.createOscillator(), g=ctx.createGain(), g2=ctx.createGain();
+    o1.type='triangle'; o2.type='sine';
+    o1.frequency.setValueAtTime(freq,t0); o2.frequency.setValueAtTime(freq*2,t0);
+    g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(vel||0.5,t0+0.08);
+    g.gain.exponentialRampToValueAtTime(0.0008,t0+dur);
+    g2.gain.value=0.18;
+    o1.connect(g); o2.connect(g2); g2.connect(g); g.connect(musicGain);
+    o1.start(t0); o1.stop(t0+dur+0.05); o2.start(t0); o2.stop(t0+dur+0.05);
+  }
+  const SCALE=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25];
+  const CHORDS=[[0,2,4],[3,4,6],[2,4,0],[0,3,4],[4,6,3],[2,0,4],[3,0,2],[0,4,2]];
+  function scheduleMusicBar(){
+    if(!musicOn||!enabled||!ctx) return;
+    const chord=CHORDS[musicStep%CHORDS.length]; const barDur=4.4;
+    chord.forEach((ni,i)=>pianoNote(SCALE[ni],3.4,i*0.55,0.2-i*0.03));
+    if(musicStep%2===0) pianoNote(SCALE[chord[0]]/2,4.0,0.1,0.13);
+    musicStep++; musicTimer=setTimeout(scheduleMusicBar, barDur*1000);
+  }
+  function startMusic(){ init(); if(musicTimer) return; scheduleMusicBar(); }
+  function stopMusic(){ if(musicTimer){ clearTimeout(musicTimer); musicTimer=null; } }
+  return {
+    unlock(){ init(); if(ctx&&ctx.state==='suspended') ctx.resume(); if(musicOn) startMusic(); },
+    setEnabled(v){ enabled=v; if(!v) stopMusic(); else if(musicOn) startMusic(); },
+    isEnabled(){ return enabled; },
+    setMusicEnabled(v){ musicOn=v; if(v&&enabled) startMusic(); else stopMusic(); },
+    click(){ init(); tone(680,0.05,'square',0.16); },
+    open(){ init(); tone(420,0.08,'sine',0.18); tone(630,0.08,'sine',0.13,0.04); },
+    close(){ init(); tone(360,0.07,'sine',0.13); },
+    success(){ init(); tone(500,0.11,'sine',0.22); tone(630,0.11,'sine',0.19,0.09); tone(750,0.16,'sine',0.19,0.18); },
+    fail(){ init(); tone(210,0.2,'sawtooth',0.16); tone(170,0.26,'sawtooth',0.13,0.1); },
+    coin(){ init(); tone(840,0.05,'square',0.13); tone(1120,0.06,'square',0.11,0.05); },
+    craft(){ init(); tone(290,0.05,'square',0.13); tone(480,0.05,'square',0.11,0.05); tone(670,0.07,'square',0.1,0.1); },
+    alarm(){ init(); tone(190,0.28,'sawtooth',0.2); tone(190,0.28,'sawtooth',0.2,0.33); tone(190,0.28,'sawtooth',0.2,0.66); },
+    levelup(){ init(); [500,630,750,1000].forEach((f,i)=>tone(f,0.13,'sine',0.18,i*0.08)); },
+  };
+})();
+document.addEventListener('pointerdown', ()=>Audio_.unlock(), {once:true});
 
 /* ============================================================
-   LESSON DATA
+   VFX
    ============================================================ */
-const LESSONS = [
-{
-  id:1, title:"المتغيرات والطباعة", summary:"تخزين القيم وعرضها باستخدام print()",
-  steps:[
-    { tag:"STEP 1 / 2", title:"إنشاء أول متغير",
-      body:`<p>المتغيّر هو اسم يُستخدم لتخزين قيمة يمكن استعمالها لاحقًا في الكود.</p>
-            <p>في بايثون، لا تحتاج لتحديد نوع المتغير — فقط اكتب اسمه، ثم علامة =، ثم القيمة.</p>
-            <ul><li>أنشئ متغيرًا اسمه <code>age</code> وأعطه القيمة <code>25</code></li>
-                <li>اطبع المتغير باستخدام <code>print(age)</code></li></ul>`,
-      starter:`# Write your code below\n`,
-      hint:"الأسماء في بايثون لا تحتوي مسافات، استخدم شرطة سفلية بدلاً من ذلك مثل my_age.",
-      speech:"لنبدأ بأبسط شيء: صندوق يخزّن قيمة. هذا هو المتغيّر!",
-      check:(code,out)=> /\bage\s*=\s*25\b/.test(code) && out.trim()==='25'
-    },
-    { tag:"STEP 2 / 2", title:"متغيرات نصية",
-      body:`<p>يمكن للمتغيرات تخزين نصوص أيضًا، بوضعها بين علامتي اقتباس.</p>
-            <ul><li>أنشئ متغيرًا اسمه <code>name</code> وضع فيه اسمك بين علامتي اقتباس</li>
-                <li>اطبعه باستخدام <code>print(name)</code></li></ul>`,
-      starter:`# Write your code below\n`,
-      hint:'مثال: name = "Sara"',
-      speech:"ممتاز! الآن جرّب تخزين نص بدلاً من رقم.",
-      check:(code,out)=> /\bname\s*=\s*["'].+["']/.test(code) && out.trim().length>0
-    }
-  ]
-},
-{
-  id:2, title:"الأرقام والعمليات الحسابية", summary:"الجمع والطرح والضرب والقسمة في بايثون",
-  steps:[
-    { tag:"STEP 1 / 2", title:"العمليات الأساسية",
-      body:`<p>تدعم بايثون العمليات الحسابية المعتادة: <code>+ - * /</code></p>
-            <ul><li>أنشئ متغيرًا اسمه <code>result</code> يساوي ناتج <code>7 * 6</code></li>
-                <li>اطبعه</li></ul>`,
-      starter:`# Write your code below\n`,
-      hint:"result = 7 * 6 ثم print(result)",
-      speech:"بايثون آلة حاسبة قوية أيضًا! جرّب ضرب رقمين.",
-      check:(code,out)=> /result\s*=\s*7\s*\*\s*6/.test(code) && out.trim()==='42'
-    },
-    { tag:"STEP 2 / 2", title:"القسمة الصحيحة والباقي",
-      body:`<p>الرمز <code>//</code> يعطي القسمة الصحيحة (بدون كسور)، والرمز <code>%</code> يعطي باقي القسمة.</p>
-            <ul><li>اطبع ناتج <code>17 // 5</code></li>
-                <li>اطبع ناتج <code>17 % 5</code></li></ul>`,
-      starter:`# Write your code below\n`,
-      hint:"print(17 // 5) ثم print(17 % 5)",
-      speech:"هناك عمليتان خاصتان بالقسمة في بايثون، لنتعرف عليهما.",
-      check:(code,out)=>{ const lines=out.trim().split('\n').map(s=>s.trim()); return lines.includes('3') && lines.includes('2'); }
-    }
-  ]
-},
-{
-  id:3, title:"النصوص (Strings)", summary:"التعامل مع النصوص، الطول، والدمج",
-  steps:[
-    { tag:"STEP 1 / 2", title:"دمج النصوص",
-      body:`<p>يمكن دمج نصين باستخدام <code>+</code>.</p>
-            <ul><li>أنشئ متغيرين <code>first</code> و<code>last</code> بأي اسمين</li>
-                <li>اطبع دمجهما مع مسافة بينهما</li></ul>`,
-      starter:`first = "Ahmad"\nlast = "Ali"\n# print the full name below\n`,
-      hint:'print(first + " " + last)',
-      speech:"يمكننا لصق النصوص ببعضها، تمامًا مثل قطع الليغو!",
-      check:(code,out)=> /print\(/.test(code) && out.trim().split(' ').length>=2
-    },
-    { tag:"STEP 2 / 2", title:"طول النص",
-      body:`<p>الدالة <code>len()</code> تعطيك عدد الأحرف في النص.</p>
-            <ul><li>اطبع طول الكلمة <code>"Python"</code> باستخدام <code>len()</code></li></ul>`,
-      starter:`# Write your code below\n`,
-      hint:'print(len("Python"))',
-      speech:"كم حرفًا في هذه الكلمة؟ دع بايثون تحسبها لك.",
-      check:(code,out)=> out.trim()==='6'
-    }
-  ]
-}
+const VFX=(function(){
+  const canvas=document.getElementById('vfx-canvas'); const vctx=canvas.getContext('2d');
+  let particles=[];
+  function resize(){ canvas.width=innerWidth*devicePixelRatio; canvas.height=innerHeight*devicePixelRatio; canvas.style.width=innerWidth+'px'; canvas.style.height=innerHeight+'px'; }
+  window.addEventListener('resize',resize); resize();
+  function flash(color){ particles.push({flash:true,life:1,decay:0.04,color}); }
+  function frame(){
+    vctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    vctx.clearRect(0,0,innerWidth,innerHeight);
+    particles.forEach(p=>{
+      if(p.flash){ vctx.fillStyle=p.color; vctx.globalAlpha=p.life*0.16; vctx.fillRect(0,0,innerWidth,innerHeight); vctx.globalAlpha=1; }
+    });
+    particles=particles.filter(p=>p.life>0);
+    particles.forEach(p=>p.life-=p.decay);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  return {flash};
+})();
+
+/* ============================================================
+   DATA: 4-STAT SYSTEM
+   ============================================================ */
+const STAT_KEYS = ['hp','speed','stealth','strength'];
+const STAT_LABEL = {hp:'HP', speed:'Speed', stealth:'Stealth', strength:'Strength'};
+const STAT_ICO = {hp:'♥', speed:'⟫', stealth:'◐', strength:'⚔'};
+
+const TACTICS = {
+  allout:  { name:'All-Out', ico:'⚔', successMod:0.05, riskMod:0.14, statFavor:'strength' },
+  cautious:{ name:'Cautious', ico:'◐', successMod:-0.02, riskMod:-0.12, statFavor:'hp' },
+  stealth: { name:'Stealth', ico:'◑', successMod:0.02, riskMod:0.0, statFavor:'stealth' },
+};
+
+const MISSION_TYPES = {
+  assassinate: { label:'Assassination', ico:'⚔', primaryStats:['stealth','strength'], baseRisk:0.24, goodTools:['blade','poison'] },
+  steal:       { label:'Theft', ico:'⛁', primaryStats:['stealth','speed'], baseRisk:0.15, goodTools:['rope','smoke'] },
+  spy:         { label:'Espionage', ico:'◐', primaryStats:['stealth','speed'], baseRisk:0.11, goodTools:['smoke','rope'] },
+  escort:      { label:'Escort', ico:'⛨', primaryStats:['strength','speed'], baseRisk:0.17, goodTools:['blade','rope'] },
+  sabotage:    { label:'Sabotage', ico:'⛭', primaryStats:['strength','stealth'], baseRisk:0.19, goodTools:['poison','smoke'] },
+};
+
+const TOOL_DEFS = {
+  blade:  { name:'Fine Blades', ico:'⚔' },
+  poison: { name:'Poison Vials', ico:'⚗' },
+  rope:   { name:'Climbing Gear', ico:'⛓' },
+  smoke:  { name:'Smoke Bombs', ico:'☁' },
+};
+const MEDICINE_KEY='medicine';
+const CRAFT_RECIPES=[
+  { key:'blade', name:'Fine Blades', ico:'⚔', ingredientCost:8, days:2, yieldQty:3 },
+  { key:'poison', name:'Poison Vials', ico:'⚗', ingredientCost:10, days:3, yieldQty:2 },
+  { key:'rope', name:'Climbing Gear', ico:'⛓', ingredientCost:6, days:1, yieldQty:3 },
+  { key:'smoke', name:'Smoke Bombs', ico:'☁', ingredientCost:7, days:2, yieldQty:3 },
+  { key:'medicine', name:'Medicine', ico:'✚', ingredientCost:9, days:2, yieldQty:3 },
 ];
 
-const REMAINING_TITLES = [
-  ["صياغة النصوص بـ f-strings","دمج المتغيرات داخل النصوص بسهولة"],
-  ["المقارنات والقيم المنطقية","Booleans و comparisons"],
-  ["الشروط If / Else","اتخاذ قرارات داخل الكود"],
-  ["القوائم Lists","تخزين مجموعة من القيم"],
-  ["أساليب القوائم والتقطيع","List methods و slicing"],
-  ["حلقة for","تكرار تنفيذ الكود"],
-  ["حلقة while","التكرار الشرطي"],
-  ["القواميس Dictionaries","تخزين أزواج مفتاح-قيمة"],
-  ["الدوال Functions","كتابة كود قابل لإعادة الاستخدام"],
-  ["الدوال والقيم المُرجعة","استخدام return"],
-  ["المعاملات الافتراضية","Default و keyword arguments"],
-  ["Tuples و Sets","أنواع بيانات إضافية"],
-  ["الأخطاء والاستثناءات","try / except"],
-  ["مقدمة في الأصناف (Classes)","أساسيات البرمجة الكائنية"],
-  ["مهمة التخرج", "تطبيق شامل على كل ما تعلمته"]
+/* ============================================================
+   NINJAS (4-stat)
+   ============================================================ */
+function makeNinja(id,name,role,sash,bio,stats){
+  return {
+    id,name,role,sash,bio,
+    stats: Object.assign({hp:10,speed:5,stealth:5,strength:5}, stats),
+    level:1, xp:0, xpNext:100,
+    happiness:75, fatigue:15, wellbeing:100,
+    status:'idle', // idle | mission | injured
+    injuredUntilDay:0, injuredSinceDay:0,
+    travelMission:null, travelDaysTotal:0, travelDaysLeft:0, travelPhase:null, // 'going'|'there'|'returning'
+    pos:{x:0,y:0}, target:null,
+    missionsRun:0, missionsWon:0,
+  };
+}
+const NINJAS = [
+  makeNinja('kaze','Kaze','The Blade','#a8352e','Eldest of the four. Trained under your father before you could walk. Says little, kills cleanly, hates being kept waiting.',
+    {hp:12, speed:6, stealth:5, strength:9}),
+  makeNinja('ren','Ren','The Ghost','#5a6e4a','Grew up picking pockets in the market district before your father found her half-starved and sharp as a blade. Fastest hands in the valley.',
+    {hp:8, speed:9, stealth:8, strength:4}),
+  makeNinja('sora','Sora','The Whisper','#b8965a','Reads a room, or a war camp, before anyone else notices there is a room to read. Quiet, patient, the clan\'s real strategist.',
+    {hp:9, speed:5, stealth:9, strength:4}),
+  makeNinja('taro','Taro','The Wall','#4a5a72','Youngest, and built like it will matter someday. Still learning that not every problem wants to be hit.',
+    {hp:13, speed:4, stealth:4, strength:8}),
 ];
-REMAINING_TITLES.forEach((t,i)=>{
-  const id = LESSONS.length+1;
-  LESSONS.push({
-    id, title:t[0], summary:t[1],
-    steps:[{
-      tag:"STEP 1 / 1", title:t[0],
-      body:`<p>هذه المهمة قيد الإعداد ضمن المحتوى الكامل. ستتضمن شرحًا خطوة بخطوة وتمارين تفاعلية مثل المهام الثلاث الأولى.</p>
-            <ul><li>جرّب أي كود بايثون في المحرر للتدرّب بحرية</li></ul>`,
-      starter:`# Free practice — try anything!\nprint("Hello from mission ${id}")\n`,
-      hint:"هذه المهمة نموذج مؤقت — المحتوى الكامل قادم قريبًا.",
-      speech:"هذه المهمة قادمة قريبًا — جرّب أي كود تريده هنا في هذه الأثناء!",
-      check:(code,out)=> out.trim().length>0
-    }]
+
+/* ============================================================
+   FACTIONS / STORY CHARACTERS
+   ============================================================ */
+function makeFaction(id,name,title,color,desc,standing){
+  return { id,name,title,color,desc,standing, closed:false, closedReason:null };
+}
+const FACTIONS=[
+  makeFaction('kurogane','House Kurogane','The old rulers of the valley','#a8352e','Lord Kurogane has held formal power for decades. He is old now, and dying. His steward Nobuo Sato manages the household in his name.', 10),
+  makeFaction('shiro','The Shiro Company','Merchants who fund everyone','#b8965a','Led by Mai Shiro. They bankroll every side of every dispute and profit no matter who wins. No loyalty, only leverage.', 0),
+  makeFaction('tsukikage','Tsukikage Temple','A mountain order trying to stay neutral','#4a5a72','Led by Abbot Renji. Quiet, principled, and currently sheltering someone whose survival threatens House Kurogane.', 5),
+];
+
+// Lord territory positions on the world map (used for travel distance)
+const VILLAGE_POS = {x:50, y:70};
+const FACTION_POS = {
+  kurogane: {x:82, y:30},
+  shiro: {x:75, y:82},
+  tsukikage: {x:18, y:25},
+};
+
+/* ============================================================
+   STORY ENGINE
+   ============================================================ */
+const state = {
+  gold:160, food:40, ingredients:14,
+  tools:{blade:2,poison:0,rope:2,smoke:1,medicine:2},
+  reputation:10, day:1,
+  ninjas:NINJAS, factions:FACTIONS,
+  craftQueue:[], missions:[], storyLog:[],
+  gameOver:false, activeTab:'missions',
+  hasSeenOnboarding:false, hasLaunchedMission:false,
+  phaseProgress:0, autoTimeEnabled:true,
+  hungerStreak:0,
+  storyBeat:0, storyDone:false, storyFlags:{},
+  unreadStoryCount:0,
+};
+const DAY_DURATION_SEC = 60;
+
+function addStory(text, mood, isEvent){
+  state.storyLog.unshift({day:state.day, text, mood:mood||'neutral', isEvent:!!isEvent});
+  if(state.storyLog.length>150) state.storyLog.pop();
+  state.unreadStoryCount++;
+  updateBellBadge();
+}
+function ping(msg, mood){
+  const feed=document.getElementById('ping-feed');
+  const el=document.createElement('div');
+  el.className='ping'+(mood?(' '+mood):'');
+  el.textContent=msg;
+  feed.appendChild(el);
+  setTimeout(()=>el.remove(), 3600);
+}
+function updateBellBadge(){
+  const badge=document.getElementById('bell-badge');
+  if(state.unreadStoryCount>0){ badge.classList.add('show'); badge.textContent = state.unreadStoryCount>9?'9+':state.unreadStoryCount; }
+  else badge.classList.remove('show');
+}
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function pickFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function randRange(a,b){ return a+Math.random()*(b-a); }
+function randInt(a,b){ return Math.floor(randRange(a,b+1)); }
+
+/* ---------- Story beats ---------- */
+// Each beat: intro text (shown as event when reached), and the mission it offers (if any).
+const STORY_BEATS = {
+  0: {
+    text: "Word reaches the clan: Lord Kurogane is failing. His steward, Nobuo Sato, now runs the household in all but name. The Lord's nephew and rightful heir, Kenji, vanished from the estate months ago. No one admits to knowing where.",
+    offerMission: 'find_kenji',
+  },
+  'find_kenji_success': {
+    text: "The contact at the market confirms it: Kenji is alive, hidden at Tsukikage Temple under Abbot Renji's protection. The Shiro Company pays well for the information — and keeps a copy for themselves.",
+    offerMission: 'loyalty_test',
+  },
+  'find_kenji_fail': {
+    text: "The trail goes cold. Whatever was learned wasn't enough — but asking questions about Kenji was itself noticed. Sato's men are watching the roads now.",
+    offerMission: 'loyalty_test',
+    flag: 'sato_hostile_start',
+  },
+  'loyalty_test_success': {
+    text: "The captain is loyal, or good enough at hiding otherwise. Sato seems satisfied — and a little surprised the job was done cleanly. He's watching now, deciding what else this clan might be trusted with.",
+    offerMission: 'guild_price',
+  },
+  'loyalty_test_fail': {
+    text: "The truth about the captain never surfaces. Sato says nothing about it, which is somehow worse than if he'd been angry. He is a careful man, and careful men remember failures.",
+    offerMission: 'guild_price',
+  },
+  'guild_price_success': {
+    text: "The correspondence is in Mai Shiro's hands now, and copies of it besides. She thanks the clan warmly and pays even better than promised — the mark of someone who knows exactly how much leverage is worth.",
+    offerMission: 'temple_reachout',
+  },
+  'guild_price_fail': {
+    text: "The letters are never recovered. Mai Shiro is unreadable about it, which is its own kind of message. The Guild does not forget an unpaid debt, even one it never collected.",
+    offerMission: 'temple_reachout',
+  },
+  'temple_reachout_success': {
+    text: "Abbot Renji speaks plainly: Sato intends real harm, not a quiet arrangement. He asks nothing in return for this warning — only that the clan remember who told the truth when it mattered.",
+    offerMission: 'sato_offer',
+  },
+  'temple_reachout_fail': {
+    text: "Whatever was learned at the Temple was murky at best. Abbot Renji remains courteous but distant, unconvinced the clan's loyalties are settled yet.",
+    offerMission: 'sato_offer',
+  },
+  'sato_offer': {
+    text: "A message arrives, unsigned but unmistakable: Nobuo Sato knows what was found. He wants Kenji gone before the truth of the succession comes apart. The pay is more gold than the clan has seen in a year.",
+    offerMission: 'kill_kenji',
+    isChoice:true,
+  },
+  'kill_kenji_success': {
+    text: "It's done. Kenji will not be found. Sato's claim to House Kurogane is secure — and this clan is now useful to him in a way that can't be undone. Tsukikage Temple will never trust the seal again.",
+    offerMission: 'loose_ends',
+    closesFaction:'tsukikage',
+  },
+  'kill_kenji_fail': {
+    text: "Kenji survives — barely. The Temple knows exactly whose blades did this. Sato is furious that the job was botched, but he still needs this clan to finish what was started.",
+    offerMission: 'damage_control',
+    closesFaction:'tsukikage',
+  },
+  'kill_kenji_declined': {
+    text: "Word goes to Tsukikage Temple instead: Sato is coming for Kenji. Abbot Renji thanks the clan gravely. Sato does not. House Kurogane's doors are closed from this day.",
+    offerMission: 'sato_reach',
+    closesFaction:'kurogane',
+  },
+  'loose_ends_success': {
+    text: "The household is quiet again. No one left alive remembers what really happened to the old Lord's nephew. Sato's grip on the succession is total, and this clan helped make it so.",
+    offerMission: 'beat3_secure_rule',
+  },
+  'loose_ends_fail': {
+    text: "Someone got away with what they knew. It may surface later, or it may not — either way, Sato's rule now rests on a foundation with a crack in it.",
+    offerMission: 'beat3_secure_rule',
+  },
+  'damage_control_success': {
+    text: "The roads are contained, for now. Kenji is still hurt, still hunted, but no closer to being found than before. It buys time — nothing more.",
+    offerMission: 'beat3_escort_kenji',
+  },
+  'damage_control_fail': {
+    text: "Word of Kenji's location slips out anyway. Whatever time this clan bought has already run out.",
+    offerMission: 'beat3_escort_kenji',
+  },
+  'sato_reach_success': {
+    text: "Sato's men are turned back before they reach the Temple gates. It costs the clan blood, but it costs Sato men he can't easily replace, and it buys Tsukikage Temple time to prepare for what's coming next.",
+    offerMission: 'beat3_defend_temple',
+  },
+  'sato_reach_fail': {
+    text: "Sato's men get through, though not unscathed. Tsukikage Temple knows now, beyond doubt, that this is no longer a quiet matter.",
+    offerMission: 'beat3_defend_temple',
+  },
+  'beat3_secure_rule_success': {
+    text: "Sato's claim holds. Kurogawa Valley has a new lord in all but title, and this clan stood beside him when it mattered. The Shiro Company, as always, profited from every side of it.",
+    ending:'sato_rules',
+  },
+  'beat3_secure_rule_fail': {
+    text: "The truth comes out anyway — Sato's rule is shakier for it, and every faction in the valley now treats this clan as unreliable. The dust will take time to settle.",
+    ending:'sato_shaky',
+  },
+  'beat3_escort_kenji_success': {
+    text: "Kenji is out of the valley and safe. Abbot Renji will not forget what this clan risked. It is the strongest debt owed to the clan by anyone in Kurogawa Valley.",
+    ending:'kenji_escaped',
+  },
+  'beat3_escort_kenji_fail': {
+    text: "Kenji doesn't make it. But the Temple saw this clan try, and that counts for something in a valley where nothing is done for free.",
+    ending:'kenji_failed',
+  },
+  'beat3_defend_temple_success': {
+    text: "Sato's men break against Tsukikage Temple's walls and this clan's blades. The Temple stands. Abbot Renji owes the clan its survival — the strongest bond that could have been made in Kurogawa Valley.",
+    ending:'temple_saved',
+  },
+  'beat3_defend_temple_fail': {
+    text: "The Temple survives, badly hurt, and so does its memory of who failed to stop the worst of it. A harder road ahead, but not a closed one.",
+    ending:'temple_hurt',
+  },
+};
+
+const STORY_ENDING_TEXT = {
+  sato_rules: "Nobuo Sato rules Kurogawa Valley now, quietly, the way he always intended to. This clan's name is spoken with a mix of respect and unease — the ones who helped a steward take a dead man's seat.",
+  sato_shaky: "Sato holds the valley, but only just. Every faction remembers this clan's part in it, and none of them are sure whether to trust it again.",
+  kenji_escaped: "Kenji lives, somewhere beyond Kurogawa Valley, and Tsukikage Temple has not forgotten who made that possible. It is the truest ally this clan has.",
+  kenji_failed: "Kenji is gone, but the Temple remembers the attempt. Not every debt is measured in success.",
+  temple_saved: "Tsukikage Temple stands because this clan chose to stand with it. Whatever else Kurogawa Valley becomes, the Temple will remember who its friends were.",
+  temple_hurt: "The Temple survives, scarred, and grateful in the guarded way of people who watched help arrive almost too late.",
+};
+
+function currentStoryBeatDef(){
+  if(state.storyDone) return null;
+  return STORY_BEATS[state.storyBeat];
+}
+
+function advanceStory(nextKey){
+  const def = STORY_BEATS[nextKey];
+  if(!def){ finishStory(nextKey); return; }
+  state.storyBeat = nextKey;
+  addStory(def.text, 'event', true);
+  if(def.flag) state.storyFlags[def.flag] = true;
+  if(def.closesFaction){
+    const f = state.factions.find(x=>x.id===def.closesFaction);
+    if(f){ f.closed=true; f.closedReason = 'This road is closed after what happened with the succession.'; f.standing = -100; }
+  }
+  if(def.ending){ finishStory(def.ending); return; }
+  if(def.offerMission){ queueStoryMission(def.offerMission); }
+}
+
+function finishStory(endingKey){
+  state.storyDone = true;
+  const text = STORY_ENDING_TEXT[endingKey] || "The story of the succession has ended.";
+  addStory(text, 'event', true);
+  addStory("The story of Kurogawa Valley's succession is over. The clan's work continues, as it always does, one contract at a time.", 'neutral', true);
+}
+
+/* ---------- Story mission definitions ---------- */
+const STORY_MISSION_DEFS = {
+  find_kenji: {
+    type:'spy', factionId:'shiro', title:'Find the Missing Heir', story:"The Shiro Company wants to know where Kenji went. Whatever the truth is, it's worth coin to them.",
+    difficulty:2, onSuccess:'find_kenji_success', onFail:'find_kenji_fail', goldReward:70, repReward:6,
+  },
+  loyalty_test: {
+    type:'spy', factionId:'kurogane', title:'A Question of Loyalty', story:"Before trusting this clan with anything real, Sato wants to know if a guard captain is loyal to him or quietly reporting to a rival branch of the family.",
+    difficulty:2, onSuccess:'loyalty_test_success', onFail:'loyalty_test_fail', goldReward:80, repReward:7,
+  },
+  guild_price: {
+    type:'steal', factionId:'shiro', title:"The Guild's Price", story:"Mai Shiro no longer just wants information — she wants leverage. Steal the correspondence between Sato and Kenji's protectors before anyone else can.",
+    difficulty:3, onSuccess:'guild_price_success', onFail:'guild_price_fail', goldReward:100, repReward:8,
+  },
+  temple_reachout: {
+    type:'spy', factionId:'tsukikage', title:'What the Temple Knows', story:"Sensing which way this clan is leaning, Abbot Renji reaches out first: confirm whether Sato truly intends Kenji harm, or if the rumors run ahead of the truth.",
+    difficulty:2, onSuccess:'temple_reachout_success', onFail:'temple_reachout_fail', goldReward:90, repReward:8,
+  },
+  sato_offer: {
+    type:'assassinate', factionId:'kurogane', title:"The Steward's Offer", story:"Nobuo Sato wants Kenji silenced before the truth of the succession unravels. This is the job, plainly stated.",
+    difficulty:3, onSuccess:'kill_kenji_success', onFail:'kill_kenji_fail', onDecline:'kill_kenji_declined', goldReward:140, repReward:10, declinable:true,
+  },
+  loose_ends: {
+    type:'sabotage', factionId:'kurogane', title:'Loose Ends', story:"Someone in the household still suspects the truth about the succession. Sato needs them silenced before word spreads.",
+    difficulty:3, onSuccess:'loose_ends_success', onFail:'loose_ends_fail', goldReward:110, repReward:9,
+  },
+  damage_control: {
+    type:'escort', factionId:'kurogane', title:'Damage Control', story:"Kenji is alive but hurt, and the Temple knows. Sato wants the roads watched — intercept anyone trying to move Kenji further from the valley.",
+    difficulty:3, onSuccess:'damage_control_success', onFail:'damage_control_fail', goldReward:110, repReward:9,
+  },
+  sato_reach: {
+    type:'sabotage', factionId:'kurogane', title:"Sato's Reach", story:"Sato doesn't take the refusal quietly. His men move toward Tsukikage Temple. Turn them back before they reach the gates.",
+    difficulty:3, onSuccess:'sato_reach_success', onFail:'sato_reach_fail', goldReward:100, repReward:9,
+  },
+  beat3_secure_rule: {
+    type:'sabotage', factionId:'kurogane', title:'Who Sits in the Seat', story:'Sato needs his claim cemented publicly before anyone else finds a body. Help him finish it.',
+    difficulty:4, onSuccess:'beat3_secure_rule_success', onFail:'beat3_secure_rule_fail', goldReward:170, repReward:15,
+  },
+  beat3_escort_kenji: {
+    type:'escort', factionId:'tsukikage', title:'Out of the Valley', story:'Kenji, wounded, needs to be gone from Kurogawa Valley before Sato\'s men finish the job.',
+    difficulty:4, onSuccess:'beat3_escort_kenji_success', onFail:'beat3_escort_kenji_fail', goldReward:160, repReward:15,
+  },
+  beat3_defend_temple: {
+    type:'escort', factionId:'tsukikage', title:'The Temple Under Watch', story:"Sato is sending everything he has left to silence what the Temple knows. This is the last stand.",
+    difficulty:4, onSuccess:'beat3_defend_temple_success', onFail:'beat3_defend_temple_fail', goldReward:180, repReward:16,
+  },
+};
+
+let missionIdCounter=1;
+function queueStoryMission(missionKey){
+  const def = STORY_MISSION_DEFS[missionKey];
+  if(!def) return;
+  const faction = state.factions.find(f=>f.id===def.factionId);
+  const meta = MISSION_TYPES[def.type];
+  const dist = distanceDaysTo(def.factionId);
+  state.missions.push({
+    id:'story'+(missionIdCounter++),
+    isStory:true, storyDefKey:missionKey,
+    type:def.type, ico:meta.ico, label:meta.label,
+    lordId:def.factionId, lordName:faction?faction.name:'',
+    title:def.title, story:def.story,
+    difficulty:def.difficulty, danger:dangerLevel(def.difficulty),
+    statReq: 4+def.difficulty*1.9, primaryStats:meta.primaryStats, goodTools:meta.goodTools, baseRisk:meta.baseRisk,
+    goldReward:def.goldReward, repReward:def.repReward,
+    travelDays: dist,
+    daysLeft: 999, createdDay: state.day,
+    declinable: !!def.declinable,
   });
-});
-
-/* ============================================================
-   PROGRESS
-   ============================================================ */
-const STORAGE_KEY='spacecode_progress_v1';
-function loadProgress(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {completedLessons:[]}; } catch(e){ return {completedLessons:[]}; } }
-function saveProgress(p){ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
-let progress = loadProgress();
-let currentLessonIdx=0, currentStepIdx=0, stepPassed=[];
-function isLessonUnlocked(idx){ return idx===0 || progress.completedLessons.includes(LESSONS[idx-1].id); }
-function isLessonDone(id){ return progress.completedLessons.includes(id); }
-
-/* ============================================================
-   PYODIDE
-   ============================================================ */
-let pyodide=null, pyodideReady=false;
-async function initPyodide(){
-  pyodide = await loadPyodide();
-  pyodideReady = true;
-  document.querySelectorAll('.run-btn').forEach(btn=>btn.disabled=false);
-  document.getElementById('hero-run-label').textContent='تشغيل Run';
-  const lrl=document.getElementById('lesson-run-label'); if(lrl) lrl.textContent='تشغيل Run';
-  document.getElementById('hero-status').textContent='Pyodide: ready';
-  const checkBtn=document.getElementById('lesson-check'); if(checkBtn) checkBtn.disabled=false;
 }
-initPyodide();
 
-async function execPython(code){
-  let capturedOut=[];
-  pyodide.setStdout({batched:(s)=>capturedOut.push(s)});
-  pyodide.setStderr({batched:(s)=>capturedOut.push(s)});
-  let errMsg=null;
-  try{ await pyodide.runPythonAsync(code); } catch(err){ errMsg = err.message || String(err); }
-  return { output: capturedOut.join('\n'), error: errMsg };
-}
-async function runCode(codeElId,outputElId,statusElId){
-  if(!pyodideReady) return;
-  const code=document.getElementById(codeElId).value;
-  const outEl=document.getElementById(outputElId);
-  outEl.classList.remove('err');
-  outEl.textContent='...جارٍ التنفيذ';
-  const {output,error} = await execPython(code);
-  if(error){ outEl.classList.add('err'); outEl.textContent=error; }
-  else{ outEl.textContent = output.length? output : '(لا يوجد ناتج مطبوع)'; }
-  if(statusElId) document.getElementById(statusElId).textContent='Pyodide: ready';
-  return {output,error};
-}
-document.getElementById('hero-run').addEventListener('click',()=>runCode('hero-code','hero-output','hero-status'));
-
-/* ============================================================
-   TAB NAVIGATION
-   ============================================================ */
-function showTab(tab){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
-  document.getElementById('view-home').classList.toggle('hidden', tab!=='home');
-  document.getElementById('view-course').classList.toggle('hidden', tab!=='course');
-  document.getElementById('view-about').classList.toggle('hidden', tab!=='about');
-  document.getElementById('view-lesson').classList.add('hidden');
-  if(tab==='home') renderCourseGrid('course-grid-preview', true);
-  if(tab==='course') renderCourseGrid('course-grid-full', false);
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function scrollToTry(e){ e.preventDefault(); document.getElementById('try').scrollIntoView({behavior:'smooth'}); }
-
-/* ============================================================
-   COURSE GRID RENDERING
-   ============================================================ */
-function renderCourseGrid(targetId, previewOnly){
-  const grid=document.getElementById(targetId);
-  if(!grid) return;
-  grid.innerHTML='';
-  const list = previewOnly ? LESSONS.slice(0,6) : LESSONS;
-  list.forEach((lesson)=>{
-    const idx = LESSONS.findIndex(l=>l.id===lesson.id);
-    const unlocked=isLessonUnlocked(idx);
-    const done=isLessonDone(lesson.id);
-    const card=document.createElement('div');
-    card.className='lesson-card'+(unlocked?'':' locked')+(done?' done':'');
-    card.innerHTML=`
-      <span class="lesson-steps-count">${lesson.steps.length} خطوات</span>
-      <span class="lesson-num">MISSION ${String(lesson.id).padStart(2,'0')}</span>
-      <h4>${lesson.title}</h4>
-      <p>${lesson.summary}</p>
-      <span class="lesson-status ${done?'done-status':(unlocked?'':'locked-status')}">
-        ${done?'✓ مكتملة':(unlocked?'● متاحة الآن':'🔒 تُفتح بعد المهمة السابقة')}
-      </span>`;
-    if(unlocked){ card.addEventListener('click',()=>openLesson(idx)); }
-    grid.appendChild(card);
-  });
-  updateNavProgress();
-}
-function updateNavProgress(){
-  const total=LESSONS.length, done=progress.completedLessons.length;
-  document.getElementById('nav-progress-text').textContent=`${done} / ${total}`;
-  document.getElementById('nav-progress-fill').style.width=(total? (done/total*100):0)+'%';
+function distanceDaysTo(factionId){
+  const fp = FACTION_POS[factionId];
+  if(!fp) return 1;
+  const dx = fp.x-VILLAGE_POS.x, dy = fp.y-VILLAGE_POS.y;
+  const dist = Math.hypot(dx,dy);
+  return clamp(Math.round(dist/22), 1, 5);
 }
 
 /* ============================================================
-   LESSON PLAYER
+   REGULAR MISSION GENERATION (post-story or filler alongside it)
    ============================================================ */
-function openLesson(idx){
-  currentLessonIdx=idx; currentStepIdx=0;
-  const lesson=LESSONS[idx];
-  stepPassed = lesson.steps.map(()=>false);
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('view-home').classList.add('hidden');
-  document.getElementById('view-course').classList.add('hidden');
-  document.getElementById('view-about').classList.add('hidden');
-  document.getElementById('view-lesson').classList.remove('hidden');
-  document.getElementById('lesson-complete-banner').classList.add('hidden');
-  document.getElementById('lesson-active-content').classList.remove('hidden');
-  document.getElementById('lesson-eyebrow').textContent=`MISSION ${lesson.id} / ${LESSONS.length}`;
-  document.getElementById('lesson-title').textContent=lesson.title;
-  renderStepDots();
-  renderStep();
-  window.scrollTo({top:0,behavior:'smooth'});
+const MISSION_FLAVORS = {
+  assassinate: [
+    {lord:'kurogane', title:'A Debt in Blood', story:"A rival captain humiliated House Kurogane at the border talks. Sato wants it settled quietly."},
+    {lord:'tsukikage', title:'The False Monk', story:"A man wearing temple robes has been extorting pilgrims on the mountain road. Abbot Renji wants him stopped before it stains the Temple's name."},
+  ],
+  steal: [
+    {lord:'shiro', title:'The Ledger of Debts', story:"A rival trade house keeps a ledger naming every noble who owes them coin. Mai Shiro will pay well for it."},
+    {lord:'kurogane', title:'The Stolen Seal', story:"House Kurogane's official seal was lifted from a careless clerk. Whoever holds it can forge orders in the Lord's name."},
+  ],
+  spy: [
+    {lord:'shiro', title:'The Rival Ledger', story:"A competing trade house is undercutting Shiro prices. Mai wants to know how, and who's helping them."},
+    {lord:'kurogane', title:'Loyalty Test', story:"Sato suspects a captain in the household guard is selling secrets. He wants proof before he acts."},
+  ],
+  escort: [
+    {lord:'shiro', title:'The Spice Caravan', story:"A caravan of rare spice must cross bandit country to reach the river towns. The Company will pay well to see it arrive whole."},
+    {lord:'tsukikage', title:"The Novice's Journey", story:"A young monk carrying temple relics must reach the mountain shrine. Bandits have taken interest."},
+  ],
+  sabotage: [
+    {lord:'shiro', title:'Burn the Rival Mill', story:"A competing grain mill is undercutting Shiro prices. They want it out of operation, no questions about the method."},
+    {lord:'kurogane', title:'The Bridge at Two Rivers', story:"An enemy house is moving troops over the Two Rivers bridge. Sato wants it unusable before they cross."},
+  ],
+};
+
+function missionTierForRep(){ if(state.reputation>=70) return 3; if(state.reputation>=30) return 2; return 1; }
+function reputationRank(){
+  if(state.reputation>=70) return {label:'Renowned', payMult:1.25, offerTarget:4};
+  if(state.reputation>=30) return {label:'Respected', payMult:1.0, offerTarget:3};
+  if(state.reputation>=10) return {label:'Talked About', payMult:0.85, offerTarget:2};
+  return {label:'Unknown', payMult:0.65, offerTarget:1};
 }
-function renderStepDots(){
-  const lesson=LESSONS[currentLessonIdx];
-  const dotsEl=document.getElementById('step-dots');
-  dotsEl.innerHTML='';
-  lesson.steps.forEach((_,i)=>{
-    const d=document.createElement('div');
-    d.className='step-dot'+(i===currentStepIdx?' active':'')+(stepPassed[i]?' completed':'');
-    dotsEl.appendChild(d);
-  });
+function dangerLevel(d){ if(d<=1) return 'low'; if(d<=2) return 'med'; if(d<=3) return 'high'; return 'extreme'; }
+const DANGER_META = {
+  low:{label:'Low Danger'}, med:{label:'Medium Danger'}, high:{label:'High Danger'}, extreme:{label:'Extreme Danger'},
+};
+
+function generateMission(){
+  const openFactions = state.factions.filter(f=>!f.closed);
+  if(openFactions.length===0) return null;
+  const typeKeys = Object.keys(MISSION_FLAVORS);
+  let type, flavor, faction, attempts=0;
+  do{
+    type = pickFrom(typeKeys);
+    flavor = pickFrom(MISSION_FLAVORS[type]);
+    faction = state.factions.find(f=>f.id===flavor.lord);
+    attempts++;
+  } while(faction && faction.closed && attempts<20);
+  if(!faction || faction.closed) return null;
+  const meta = MISSION_TYPES[type];
+  const tier = missionTierForRep(); const rank = reputationRank();
+  const difficulty = clamp(randInt(1,3)+(tier-1), 1, 5);
+  const goldReward = Math.round((50+difficulty*50+tier*25)*randRange(0.9,1.15)*rank.payMult);
+  const repReward = Math.round(2+difficulty*1.6);
+  const dist = distanceDaysTo(faction.id);
+  return {
+    id:'m'+(missionIdCounter++), isStory:false,
+    type, ico:meta.ico, label:meta.label,
+    lordId:faction.id, lordName:faction.name,
+    title:flavor.title, story:flavor.story,
+    difficulty, danger:dangerLevel(difficulty),
+    statReq:4+difficulty*1.9, primaryStats:meta.primaryStats, goodTools:meta.goodTools, baseRisk:meta.baseRisk,
+    goldReward, repReward, travelDays:dist,
+    daysLeft: randInt(4,7), createdDay: state.day,
+  };
 }
-function renderStep(){
-  const lesson=LESSONS[currentLessonIdx];
-  const step=lesson.steps[currentStepIdx];
-  document.getElementById('lesson-instructions').innerHTML=`
-    <span class="lesson-step-tag">${step.tag}</span>
-    <h3>${step.title}</h3>
-    ${step.body}
-    <button class="hint-toggle" onclick="toggleHint()">💡 إظهار تلميح</button>
-    <div class="hint-box hidden" id="hint-box">${step.hint}</div>
-  `;
-  document.getElementById('droid-speech').textContent = step.speech || '';
-  setDroidExpression('droid-face-lesson','idle');
-  document.getElementById('lesson-code').value = step.starter;
-  document.getElementById('lesson-output').innerHTML='<span class="placeholder">سيظهر ناتج الكود هنا بعد الضغط على Run</span>';
-  document.getElementById('lesson-output').classList.remove('err');
-  const resultEl=document.getElementById('lesson-check-result');
-  resultEl.className='check-result idle';
-  resultEl.textContent='لم يتم التحقق بعد — نفّذ الكود ثم اضغط "تحقق من الحل".';
-  document.getElementById('prev-step-btn').disabled = currentStepIdx===0;
-  document.getElementById('next-step-btn').disabled = !stepPassed[currentStepIdx];
-  document.getElementById('next-step-btn').textContent = (currentStepIdx===lesson.steps.length-1) ? 'إنهاء المهمة ✓' : 'التالي ←';
-  renderStepDots();
+
+const FORAGE_FLAVORS=[
+  "The old logging trail hasn't been picked over in a while.",
+  "Word is a merchant cart broke a wheel on the north road and left cargo behind.",
+  "The autumn stores in the ravine caves are worth checking again.",
+  "An abandoned shrine near the ridge sometimes still has offerings left for it.",
+  "The riverbank downstream collects whatever the current drops.",
+];
+function generateForageMission(){
+  return {
+    id:'forage'+(missionIdCounter++), isForage:true,
+    type:'forage', ico:'⛰', label:'Scavenge',
+    lordId:null, lordName:null,
+    title:'Search for Supplies', story:pickFrom(FORAGE_FLAVORS),
+    difficulty:1, danger:'low', statReq:0, primaryStats:['speed','stealth'], goodTools:[], baseRisk:0.05,
+    goldReward:0, repReward:0, travelDays:1,
+    daysLeft:999, createdDay: state.day,
+  };
 }
-function toggleHint(){ document.getElementById('hint-box').classList.toggle('hidden'); }
-function prevStep(){ if(currentStepIdx>0){ currentStepIdx--; renderStep(); } }
-function nextStep(){
-  const lesson=LESSONS[currentLessonIdx];
-  if(currentStepIdx < lesson.steps.length-1){ currentStepIdx++; renderStep(); }
-  else{ completeLesson(); }
+
+const FILLER_MISSIONS_START_DAY = 4; // regular/forage jobs don't appear until the story has had room to breathe
+
+function ensureMissionSupply(){
+  if(state.day < FILLER_MISSIONS_START_DAY && !state.storyDone) return;
+  const rank = reputationRank();
+  const nonStoryOpen = state.missions.filter(m=>!m.resolved && !m.isForage && !m.isStory);
+  while(nonStoryOpen.length < rank.offerTarget){
+    const m = generateMission();
+    if(!m) break;
+    state.missions.push(m);
+    nonStoryOpen.push(m);
+  }
+  if(!state.missions.some(m=>m.isForage && !m.resolved)){ state.missions.push(generateForageMission()); }
 }
-function completeLesson(){
-  const lesson=LESSONS[currentLessonIdx];
-  if(!progress.completedLessons.includes(lesson.id)){ progress.completedLessons.push(lesson.id); saveProgress(progress); }
-  document.getElementById('lesson-active-content').classList.add('hidden');
-  const banner=document.getElementById('lesson-complete-banner');
-  banner.classList.remove('hidden');
-  const nextLesson = LESSONS[currentLessonIdx+1];
-  const finalCta = document.getElementById('final-cta-box');
-  const nextBtn = document.getElementById('next-mission-btn');
-  if(nextLesson){
-    document.getElementById('complete-banner-title').textContent = '🎉 مهمة مُنجزة!';
-    document.getElementById('next-lesson-preview').textContent = `المهمة التالية: ${nextLesson.title}`;
-    nextBtn.classList.remove('hidden');
-    finalCta.classList.add('hidden');
+
+/* ============================================================
+   NINJA SILHOUETTE ART (Tenchu-inspired: hooded shadow figures)
+   ============================================================ */
+const avatarCache={};
+function getAvatarURL(ninja,size){
+  const key=ninja.id+'_'+size+'_'+ninja.status;
+  if(avatarCache[key]) return avatarCache[key];
+  const c=document.createElement('canvas'); c.width=size; c.height=size;
+  const actx=c.getContext('2d'); actx.imageSmoothingEnabled=true;
+  drawNinjaSilhouette(actx, size/2, size/2, size*0.44, ninja);
+  const url=c.toDataURL(); avatarCache[key]=url; return url;
+}
+function drawNinjaSilhouette(actx, cx, cy, r, ninja){
+  actx.save(); actx.translate(cx,cy);
+  // background disc
+  actx.fillStyle='#141210';
+  actx.beginPath(); actx.arc(0,0,r,0,Math.PI*2); actx.fill();
+
+  // hooded silhouette body
+  actx.fillStyle='#1c1a17';
+  actx.beginPath();
+  actx.moveTo(-r*0.4, r*0.55);
+  actx.quadraticCurveTo(-r*0.5, r*0.05, -r*0.28, -r*0.18);
+  actx.quadraticCurveTo(0, -r*0.42, r*0.28, -r*0.18);
+  actx.quadraticCurveTo(r*0.5, r*0.05, r*0.4, r*0.55);
+  actx.closePath(); actx.fill();
+
+  // hood shading
+  actx.fillStyle='#242019';
+  actx.beginPath();
+  actx.moveTo(-r*0.3, r*0.5);
+  actx.quadraticCurveTo(-r*0.35, r*0.1, -r*0.18, -r*0.1);
+  actx.lineTo(r*0.05, r*0.15);
+  actx.lineTo(-r*0.1, r*0.5);
+  actx.closePath(); actx.fill();
+
+  // sash (color-coded)
+  actx.strokeStyle=ninja.sash; actx.lineWidth=r*0.16; actx.lineCap='round';
+  actx.beginPath();
+  actx.moveTo(-r*0.32,-r*0.05); actx.lineTo(r*0.3, r*0.32);
+  actx.stroke();
+
+  // eyes (narrow slit, only feature visible)
+  actx.fillStyle='#e8e2d5';
+  actx.beginPath(); actx.ellipse(-r*0.12,-r*0.05,r*0.09,r*0.035,-0.15,0,Math.PI*2); actx.fill();
+  actx.beginPath(); actx.ellipse(r*0.12,-r*0.05,r*0.09,r*0.035,0.15,0,Math.PI*2); actx.fill();
+
+  // status ring
+  let ringColor=null;
+  if(ninja.status==='mission') ringColor='#b8965a';
+  else if(ninja.status==='injured') ringColor='#c94b3f';
+  if(ringColor){
+    actx.strokeStyle=ringColor; actx.lineWidth=Math.max(2,r*0.12);
+    actx.beginPath(); actx.arc(0,0,r*0.98,0,Math.PI*2); actx.stroke();
   } else {
-    document.getElementById('complete-banner-title').textContent = '🎉 أنهيت المسار بالكامل!';
-    document.getElementById('next-lesson-preview').textContent = 'أحسنت — أتممت جميع المهام الـ18. إليك أين تذهب من هنا:';
-    nextBtn.classList.add('hidden');
-    finalCta.classList.remove('hidden');
-    setDroidExpression('droid-face-final','happy');
+    actx.strokeStyle='rgba(232,226,213,.12)'; actx.lineWidth=Math.max(1,r*0.04);
+    actx.beginPath(); actx.arc(0,0,r*0.98,0,Math.PI*2); actx.stroke();
   }
-  updateNavProgress();
+  actx.restore();
 }
-function goToNextLesson(){
-  if(currentLessonIdx+1 < LESSONS.length) openLesson(currentLessonIdx+1);
-  else showTab('course');
+function avatarImgTag(ninja,size,extraClass){
+  return `<img class="avatar ${extraClass||''}" width="${size}" height="${size}" src="${getAvatarURL(ninja,size*3)}" style="width:${size}px;height:${size}px;">`;
 }
 
-document.getElementById('lesson-run')?.addEventListener('click',()=>runCode('lesson-code','lesson-output',null));
-document.getElementById('lesson-check')?.addEventListener('click', async ()=>{
-  if(!pyodideReady) return;
-  const lesson = LESSONS[currentLessonIdx];
-  const step = lesson.steps[currentStepIdx];
-  const code = document.getElementById('lesson-code').value;
-  const resultEl = document.getElementById('lesson-check-result');
-  const {output,error} = await execPython(code);
-  document.getElementById('lesson-output').textContent = error ? error : (output.length?output:'(لا يوجد ناتج مطبوع)');
-  document.getElementById('lesson-output').classList.toggle('err', !!error);
+/* ============================================================
+   RENDER: HUD / CLOCK
+   ============================================================ */
+function renderHUD(){
+  document.getElementById('hud-gold').textContent=state.gold;
+  document.getElementById('hud-food').textContent=state.food;
+  document.getElementById('hud-rep').textContent=state.reputation;
+  updateClockWidget();
+  const readyMissions=state.missions.filter(m=>!m.resolved && !m.launched).length;
+  const badge=document.getElementById('badge-missions');
+  if(readyMissions>0){ badge.style.display='flex'; badge.textContent=readyMissions; } else badge.style.display='none';
+  const hint=document.getElementById('onboard-hint');
+  if(!state.hasLaunchedMission && !state.hasSeenOnboarding){ hint.classList.add('show'); } else hint.classList.remove('show');
+}
+function updateClockWidget(){
+  const arc=document.getElementById('clock-arc');
+  const CIRC=106.8;
+  arc.style.strokeDashoffset = CIRC*(1-state.phaseProgress);
+  document.getElementById('clock-center-txt').textContent = state.day;
+  document.getElementById('clock-detail-day').textContent = 'Day '+state.day;
+  document.getElementById('clock-detail-sub').textContent = state.storyDone ? 'The valley moves on' : 'Kurogawa Valley';
+}
 
-  if(error){
-    resultEl.className='check-result fail';
-    resultEl.textContent='✗ يوجد خطأ في الكود: '+error;
-    setDroidExpression('droid-face-lesson','sad');
+/* ============================================================
+   MISSIONS PANEL
+   ============================================================ */
+function computeSuccessChance(ninjaIds, mission, tacticKey, toolCounts){
+  if(ninjaIds.length===0) return {chance:0,risk:1};
+  const tactic=TACTICS[tacticKey];
+  let sum=0;
+  ninjaIds.forEach(id=>{ const n=state.ninjas.find(x=>x.id===id); mission.primaryStats.forEach(sk=>sum+=n.stats[sk]); });
+  const avgPrimary = sum/(ninjaIds.length*mission.primaryStats.length);
+  let chance = 0.5 + (avgPrimary-mission.statReq)*0.055;
+  chance += Math.min(0.1,(ninjaIds.length-1)*0.035);
+
+  let avgHappy=0, avgFatigue=0, avgWellbeing=0;
+  ninjaIds.forEach(id=>{ const n=state.ninjas.find(x=>x.id===id); avgHappy+=n.happiness; avgFatigue+=n.fatigue; avgWellbeing+=n.wellbeing; });
+  avgHappy/=ninjaIds.length; avgFatigue/=ninjaIds.length; avgWellbeing/=ninjaIds.length;
+  chance += (avgHappy-60)*0.0025; chance -= avgFatigue*0.0035; chance += (avgWellbeing-60)*0.004;
+
+  let favorAvg=0;
+  ninjaIds.forEach(id=>{ const n=state.ninjas.find(x=>x.id===id); favorAvg+=n.stats[tactic.statFavor]; });
+  favorAvg/=ninjaIds.length;
+  chance += tactic.successMod + (favorAvg-6)*0.01;
+
+  let toolBonus=0;
+  Object.keys(toolCounts||{}).forEach(tk=>{
+    const qty=toolCounts[tk]||0; if(qty<=0) return;
+    const perUnit = mission.goodTools.includes(tk)?0.045:0.012;
+    toolBonus += perUnit*Math.min(qty,3);
+  });
+  chance += toolBonus;
+  chance = clamp(chance,0.05,0.95);
+  let risk = mission.baseRisk + tactic.riskMod + (1-chance)*0.25 + avgFatigue*0.002;
+  risk = clamp(risk,0.02,0.85);
+  return {chance,risk};
+}
+
+function renderMissions(){
+  const list=document.getElementById('missions-list');
+  const rank=reputationRank();
+  const subEl=document.getElementById('missions-rank-sub');
+  if(subEl) subEl.innerHTML = `Clan standing: <b style="color:var(--gold-bright)">${rank.label}</b> — ${rank.label==='Unknown'?'few trust you yet, and pay is thin.':rank.label==='Talked About'?'word is spreading, jobs are more frequent.':rank.label==='Respected'?'people seek you out and pay fairly.':'your name opens doors and purses both.'}`;
+
+  const open=state.missions.filter(m=>!m.resolved && !m.launched);
+  if(open.length===0){
+    list.innerHTML=`<div style="text-align:center;color:var(--text-dim);padding:36px 10px;font-size:12.5px;">No work on the board right now.<br>Advance to the next day.</div>`;
     return;
   }
-  const passed = step.check(code, output);
-  if(passed){
-    resultEl.className='check-result pass';
-    resultEl.textContent='✓ ممتاز! الحل صحيح.';
-    stepPassed[currentStepIdx]=true;
-    document.getElementById('next-step-btn').disabled=false;
-    renderStepDots();
-    setDroidExpression('droid-face-lesson','happy');
-  } else {
-    resultEl.className='check-result fail';
-    resultEl.textContent='✗ لم يكتمل الحل بعد — راجع التعليمات وحاول مجددًا.';
-    setDroidExpression('droid-face-lesson','thinking');
-  }
-});
+  const sorted=[...open].sort((a,b)=>{
+    if(a.isForage) return 1; if(b.isForage) return -1;
+    if(a.isStory) return -1; if(b.isStory) return 1;
+    return 0;
+  });
+  list.innerHTML = sorted.map(m=> m.isForage ? renderForageCard(m) : renderMissionCard(m)).join('');
+}
+function renderMissionCard(m){
+  const faction=state.factions.find(f=>f.id===m.lordId);
+  const dm=DANGER_META[m.danger];
+  return `
+  <div class="m-card ${m.isStory?'story':''}" data-mid="${m.id}">
+    <div class="m-top">
+      <div>
+        <span class="m-type-badge">${m.isStory?'★ ':''}${m.label}</span>
+        <div class="m-title">${m.title}</div>
+        <div class="m-lord">Requested by <b style="color:${faction?faction.color:'#fff'}">${faction?faction.name:''}</b></div>
+      </div>
+      <div class="m-reward"><div class="gold-amt">${m.goldReward}⛁</div><div class="rep-amt">+${m.repReward}⛩</div></div>
+    </div>
+    <div class="m-story">"${m.story}"</div>
+    <div class="m-danger-row">
+      <span class="danger-pill ${m.danger}">${dm.label}</span>
+      <span class="travel-pill">⛰ ${m.travelDays} day${m.travelDays>1?'s':''} travel each way</span>
+    </div>
+    <div class="m-deadline">${m.isStory? 'This job matters to the story.' : `Expires in ${m.daysLeft} day${m.daysLeft>1?'s':''}`}</div>
+    <div class="m-actions">
+      <button class="btn block" data-assign="${m.id}">Choose your team</button>
+      ${(!m.isStory || m.declinable) ? `<button class="btn ghost small" data-decline="${m.id}">Decline</button>` : ''}
+    </div>
+  </div>`;
+}
+function renderForageCard(m){
+  return `
+  <div class="m-card" data-mid="${m.id}" style="opacity:.85;">
+    <div class="m-top">
+      <div>
+        <span class="m-type-badge" style="color:var(--text-dim);background:rgba(232,226,213,.06);">Always Available</span>
+        <div class="m-title">${m.title}</div>
+        <div class="m-lord">No lord, no pay owed — just what you can find</div>
+      </div>
+    </div>
+    <div class="m-story">"${m.story}"</div>
+    <div class="m-danger-row"><span class="danger-pill low">Unknown Outcome</span></div>
+    <div class="m-actions"><button class="btn ghost block" data-assign="${m.id}">Send someone to search</button></div>
+  </div>`;
+}
 
 /* ============================================================
-   INIT
+   ASSIGN MODAL
    ============================================================ */
-initStarfield();
-initAllDroids();
-renderCourseGrid('course-grid-preview', true);
-</script>
+let assignState={missionId:null, selected:[], tactic:'cautious', toolCounts:{}};
+function openAssignModal(missionId){
+  const mission=state.missions.find(m=>m.id===missionId);
+  if(!mission) return;
+  if(mission.isForage) return openForageAssignModal(mission);
+  assignState={missionId, selected:[], tactic:'cautious', toolCounts:{}};
+  Audio_.open(); renderAssignModal(); showModal();
+}
+function renderAssignModal(){
+  const mission=state.missions.find(m=>m.id===assignState.missionId);
+  if(!mission) return;
+  const modal=document.getElementById('modal');
+  const avail=state.ninjas.filter(n=>n.status==='idle');
+  const {chance,risk}=computeSuccessChance(assignState.selected, mission, assignState.tactic, assignState.toolCounts);
+  const dm=DANGER_META[mission.danger];
+  let chanceColor = chance>=0.65?'var(--moss-bright)':(chance>=0.4?'var(--gold-bright)':'var(--seal-bright)');
+  modal.innerHTML=`
+    <h2>${mission.title}</h2>
+    <div class="modal-sub">${mission.label} for ${mission.lordName} · ${dm.label} · ⛰ ${mission.travelDays} day${mission.travelDays>1?'s':''} each way</div>
+    <div class="modal-section-label">Choose who goes</div>
+    <div id="assign-ninja-list"></div>
+    <div class="modal-section-label">Tactic</div>
+    <div class="tactic-grid" id="tactic-row" style="display:flex;gap:7px;margin:8px 0 4px;"></div>
+    <div class="modal-section-label">Bring tools</div>
+    <div id="tool-select-list"></div>
+    <div class="chance-box">
+      <div class="chance-txt" style="color:${chanceColor}">${Math.round(chance*100)}% success chance</div>
+      <div class="chance-meter-bg"><div class="chance-meter-fill" style="width:${Math.round(chance*100)}%; background:${chanceColor}"></div></div>
+      <div class="chance-sub">${Math.round(risk*100)}% injury risk · gone ${mission.travelDays*2}+ days round trip</div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn gold block" id="confirm-assign" ${assignState.selected.length===0?'disabled':''}>Send them out</button>
+      <button class="btn ghost" id="cancel-assign">Cancel</button>
+    </div>
+  `;
+  const nlist=document.getElementById('assign-ninja-list');
+  if(avail.length===0){ nlist.innerHTML=`<div style="font-size:12px;color:var(--text-dim);padding:8px 0;">No one is free right now.</div>`; }
+  else {
+    nlist.innerHTML=avail.map(n=>{
+      const sel=assignState.selected.includes(n.id);
+      return `<div class="pick-ninja-card ${sel?'selected':''}" data-nid="${n.id}">
+        ${avatarImgTag(n,40)}
+        <div class="pn-info"><div class="pn-name">${n.name} <span style="color:var(--text-faint);font-weight:600;">· ${n.role}</span></div>
+        <div class="pn-meta">${mission.primaryStats.map(s=>STAT_LABEL[s]+' '+n.stats[s]).join(' · ')} · Fatigue ${n.fatigue}%</div></div>
+        <div class="pn-check">${sel?'✓':''}</div></div>`;
+    }).join('');
+    nlist.querySelectorAll('.pick-ninja-card').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        Audio_.click();
+        const nid=row.dataset.nid; const idx=assignState.selected.indexOf(nid);
+        if(idx>=0) assignState.selected.splice(idx,1); else assignState.selected.push(nid);
+        renderAssignModal();
+      });
+    });
+  }
+  const trow=document.getElementById('tactic-row');
+  trow.innerHTML=Object.keys(TACTICS).map(k=>{
+    const t=TACTICS[k];
+    return `<div class="tactic-card" data-tk="${k}" style="flex:1;text-align:center;padding:10px 4px;border-radius:9px;background:${assignState.tactic===k?'var(--card2)':'var(--card)'};border:1.5px solid ${assignState.tactic===k?'var(--gold-bright)':'transparent'};cursor:pointer;">
+      <span style="font-size:17px;display:block;margin-bottom:3px;">${t.ico}</span>
+      <span style="font-size:10px;font-weight:700;color:${assignState.tactic===k?'var(--gold-bright)':'var(--text-dim)'};">${t.name}</span>
+    </div>`;
+  }).join('');
+  trow.querySelectorAll('.tactic-card').forEach(el=>{
+    el.addEventListener('click', ()=>{ Audio_.click(); assignState.tactic=el.dataset.tk; renderAssignModal(); });
+  });
+  const toolList=document.getElementById('tool-select-list');
+  toolList.innerHTML=Object.keys(TOOL_DEFS).map(tk=>{
+    const have=state.tools[tk]||0; const chosen=assignState.toolCounts[tk]||0; const good=mission.goodTools.includes(tk);
+    return `<div class="tool-stepper-row" style="display:flex;align-items:center;gap:9px;padding:9px;border-radius:9px;background:${good?'rgba(125,153,104,.1)':'var(--card)'};margin-bottom:7px;">
+      <div style="font-size:16px;width:22px;text-align:center;">${TOOL_DEFS[tk].ico}</div>
+      <div style="flex:1;"><div style="font-size:11.5px;font-weight:700;color:var(--text);">${TOOL_DEFS[tk].name} ${good?'<span style="color:var(--moss-bright)">★</span>':''}</div>
+      <div style="font-size:9.5px;color:var(--text-faint);">${have} in stock</div></div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <button class="ts-btn" data-tool-dec="${tk}" ${chosen<=0?'disabled':''} style="width:26px;height:26px;border-radius:8px;background:var(--card2);border:none;color:var(--text);font-size:14px;font-weight:800;cursor:pointer;">–</button>
+        <div style="font-size:13px;font-weight:800;width:18px;text-align:center;">${chosen}</div>
+        <button class="ts-btn" data-tool-inc="${tk}" ${chosen>=have?'disabled':''} style="width:26px;height:26px;border-radius:8px;background:var(--card2);border:none;color:var(--text);font-size:14px;font-weight:800;cursor:pointer;">+</button>
+      </div></div>`;
+  }).join('');
+  toolList.querySelectorAll('[data-tool-inc]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ const tk=btn.dataset.toolInc; const have=state.tools[tk]||0; const cur=assignState.toolCounts[tk]||0; if(cur<have){ assignState.toolCounts[tk]=cur+1; Audio_.click(); renderAssignModal(); } });
+  });
+  toolList.querySelectorAll('[data-tool-dec]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ const tk=btn.dataset.toolDec; const cur=assignState.toolCounts[tk]||0; if(cur>0){ assignState.toolCounts[tk]=cur-1; Audio_.click(); renderAssignModal(); } });
+  });
+  document.getElementById('confirm-assign').addEventListener('click', ()=>{
+    if(assignState.selected.length===0){ ping('Choose at least one ninja to send.','bad'); return; }
+    launchMission(mission, assignState.selected, assignState.tactic, assignState.toolCounts);
+    closeModal();
+  });
+  document.getElementById('cancel-assign').addEventListener('click', ()=>{ Audio_.close(); closeModal(); });
+}
 
+function launchMission(mission, ninjaIds, tacticKey, toolCounts){
+  Object.keys(toolCounts).forEach(tk=>{ const qty=toolCounts[tk]||0; state.tools[tk]=Math.max(0,(state.tools[tk]||0)-qty); });
+  mission.assigned=ninjaIds; mission.tactic=tacticKey; mission.toolCounts=toolCounts;
+  const {chance,risk}=computeSuccessChance(ninjaIds, mission, tacticKey, toolCounts);
+  mission.chance=chance; mission.risk=risk; mission.launched=true;
+  const totalTravel = mission.travelDays*2; // there and back
+  const names=ninjaIds.map(id=>state.ninjas.find(n=>n.id===id).name);
+  ninjaIds.forEach(id=>{
+    const n=state.ninjas.find(x=>x.id===id);
+    n.status='mission'; n.currentMission=mission.id;
+    n.travelMission=mission.id; n.travelDaysTotal=totalTravel; n.travelDaysLeft=totalTravel; n.travelPhase='going';
+  });
+  addStory(`${names.join(', ')} set out for "${mission.title}." Expect them back in ${totalTravel} day${totalTravel>1?'s':''}.`, 'neutral');
+  state.hasLaunchedMission=true;
+  document.getElementById('onboard-hint').classList.remove('show');
+  ping(`${names.join(', ')} on the road.`, 'good');
+  renderAll(); saveGame();
+}
+
+function declineMission(missionId){
+  const mission=state.missions.find(m=>m.id===missionId);
+  if(!mission) return;
+  mission.resolved=true; mission.declined=true;
+  const faction=state.factions.find(f=>f.id===mission.lordId);
+  if(faction) faction.standing=clamp(faction.standing-3,-100,100);
+  if(mission.isStory && mission.storyDefKey==='sato_offer'){
+    addStory(`The clan refuses Sato's contract.`, 'neutral');
+    advanceStory('kill_kenji_declined');
+  } else {
+    addStory(`Declined "${mission.title}" — ${faction?faction.name:'they'} noted the refusal.`, 'bad');
+  }
+  Audio_.close(); ping('Declined.', 'bad');
+  renderAll(); saveGame();
+}
+
+/* ---------- Forage ---------- */
+function openForageAssignModal(mission){
+  Audio_.open();
+  const modal=document.getElementById('modal');
+  const avail=state.ninjas.filter(n=>n.status==='idle');
+  let selected=[];
+  function render(){
+    modal.innerHTML=`<h2>${mission.title}</h2>
+      <div class="modal-sub">"${mission.story}" No lord is paying for this — whatever comes back is yours.</div>
+      <div class="modal-section-label">Choose who goes</div><div id="forage-ninja-list"></div>
+      <div style="display:flex;gap:10px;margin-top:13px;">
+        <button class="btn gold block" id="confirm-forage" ${selected.length===0?'disabled':''}>Send them searching</button>
+        <button class="btn ghost" id="cancel-forage">Cancel</button>
+      </div>`;
+    const nlist=document.getElementById('forage-ninja-list');
+    if(avail.length===0){ nlist.innerHTML=`<div style="font-size:12px;color:var(--text-dim);padding:8px 0;">No one is free right now.</div>`; }
+    else {
+      nlist.innerHTML=avail.map(n=>{
+        const sel=selected.includes(n.id);
+        return `<div class="pick-ninja-card ${sel?'selected':''}" data-nid="${n.id}">${avatarImgTag(n,40)}
+          <div class="pn-info"><div class="pn-name">${n.name} <span style="color:var(--text-faint);font-weight:600;">· ${n.role}</span></div>
+          <div class="pn-meta">Fatigue ${n.fatigue}% · Wellbeing ${n.wellbeing}%</div></div>
+          <div class="pn-check">${sel?'✓':''}</div></div>`;
+      }).join('');
+      nlist.querySelectorAll('.pick-ninja-card').forEach(row=>{
+        row.addEventListener('click', ()=>{ Audio_.click(); const nid=row.dataset.nid; const idx=selected.indexOf(nid); if(idx>=0) selected.splice(idx,1); else selected.push(nid); render(); });
+      });
+    }
+    document.getElementById('confirm-forage').addEventListener('click', ()=>{
+      if(selected.length===0){ ping('Choose at least one ninja.','bad'); return; }
+      launchForageMission(mission, selected); closeModal();
+    });
+    document.getElementById('cancel-forage').addEventListener('click', ()=>{ Audio_.close(); closeModal(); });
+  }
+  render(); showModal();
+}
+function launchForageMission(mission, ninjaIds){
+  mission.assigned=ninjaIds; mission.launched=true; mission.chance=1; mission.risk=0;
+  const total=2;
+  const names=ninjaIds.map(id=>state.ninjas.find(n=>n.id===id).name);
+  ninjaIds.forEach(id=>{
+    const n=state.ninjas.find(x=>x.id===id);
+    n.status='mission'; n.currentMission=mission.id;
+    n.travelMission=mission.id; n.travelDaysTotal=total; n.travelDaysLeft=total; n.travelPhase='going';
+  });
+  addStory(`${names.join(', ')} went out to search for supplies.`, 'neutral');
+  ping(`${names.join(', ')} scavenging nearby.`, 'good');
+  renderAll(); saveGame();
+}
+
+/* ============================================================
+   ROSTER
+   ============================================================ */
+function statusPillHTML(n){
+  if(n.status==='mission') return `<span class="status-pill busy">On the road</span>`;
+  if(n.status==='injured') return `<span class="status-pill hurt">Recovering</span>`;
+  return `<span class="status-pill ready">Ready</span>`;
+}
+function renderRoster(){
+  const list=document.getElementById('roster-list');
+  const readyCount=state.ninjas.filter(n=>n.status==='idle' && n.fatigue<50).length;
+  list.innerHTML = `
+    <div style="display:flex;align-items:center;gap:9px;background:${readyCount>=2?'rgba(125,153,104,.12)':'rgba(201,75,63,.12)'};border-radius:10px;padding:11px 13px;margin-bottom:13px;">
+      <div style="font-size:11.5px;font-weight:600;color:${readyCount>=2?'var(--moss-bright)':'var(--seal-bright)'};">
+        ${readyCount} ninja${readyCount===1?'':'s'} home and rested. ${readyCount<2?'Too few — the village is exposed.':'The village has a fighting chance.'}
+      </div>
+    </div>` + state.ninjas.map(n=>{
+      const statsHtml=STAT_KEYS.map(sk=>`<div class="bar-row"><div class="bar-label">${STAT_ICO[sk]} ${STAT_LABEL[sk]}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${(sk==='hp'?n.stats[sk]*6.5:n.stats[sk]*10)}%; background:var(--gold-bright);"></div></div>
+        <div class="bar-num">${n.stats[sk]}</div></div>`).join('');
+      let recoveryHtml='';
+      if(n.status==='injured'){
+        const totalDays=Math.max(1,n.injuredUntilDay-n.injuredSinceDay);
+        const doneDays=clamp(state.day-n.injuredSinceDay,0,totalDays);
+        const pct=Math.round((doneDays/totalDays)*100);
+        recoveryHtml=`<div class="recovery-box"><div class="recovery-label"><span>Recovering</span><span>${pct}%</span></div>
+          <div class="recovery-bar-bg"><div class="recovery-bar-fill" style="width:${pct}%"></div></div></div>`;
+      }
+      let travelHtml='';
+      if(n.status==='mission' && n.travelDaysTotal>0){
+        const pct=Math.round((1-(n.travelDaysLeft/n.travelDaysTotal))*100);
+        const phaseLabel = n.travelDaysLeft > n.travelDaysTotal/2 ? 'Traveling there' : 'Returning home';
+        travelHtml=`<div class="travel-box"><div class="travel-label"><span>${phaseLabel}</span><span>${n.travelDaysLeft}d left</span></div>
+          <div class="travel-bar-bg"><div class="travel-bar-fill" style="width:${pct}%"></div></div></div>`;
+      }
+      return `<div class="ninja-card">
+        <div class="nc-top">${avatarImgTag(n,50)}
+          <div class="nc-info"><div class="nc-name-row"><span class="nc-name">${n.name}</span><span class="lvl-pill">Lv.${n.level}</span></div>
+          <div class="nc-role">${n.role}</div>${statusPillHTML(n)}</div></div>
+        <div class="nc-bio">${n.bio}</div>
+        ${recoveryHtml}${travelHtml}${statsHtml}
+        <div class="bar-row"><div class="bar-label">Well</div><div class="bar-bg"><div class="bar-fill" style="width:${n.wellbeing}%; background:${n.wellbeing<35?'var(--seal-bright)':(n.wellbeing<65?'var(--gold-bright)':'var(--moss-bright)')};"></div></div></div>
+        <div class="bar-row"><div class="bar-label">Fatigue</div><div class="bar-bg"><div class="bar-fill" style="width:${n.fatigue}%; background:var(--seal-bright);"></div></div></div>
+        ${n.wellbeing<35?'<div class="threat-box" style="margin-top:6px;">'+n.name+' is malnourished and weak. Feed the clan.</div>':''}
+      </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   BUILDING POPUPS
+   ============================================================ */
+function openBuildingPopup(zoneId){
+  Audio_.open();
+  if(zoneId==='workshop') return openWorkshopPopup();
+  if(zoneId==='infirmary') return openInfirmaryPopup();
+  if(zoneId==='training') return openTrainingYardPopup();
+  if(zoneId==='huts') return openPanel('roster');
+  if(zoneId==='hq') return openPanel('missions');
+  if(zoneId==='gate') return openMarketPopup();
+}
+function openWorkshopPopup(){
+  const modal=document.getElementById('modal');
+  function render(){
+    modal.innerHTML=`<h2>Workshop</h2><div class="modal-sub">Turn supplies into tools and medicine.</div>
+      <div class="bp-resource-strip"><div class="bp-res"><div class="r-num">${state.gold}</div><div class="r-lbl">Gold</div></div>
+      <div class="bp-res"><div class="r-num">${state.ingredients}</div><div class="r-lbl">Supplies</div></div></div>
+      <button class="btn gold block" id="buy-supplies" style="margin-bottom:13px;">Buy 10 Supplies — 30 gold</button>
+      <div class="modal-section-label">In progress</div><div id="queue-list"></div>
+      <div class="modal-section-label">Craft something</div><div id="craft-options"></div>
+      <div class="modal-section-label">Stockpile</div><div class="stock-grid" id="stockpile-grid"></div>`;
+    const qlist=document.getElementById('queue-list');
+    if(state.craftQueue.length===0){ qlist.innerHTML=`<div style="font-size:11.5px;color:var(--text-faint);padding:5px 0 11px;">Nothing being made right now.</div>`; }
+    else {
+      qlist.innerHTML=state.craftQueue.map((q,i)=>`<div class="queue-card"><div class="queue-ico">${q.ico}</div>
+        <div class="queue-info"><div class="queue-name">${q.name} ×${q.yieldQty}</div>
+        <div class="queue-bar-bg"><div class="queue-bar-fill" style="width:${Math.round((1-(q.daysLeft/q.totalDays))*100)}%"></div></div>
+        <div class="queue-days">${q.daysLeft} day${q.daysLeft>1?'s':''} left</div></div>
+        <button class="btn ghost small" data-cancel="${i}">✕</button></div>`).join('');
+      qlist.querySelectorAll('[data-cancel]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{ const idx=parseInt(btn.dataset.cancel,10); const q=state.craftQueue[idx];
+          state.ingredients+=Math.round(q.ingredientCost*0.5); state.craftQueue.splice(idx,1);
+          ping('Order cancelled, half supplies refunded.'); render(); renderAll(); saveGame(); });
+      });
+    }
+    const copts=document.getElementById('craft-options');
+    copts.innerHTML=CRAFT_RECIPES.map(r=>{ const can=state.ingredients>=r.ingredientCost;
+      return `<div class="craft-row ${can?'':'unavail'}" data-craft="${r.key}"><div class="cr-ico">${r.ico}</div>
+        <div class="cr-info"><div class="cr-name">${r.name} ×${r.yieldQty}</div><div class="cr-meta">${r.ingredientCost} supplies · ${r.days} day${r.days>1?'s':''}</div></div>
+        <div class="cr-arrow">›</div></div>`;
+    }).join('');
+    copts.querySelectorAll('.craft-row').forEach(el=>{
+      el.addEventListener('click', ()=>{ const recipe=CRAFT_RECIPES.find(r=>r.key===el.dataset.craft);
+        if(state.ingredients<recipe.ingredientCost){ ping('Not enough supplies.','bad'); return; }
+        state.ingredients-=recipe.ingredientCost;
+        state.craftQueue.push({key:recipe.key,name:recipe.name,ico:recipe.ico,daysLeft:recipe.days,totalDays:recipe.days,yieldQty:recipe.yieldQty,ingredientCost:recipe.ingredientCost});
+        Audio_.craft(); ping(`Started crafting ${recipe.name}.`,'good'); render(); renderAll(); saveGame(); });
+    });
+    const stock=document.getElementById('stockpile-grid');
+    const rows=Object.keys(TOOL_DEFS).map(tk=>`<div class="stock-item"><span class="stock-ico">${TOOL_DEFS[tk].ico}</span><span class="stock-name">${TOOL_DEFS[tk].name}</span><span class="stock-qty">${state.tools[tk]||0}</span></div>`).join('');
+    stock.innerHTML=rows+`<div class="stock-item"><span class="stock-ico">✚</span><span class="stock-name">Medicine</span><span class="stock-qty">${state.tools[MEDICINE_KEY]||0}</span></div>`;
+    document.getElementById('buy-supplies').addEventListener('click', ()=>{
+      if(state.gold<30){ ping('Not enough gold.','bad'); return; }
+      state.gold-=30; state.ingredients+=10; Audio_.coin(); ping('Bought 10 supplies.','good'); render(); renderAll(); saveGame();
+    });
+  }
+  render(); showModal();
+}
+function openInfirmaryPopup(){
+  const modal=document.getElementById('modal');
+  const injured=state.ninjas.filter(n=>n.status==='injured');
+  modal.innerHTML=`<h2>Infirmary</h2><div class="modal-sub">Medicine speeds recovery. ${state.tools[MEDICINE_KEY]||0} doses in stock.</div><div id="infirmary-list"></div>`;
+  const ilist=document.getElementById('infirmary-list');
+  if(injured.length===0){ ilist.innerHTML=`<div style="text-align:center;padding:26px 10px;color:var(--text-dim);font-size:12.5px;">Everyone is healthy.</div>`; }
+  else {
+    ilist.innerHTML=injured.map(n=>{ const totalDays=Math.max(1,n.injuredUntilDay-n.injuredSinceDay); const doneDays=clamp(state.day-n.injuredSinceDay,0,totalDays); const pct=Math.round((doneDays/totalDays)*100);
+      return `<div class="ninja-card" style="margin-bottom:9px;"><div class="nc-top">${avatarImgTag(n,44)}<div class="nc-info"><div class="nc-name">${n.name}</div><div class="nc-role">${n.role}</div></div></div>
+      <div class="recovery-box"><div class="recovery-label"><span>Recovering</span><span>${pct}%</span></div><div class="recovery-bar-bg"><div class="recovery-bar-fill" style="width:${pct}%"></div></div></div>
+      <button class="btn gold small block" data-heal="${n.id}" ${(state.tools[MEDICINE_KEY]||0)<=0?'disabled':''}>Use medicine</button></div>`;
+    }).join('');
+    ilist.querySelectorAll('[data-heal]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ const n=state.ninjas.find(x=>x.id===btn.dataset.heal); if((state.tools[MEDICINE_KEY]||0)<=0) return;
+        state.tools[MEDICINE_KEY]--; n.injuredUntilDay=Math.max(state.day,n.injuredUntilDay-1);
+        Audio_.craft(); ping(`Used medicine on ${n.name}.`,'good'); openInfirmaryPopup(); renderAll(); saveGame(); });
+    });
+  }
+  showModal();
+}
+function openTrainingYardPopup(){
+  const modal=document.getElementById('modal');
+  const idle=state.ninjas.filter(n=>n.status==='idle');
+  modal.innerHTML=`<h2>Training Yard</h2><div class="modal-sub">Pick a ninja to sharpen a stat. Takes 2 days, they can't take jobs while training.</div><div id="tyard-idle"></div>`;
+  const tlist=document.getElementById('tyard-idle');
+  if(idle.length===0){ tlist.innerHTML=`<div style="font-size:11.5px;color:var(--text-dim);padding:7px 0;">No one free to train right now.</div>`; }
+  else {
+    tlist.innerHTML=idle.map(n=>`<div class="pick-ninja-card" data-nid="${n.id}" style="cursor:pointer;">${avatarImgTag(n,40)}
+      <div class="pn-info"><div class="pn-name">${n.name}</div><div class="pn-meta">${n.role}</div></div><div class="cr-arrow">›</div></div>`).join('');
+    tlist.querySelectorAll('.pick-ninja-card').forEach(row=>{ row.addEventListener('click', ()=>{ closeModal(); openTrainStatModal(row.dataset.nid); }); });
+  }
+  showModal();
+}
+function openTrainStatModal(ninjaId){
+  const n=state.ninjas.find(x=>x.id===ninjaId);
+  const modal=document.getElementById('modal');
+  modal.innerHTML=`<h2>Train ${n.name}</h2><div class="modal-sub">2 days, raises one stat by 1.</div><div id="train-stat-list"></div>
+    <button class="btn ghost block" id="cancel-train" style="margin-top:9px;">Cancel</button>`;
+  const tlist=document.getElementById('train-stat-list');
+  tlist.innerHTML=STAT_KEYS.map(sk=>`<div class="pick-ninja-card" data-stat="${sk}" style="cursor:pointer;">
+    <div style="width:38px;height:38px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;">${STAT_ICO[sk]}</div>
+    <div class="pn-info"><div class="pn-name">${STAT_LABEL[sk]}</div><div class="pn-meta">Currently ${n.stats[sk]}</div></div>
+    <button class="btn small gold">Train</button></div>`).join('');
+  tlist.querySelectorAll('.pick-ninja-card').forEach(row=>{
+    row.addEventListener('click', ()=>{ const sk=row.dataset.stat; n.status='training'; n.trainingStat=sk; n.trainingDaysLeft=2; n.trainingTotalDays=2;
+      addStory(`${n.name} began training ${STAT_LABEL[sk]}.`,'neutral'); Audio_.click(); closeModal(); renderAll(); saveGame(); });
+  });
+  document.getElementById('cancel-train').addEventListener('click', closeModal);
+  showModal();
+}
+function openMarketPopup(){
+  const modal=document.getElementById('modal');
+  modal.innerHTML=`<h2>Village Gate Market</h2><div class="modal-sub">Buy food to keep the clan fed.</div>
+    <div class="bp-resource-strip"><div class="bp-res"><div class="r-num">${state.gold}</div><div class="r-lbl">Gold</div></div>
+    <div class="bp-res"><div class="r-num">${state.food}</div><div class="r-lbl">Food</div></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn gold block" id="buy-food-10">Buy 10 Food — 12 gold</button>
+      <button class="btn gold block" id="buy-food-40">Buy 40 Food — 42 gold</button></div>`;
+  document.getElementById('buy-food-10').addEventListener('click', ()=>{ if(state.gold<12){ping('Not enough gold.','bad');return;} state.gold-=12; state.food+=10; Audio_.coin(); ping('Bought 10 food.','good'); openMarketPopup(); renderAll(); saveGame(); });
+  document.getElementById('buy-food-40').addEventListener('click', ()=>{ if(state.gold<42){ping('Not enough gold.','bad');return;} state.gold-=42; state.food+=40; Audio_.coin(); ping('Bought 40 food.','good'); openMarketPopup(); renderAll(); saveGame(); });
+  showModal();
+}
+
+/* ============================================================
+   FACTIONS
+   ============================================================ */
+function standingColor(v){ if(v>=40) return 'var(--moss-bright)'; if(v>=0) return 'var(--gold-bright)'; if(v>=-40) return 'var(--text-dim)'; return 'var(--seal-bright)'; }
+function standingWord(v){ if(v>=60) return 'Trusted Ally'; if(v>=25) return 'Friendly'; if(v>=-10) return 'Neutral'; if(v>=-40) return 'Wary'; if(v>=-70) return 'Hostile'; return 'At War'; }
+function renderFactions(){
+  const list=document.getElementById('factions-list');
+  list.innerHTML=state.factions.map(f=>{
+    const pct=(f.standing+100)/2;
+    const warn = (!f.closed && f.standing<=-60) ? `<div class="threat-box">${f.name} is losing patience. Keep the village defended, or expect a raid.</div>` : '';
+    const closedBox = f.closed ? `<div class="closed-box">${f.closedReason||'This road is closed.'}</div>` : '';
+    return `<div class="faction-card"><div class="fc-top">
+      <div><div class="fc-name" style="color:${f.color}">${f.name}</div><div class="fc-title">${f.title}</div></div>
+      <div class="fc-label" style="color:${f.closed?'var(--text-faint)':standingColor(f.standing)};background:rgba(232,226,213,.05);">${f.closed?'Closed':standingWord(f.standing)}</div></div>
+      <div class="standing-bg"><div class="standing-mid"></div><div class="standing-fill" style="left:${f.standing<0?pct:50}%; width:${Math.abs(f.standing)/2}%; background:${f.standing<0?'var(--seal-bright)':'var(--moss-bright)'};"></div></div>
+      <div class="fc-desc">${f.desc}</div>${warn}${closedBox}</div>`;
+  }).join('');
+}
+
+/* ============================================================
+   STORY LOG (bell panel)
+   ============================================================ */
+function renderStoryLog(){
+  const list=document.getElementById('story-list');
+  if(state.storyLog.length===0){ list.innerHTML=`<div style="text-align:center;color:var(--text-dim);padding:36px 10px;font-size:12.5px;">Nothing has happened yet.</div>`; return; }
+  list.innerHTML=state.storyLog.map(l=>`<div class="story-entry ${l.mood} ${l.isEvent?'event':''}"><div class="se-day">Day ${l.day}</div><div class="se-text">${l.text}</div></div>`).join('');
+}
+
+/* ============================================================
+   MAP PANEL
+   ============================================================ */
+function renderMapPanel(){
+  const body=document.getElementById('map-body');
+  body.innerHTML = `<canvas id="map-canvas" width="600" height="440"></canvas>
+    <div class="map-legend">
+      <span><span class="dot" style="background:#e8e2d5;"></span>The village</span>
+      <span><span class="dot" style="background:#a8352e;"></span>House Kurogane</span>
+      <span><span class="dot" style="background:#b8965a;"></span>Shiro Company</span>
+      <span><span class="dot" style="background:#4a5a72;"></span>Tsukikage Temple</span>
+    </div>`;
+  drawMap();
+}
+function drawMap(){
+  const canvas=document.getElementById('map-canvas');
+  if(!canvas) return;
+  const mctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  mctx.clearRect(0,0,W,H);
+  mctx.fillStyle='#0a0908'; mctx.fillRect(0,0,W,H);
+  // terrain texture: soft mottled patches
+  for(let i=0;i<40;i++){
+    mctx.fillStyle = `rgba(${74+Math.random()*20},${94+Math.random()*20},${68+Math.random()*15},${0.05+Math.random()*0.05})`;
+    mctx.beginPath(); mctx.ellipse(Math.random()*W, Math.random()*H, 30+Math.random()*50, 20+Math.random()*30, Math.random()*Math.PI, 0, Math.PI*2); mctx.fill();
+  }
+  function toXY(pct){ return {x: pct.x/100*W, y: pct.y/100*H}; }
+  const villageXY=toXY(VILLAGE_POS);
+  // travel paths
+  Object.keys(FACTION_POS).forEach(fid=>{
+    const f=state.factions.find(x=>x.id===fid);
+    const fxy=toXY(FACTION_POS[fid]);
+    mctx.strokeStyle= f&&f.closed ? 'rgba(232,226,213,.08)' : 'rgba(184,150,90,.35)';
+    mctx.lineWidth=2; mctx.setLineDash([6,7]);
+    mctx.beginPath(); mctx.moveTo(villageXY.x,villageXY.y); mctx.lineTo(fxy.x,fxy.y); mctx.stroke();
+    mctx.setLineDash([]);
+  });
+  // faction markers
+  Object.keys(FACTION_POS).forEach(fid=>{
+    const f=state.factions.find(x=>x.id===fid);
+    const fxy=toXY(FACTION_POS[fid]);
+    mctx.fillStyle = f ? f.color : '#888';
+    mctx.globalAlpha = f&&f.closed ? 0.35 : 1;
+    mctx.beginPath(); mctx.arc(fxy.x,fxy.y,10,0,Math.PI*2); mctx.fill();
+    mctx.globalAlpha=1;
+    mctx.strokeStyle='#0a0908'; mctx.lineWidth=2; mctx.stroke();
+    mctx.font='bold 12px -apple-system,sans-serif'; mctx.fillStyle='#e8e2d5'; mctx.textAlign='center';
+    mctx.fillText(f?f.name:'', fxy.x, fxy.y+24);
+    const days = distanceDaysTo(fid);
+    mctx.font='10px -apple-system,sans-serif'; mctx.fillStyle='#a89f8c';
+    mctx.fillText(days+' day'+(days>1?'s':'')+' travel', fxy.x, fxy.y+38);
+  });
+  // traveling ninjas as moving dots along their path
+  state.ninjas.forEach(n=>{
+    if(n.status!=='mission' || !n.travelMission) return;
+    const mission = state.missions.find(m=>m.id===n.travelMission);
+    if(!mission || !mission.lordId) return;
+    const fxy=toXY(FACTION_POS[mission.lordId]||VILLAGE_POS);
+    const totalT=n.travelDaysTotal||1;
+    const elapsed = totalT - n.travelDaysLeft;
+    let t;
+    if(elapsed <= totalT/2){ t = elapsed/(totalT/2); } // going
+    else { t = 1-((elapsed-totalT/2)/(totalT/2)); } // returning
+    t = clamp(t,0,1);
+    const px = villageXY.x + (fxy.x-villageXY.x)*t;
+    const py = villageXY.y + (fxy.y-villageXY.y)*t;
+    mctx.fillStyle='#d4b378';
+    mctx.beginPath(); mctx.arc(px,py,5,0,Math.PI*2); mctx.fill();
+    mctx.strokeStyle='#0a0908'; mctx.lineWidth=1.5; mctx.stroke();
+  });
+  // village marker (on top)
+  mctx.fillStyle='#e8e2d5';
+  mctx.beginPath(); mctx.arc(villageXY.x,villageXY.y,12,0,Math.PI*2); mctx.fill();
+  mctx.strokeStyle='#0a0908'; mctx.lineWidth=2; mctx.stroke();
+  mctx.font='bold 13px -apple-system,sans-serif'; mctx.fillStyle='#e8e2d5'; mctx.textAlign='center';
+  mctx.fillText('The Kaze Clan', villageXY.x, villageXY.y-18);
+}
+
+/* ============================================================
+   TIME / DAY ADVANCE
+   ============================================================ */
+function advanceTime(){
+  if(state.gameOver) return;
+  state.phaseProgress=0;
+  goToNextDay();
+}
+function goToNextDay(){
+  state.day++;
+  const results=[];
+  // resolve missions whose ninjas have returned
+  state.ninjas.forEach(n=>{
+    if(n.status==='mission' && n.travelMission){
+      n.travelDaysLeft--;
+      if(n.travelDaysLeft<=0){
+        // handled per-mission below (avoid double resolve)
+      }
+    }
+  });
+  // find missions where all assigned ninjas have completed travel
+  const missionsToResolve = state.missions.filter(m=>m.launched && !m.resolved && m.assigned.every(id=>{
+    const n=state.ninjas.find(x=>x.id===id); return n.travelDaysLeft<=0;
+  }));
+  missionsToResolve.forEach(m=>{ results.push(resolveMission(m)); });
+
+  const attackResult=rollForAttack();
+  if(attackResult) results.push(attackResult);
+
+  dailyUpkeep();
+  ensureMissionSupply();
+  renderAll();
+
+  if(state.gameOver) return;
+
+  if(results.length>0){ showResolutionModal(results); }
+  else { ping(`Day ${state.day} begins.`); }
+  saveGame();
+}
+function dailyUpkeep(){
+  const upkeep=state.ninjas.length*2;
+  state.food-=upkeep;
+  if(state.food<=0){
+    state.food=0; state.hungerStreak=(state.hungerStreak||0)+1;
+    const severity=clamp(4+state.hungerStreak*3,4,30);
+    state.ninjas.forEach(n=>{ if(n.status==='mission') return; n.happiness=clamp(n.happiness-severity,0,100); n.wellbeing=clamp(n.wellbeing-severity,0,100); });
+    if(state.hungerStreak===1){ addStory('The pantry ran empty. The clan goes hungry.','bad'); ping('Food ran out.','bad'); }
+    else { ping(`${state.hungerStreak} days without food.`, 'bad'); }
+  } else {
+    if(state.hungerStreak>0) ping('Food stores replenished.','good');
+    state.hungerStreak=0;
+    state.ninjas.forEach(n=>{ if(n.status==='mission') return; n.wellbeing=clamp(n.wellbeing+4,0,100); });
+  }
+  state.ninjas.forEach(n=>{
+    if(n.status==='training'){
+      n.trainingDaysLeft--;
+      if(n.trainingDaysLeft<=0){
+        n.stats[n.trainingStat]=clamp(n.stats[n.trainingStat]+1, 1, n.trainingStat==='hp'?20:10);
+        addStory(`${n.name}'s ${STAT_LABEL[n.trainingStat]} improved.`,'good');
+        ping(`${n.name} finished training.`,'good');
+        n.status='idle'; n.trainingStat=null;
+      }
+    } else if(n.status==='idle'){
+      const recoveryRate = n.wellbeing<35?5:(n.wellbeing<65?9:12);
+      n.fatigue=clamp(n.fatigue-recoveryRate,0,100);
+      n.happiness=clamp(n.happiness+(n.wellbeing<35?1:6),0,100);
+    } else if(n.status==='mission'){
+      n.fatigue=clamp(n.fatigue+3,0,100);
+    }
+  });
+  const justHealed=[];
+  state.ninjas.forEach(n=>{ if(n.status==='injured' && state.day>=n.injuredUntilDay){ n.status='idle'; justHealed.push(n); } });
+  justHealed.forEach(n=>{ addStory(`${n.name} has recovered.`,'good'); ping(`${n.name} is back on their feet.`,'good'); });
+
+  const finished=[];
+  state.craftQueue=state.craftQueue.filter(q=>{ q.daysLeft--; if(q.daysLeft<=0){ state.tools[q.key]=(state.tools[q.key]||0)+q.yieldQty; finished.push(q); return false; } return true; });
+  finished.forEach(q=>{ addStory(`The Workshop finished ${q.yieldQty} ${q.name}.`,'good'); ping(`${q.name} ready.`,'good'); });
+
+  state.missions.filter(m=>!m.resolved && !m.launched && !m.isForage && !m.isStory).forEach(m=>{
+    m.daysLeft--;
+    if(m.daysLeft<=0){ m.resolved=true; m.expired=true; const f=state.factions.find(x=>x.id===m.lordId); if(f) f.standing=clamp(f.standing-1,-100,100); }
+  });
+  state.factions.forEach(f=>{ if(!f.closed && Math.abs(f.standing)<60){ f.standing += f.standing>0?-0.4:0.4; } });
+  checkStarvationGameOver();
+}
+
+/* ============================================================
+   RESOLUTION
+   ============================================================ */
+function resolveMission(m){
+  m.resolved=true;
+  if(m.isForage) return resolveForageMission(m);
+  const faction=state.factions.find(f=>f.id===m.lordId);
+  const team=m.assigned.map(id=>state.ninjas.find(n=>n.id===id));
+  const success=Math.random()<m.chance;
+  const teamNames=team.map(n=>n.name).join(', ');
+  let text,mood;
+
+  if(success){
+    state.gold+=m.goldReward; state.reputation=clamp(state.reputation+m.repReward,0,999);
+    if(faction) faction.standing=clamp(faction.standing+6,-100,100);
+    team.forEach(n=>{
+      n.happiness=clamp(n.happiness+10,0,100); n.fatigue=clamp(n.fatigue+randInt(10,20),0,100);
+      n.xp+=30+m.difficulty*10; n.missionsRun++; n.missionsWon++;
+      if(n.xp>=n.xpNext){ n.xp-=n.xpNext; n.level++; n.xpNext=Math.round(n.xpNext*1.3);
+        const boost=pickFrom(STAT_KEYS); n.stats[boost]=clamp(n.stats[boost]+1,1,boost==='hp'?20:10);
+        addStory(`${n.name} reached level ${n.level}.`,'good'); }
+      n.status='idle'; n.currentMission=null; n.travelMission=null;
+    });
+    text=`"${m.title}" succeeded. ${teamNames} delivered for ${faction?faction.name:''}. Paid ${m.goldReward} gold, +${m.repReward} reputation.`;
+    mood='good';
+  } else {
+    if(faction) faction.standing=clamp(faction.standing-4,-100,100);
+    let anyInjured=false;
+    team.forEach(n=>{
+      n.happiness=clamp(n.happiness-15,0,100); n.fatigue=clamp(n.fatigue+randInt(15,25),0,100); n.missionsRun++;
+      if(Math.random()<m.risk){ anyInjured=true; n.status='injured'; n.injuredSinceDay=state.day; n.injuredUntilDay=state.day+randInt(3,5); n.currentMission=null; n.travelMission=null; }
+      else { n.status='idle'; n.currentMission=null; n.travelMission=null; }
+    });
+    const partial=Math.round(m.goldReward*0.15); state.gold+=partial;
+    text=`"${m.title}" failed. ${teamNames} barely made it back${anyInjured?', hurt and recovering':''}. Salvaged ${partial} gold.`;
+    mood='bad';
+  }
+  addStory(text, mood);
+
+  // story progression
+  if(m.isStory){
+    const def = STORY_MISSION_DEFS[m.storyDefKey];
+    if(def){
+      const nextKey = success ? def.onSuccess : def.onFail;
+      advanceStory(nextKey);
+    }
+  }
+  return {text, mood, ico: success?'✓':'✕'};
+}
+function resolveForageMission(m){
+  const team=m.assigned.map(id=>state.ninjas.find(n=>n.id===id));
+  const teamNames=team.map(n=>n.name).join(', ');
+  team.forEach(n=>{ n.fatigue=clamp(n.fatigue+randInt(8,15),0,100); n.missionsRun++; n.status='idle'; n.currentMission=null; n.travelMission=null; });
+  const roll=Math.random(); let text,mood;
+  if(roll<0.12){ text=`${teamNames} came back empty-handed. A quiet trip, no harm done.`; mood='neutral'; }
+  else if(roll<0.35){ const g=randInt(8,22); state.gold+=g; text=`${teamNames} found scattered coin — ${g} gold.`; mood='good'; }
+  else if(roll<0.58){ const f=randInt(10,25); state.food+=f; text=`${teamNames} came back with foraged food — ${f} food.`; mood='good'; }
+  else if(roll<0.78){ const ing=randInt(6,15); state.ingredients+=ing; text=`${teamNames} salvaged materials — ${ing} supplies.`; mood='good'; }
+  else if(roll<0.92){ const med=randInt(1,2); state.tools[MEDICINE_KEY]=(state.tools[MEDICINE_KEY]||0)+med; text=`${teamNames} found usable herbs — ${med} medicine.`; mood='good'; }
+  else { const g=randInt(30,55); state.gold+=g; text=`${teamNames} stumbled onto a real haul — ${g} gold.`; mood='good'; }
+  addStory(text, mood);
+  return {text, mood, ico:'⛰'};
+}
+function rollForAttack(){
+  let attacker=null, cause=null;
+  const hostile=state.factions.find(f=>!f.closed && f.standing<=-60);
+  if(hostile){ const chance=hostile.standing<=-85?0.30:0.10; if(Math.random()<chance){ attacker=hostile; cause='hostility'; } }
+  if(!attacker){ if(Math.random()<0.05){ attacker={name:'A roving bandit gang'}; cause='random'; } }
+  if(!attacker) return null;
+  const home=state.ninjas.filter(n=>n.status==='idle' && n.fatigue<70);
+  const defenders=home.length;
+  const avgHP = defenders>0 ? home.reduce((s,n)=>s+n.stats.hp,0)/defenders : 0;
+  const defenseScore=defenders*10+avgHP*3;
+  const attackStrength=cause==='hostility'?55:30;
+  const winChance=clamp(defenseScore/(defenseScore+attackStrength),0.08,0.95);
+  const survived=Math.random()<winChance;
+  let text,mood,ico;
+  if(survived){
+    const goldLost=Math.round(state.gold*randRange(0.02,0.08)); state.gold=Math.max(0,state.gold-goldLost);
+    text=`${attacker.name} tested the village. ${defenders} defender${defenders===1?'':'s'} held the line. Lost ${goldLost} gold in the chaos.`;
+    mood='good'; ico='⚔';
+    if(defenders>0 && Math.random()<0.3){ const u=pickFrom(home); u.status='injured'; u.injuredSinceDay=state.day; u.injuredUntilDay=state.day+2; text+=` ${u.name} took a wound.`; }
+  } else {
+    const goldLost=Math.round(state.gold*randRange(0.15,0.35)); const foodLost=Math.round(state.food*randRange(0.2,0.4));
+    Object.keys(state.tools).forEach(tk=>{ state.tools[tk]=Math.round((state.tools[tk]||0)*0.5); });
+    state.gold=Math.max(0,state.gold-goldLost); state.food=Math.max(0,state.food-foodLost);
+    text=`${attacker.name} broke through with too few defenders home. Lost ${goldLost} gold, ${foodLost} food, half the workshop stock.`;
+    mood='bad'; ico='⚠';
+    home.forEach(n=>{ if(Math.random()<0.5){ n.status='injured'; n.injuredSinceDay=state.day; n.injuredUntilDay=state.day+3; } });
+    if(defenders===0 || (state.gold<=0 && state.food<=0)){ triggerGameOver({name:attacker.name}); }
+  }
+  addStory(text,mood);
+  return {text,mood,ico};
+}
+function showResolutionModal(results){
+  const backdrop=document.getElementById('resolution-modal-backdrop');
+  const entries=document.getElementById('res-entries');
+  document.getElementById('res-title').textContent='Day '+state.day+' Report';
+  entries.innerHTML=results.map(r=>`<div class="res-card ${r.mood}">${r.ico||''} ${r.text}</div>`).join('');
+  const anyGood=results.some(r=>r.mood==='good'), anyBad=results.some(r=>r.mood==='bad');
+  if(anyBad) Audio_.fail(); else if(anyGood) Audio_.success();
+  if(results.some(r=>r.text.includes('broke through'))){ Audio_.alarm(); VFX.flash('#a8352e'); }
+  backdrop.classList.add('show');
+  renderAll();
+}
+function closeResolutionModal(){ document.getElementById('resolution-modal-backdrop').classList.remove('show'); Audio_.click(); }
+
+/* ============================================================
+   GAME OVER
+   ============================================================ */
+function triggerGameOver(attacker){
+  state.gameOver=true;
+  document.getElementById('go-title').textContent='The Village Falls';
+  document.getElementById('go-text').textContent=`${attacker.name} overran the village. With no one left to hold the line, the fires took everything. You survived ${state.day} day${state.day===1?'':'s'}, reached ${state.reputation} reputation.`;
+  document.getElementById('resolution-modal-backdrop').classList.remove('show');
+  document.getElementById('gameover').classList.add('show');
+  Audio_.alarm(); clearSave();
+}
+function triggerStarvationGameOver(){
+  state.gameOver=true;
+  document.getElementById('go-title').textContent='The Clan Scatters';
+  document.getElementById('go-text').textContent=`No coin, no food, no strength left to earn either. One by one, the shadows who followed you slipped away to find a roof that could still feed them. You survived ${state.day} day${state.day===1?'':'s'}, reached ${state.reputation} reputation.`;
+  document.getElementById('resolution-modal-backdrop').classList.remove('show');
+  document.getElementById('gameover').classList.add('show');
+  Audio_.fail(); clearSave();
+}
+function checkStarvationGameOver(){
+  if(state.gameOver) return;
+  if(state.gold>0 || state.food>0) return;
+  const critical=state.ninjas.filter(n=>n.wellbeing<20).length;
+  const onMission=state.ninjas.some(n=>n.status==='mission');
+  if(onMission) return;
+  if(critical>=Math.ceil(state.ninjas.length/2)){ triggerStarvationGameOver(); }
+}
+
+/* ============================================================
+   MODAL / PANEL HELPERS
+   ============================================================ */
+function showModal(){ document.getElementById('modal-backdrop').classList.add('show'); document.getElementById('modal-backdrop').dataset.openedAt=Date.now(); }
+function closeModal(){ document.getElementById('modal-backdrop').classList.remove('show'); }
+function openPanel(name){
+  Audio_.open();
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  const backdrop=document.getElementById('panel-backdrop');
+  backdrop.classList.add('show'); backdrop.dataset.openedAt=Date.now();
+  document.getElementById('panel-'+name).classList.add('show');
+  state.activeTab=name;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  state.hasSeenOnboarding=true;
+  if(name==='map') renderMapPanel();
+}
+function closeAllPanels(){ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show')); document.getElementById('panel-backdrop').classList.remove('show'); }
+function openStoryPanel(){
+  Audio_.open();
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  const backdrop=document.getElementById('panel-backdrop');
+  backdrop.classList.add('show'); backdrop.dataset.openedAt=Date.now();
+  document.getElementById('panel-story').classList.add('show');
+  state.unreadStoryCount=0; updateBellBadge();
+  renderStoryLog();
+}
+
+/* ============================================================
+   MASTER RENDER
+   ============================================================ */
+function renderAll(){ renderHUD(); renderMissions(); renderRoster(); renderFactions(); if(document.getElementById('panel-map').classList.contains('show')) drawMap(); }
+
+/* ============================================================
+   EVENT WIRING
+   ============================================================ */
+document.getElementById('menu-btn').addEventListener('click', ()=>openPanel(state.activeTab||'missions'));
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click', ()=>openPanel(btn.dataset.tab)));
+document.querySelectorAll('.panel-close').forEach(btn=>btn.addEventListener('click', ()=>{ Audio_.close(); closeAllPanels(); }));
+document.getElementById('panel-backdrop').addEventListener('click', (e)=>{
+  const openedAt=parseInt(e.currentTarget.dataset.openedAt||'0',10);
+  if(Date.now()-openedAt<350) return;
+  Audio_.close(); closeAllPanels();
+});
+document.getElementById('modal-backdrop').addEventListener('click', (e)=>{
+  if(e.target.id==='modal-backdrop'){
+    const openedAt=parseInt(e.currentTarget.dataset.openedAt||'0',10);
+    if(Date.now()-openedAt<350) return;
+    Audio_.close(); closeModal();
+  }
+});
+document.getElementById('res-continue').addEventListener('click', closeResolutionModal);
+document.getElementById('hint-close').addEventListener('click', ()=>{ state.hasSeenOnboarding=true; document.getElementById('onboard-hint').classList.remove('show'); });
+document.getElementById('bell-btn').addEventListener('click', openStoryPanel);
+
+document.getElementById('missions-list').addEventListener('click', (e)=>{
+  const assignBtn=e.target.closest('[data-assign]'); const declineBtn=e.target.closest('[data-decline]');
+  if(assignBtn) openAssignModal(assignBtn.dataset.assign);
+  if(declineBtn) declineMission(declineBtn.dataset.decline);
+});
+
+document.getElementById('clock-widget').addEventListener('click', ()=>{ document.getElementById('clock-detail').classList.toggle('show'); });
+document.addEventListener('click', (e)=>{
+  const detail=document.getElementById('clock-detail'); const widget=document.getElementById('clock-widget');
+  if(detail.classList.contains('show') && !detail.contains(e.target) && !widget.contains(e.target)) detail.classList.remove('show');
+});
+document.getElementById('clock-auto-toggle').addEventListener('change', function(){ state.autoTimeEnabled=this.checked; });
+
+const advanceBtn=document.getElementById('advance-btn');
+advanceBtn.addEventListener('click', ()=>{ advanceBtn.disabled=true; Audio_.click(); advanceTime(); setTimeout(()=>{advanceBtn.disabled=false;},300); });
+
+/* ============================================================
+   CANVAS WORLD (village)
+   ============================================================ */
+const ZONES=[
+  {id:'hq', name:"Elder's House", x:500, y:330, r:46, color:'#b8965a', color2:'#a8352e'},
+  {id:'training', name:'Training Yard', x:280, y:470, r:38, color:'#5a6e4a'},
+  {id:'huts', name:'Family Huts', x:720, y:470, r:38, color:'#b8965a'},
+  {id:'workshop', name:'Workshop', x:250, y:200, r:36, color:'#4a5a72'},
+  {id:'infirmary', name:'Infirmary', x:730, y:200, r:36, color:'#4a5a72'},
+  {id:'gate', name:'Village Gate', x:500, y:610, r:34, color:'#6b6455'},
+];
+const WORLD_W=1000, WORLD_H=730;
+const TREES=[];
+(function seedTrees(){
+  const rng=mulberry32(1337); const fenceMargin=46;
+  for(let i=0;i<120;i++){
+    const x=rng()*(WORLD_W-fenceMargin*2)+fenceMargin, y=rng()*(WORLD_H-fenceMargin*2)+fenceMargin;
+    let tooClose=false; for(const z of ZONES){ if(Math.hypot(z.x-x,z.y-y)<z.r+50){ tooClose=true; break; } }
+    if(tooClose) continue;
+    const distC=Math.hypot(x-500,y-380); if(distC<160 && rng()<0.9) continue;
+    if(x<fenceMargin+18||x>WORLD_W-fenceMargin-18||y<fenceMargin+18||y>WORLD_H-fenceMargin-18) continue;
+    TREES.push({x,y,s:0.7+rng()*1.0, type: rng()<0.12?'rock':(rng()<0.5?'pine':'bush')});
+  }
+  const ringOuter=[{from:{x:-40,y:-40},to:{x:WORLD_W+40,y:-40}},{from:{x:-40,y:WORLD_H+40},to:{x:WORLD_W+40,y:WORLD_H+40}},{from:{x:-40,y:-40},to:{x:-40,y:WORLD_H+40}},{from:{x:WORLD_W+40,y:-40},to:{x:WORLD_W+40,y:WORLD_H+40}}];
+  for(let i=0;i<80;i++){ const strip=ringOuter[Math.floor(rng()*ringOuter.length)]; const t=rng(); const j=(rng()-0.5)*70;
+    let x=strip.from.x+(strip.to.x-strip.from.x)*t, y=strip.from.y+(strip.to.y-strip.from.y)*t; x+=j; y+=j*0.4;
+    TREES.push({x,y,s:0.9+rng()*1.2, type: rng()<0.85?'pine':'rock'});
+  }
+})();
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; } }
+
+const canvas=document.getElementById('world'); const ctx=canvas.getContext('2d'); const worldWrap=document.getElementById('world-wrap');
+let cam={x:WORLD_W/2, y:WORLD_H/2-30, zoom:0.95}; let dragging=false, dragStart={x:0,y:0}, camStart={x:0,y:0}, lastPinchDist=null;
+function resizeCanvas(){ canvas.width=worldWrap.clientWidth*devicePixelRatio; canvas.height=worldWrap.clientHeight*devicePixelRatio; canvas.style.width=worldWrap.clientWidth+'px'; canvas.style.height=worldWrap.clientHeight+'px'; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
+function screenToWorld(sx,sy){ const rect=canvas.getBoundingClientRect(); const cx=rect.width/2, cy=rect.height/2; return {x:cam.x+(sx-rect.left-cx)/cam.zoom, y:cam.y+(sy-rect.top-cy)/cam.zoom}; }
+function clampCam(){ cam.x=clamp(cam.x,0,WORLD_W); cam.y=clamp(cam.y,0,WORLD_H); }
+const activePointers=new Map();
+canvas.addEventListener('pointerdown', (e)=>{
+  activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(activePointers.size===1){ dragging=true; canvas.classList.add('grabbing'); dragStart={x:e.clientX,y:e.clientY}; camStart={x:cam.x,y:cam.y}; }
+  else if(activePointers.size===2){ dragging=false; const pts=Array.from(activePointers.values()); lastPinchDist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y); }
+});
+window.addEventListener('pointermove', (e)=>{
+  if(!activePointers.has(e.pointerId)){ if(dragging){ const dx=(e.clientX-dragStart.x)/cam.zoom, dy=(e.clientY-dragStart.y)/cam.zoom; cam.x=camStart.x-dx; cam.y=camStart.y-dy; clampCam(); } return; }
+  activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(activePointers.size===2){ const pts=Array.from(activePointers.values()); const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+    if(lastPinchDist){ cam.zoom=clamp(cam.zoom*(dist/lastPinchDist),0.5,2.2); clampCam(); } lastPinchDist=dist;
+  } else if(dragging && activePointers.size===1){ const dx=(e.clientX-dragStart.x)/cam.zoom, dy=(e.clientY-dragStart.y)/cam.zoom; cam.x=camStart.x-dx; cam.y=camStart.y-dy; clampCam(); }
+});
+window.addEventListener('pointerup', (e)=>{
+  activePointers.delete(e.pointerId); if(activePointers.size<2) lastPinchDist=null;
+  if(activePointers.size===0){ dragging=false; canvas.classList.remove('grabbing'); }
+  else if(activePointers.size===1){ const pt=Array.from(activePointers.values())[0]; dragging=true; dragStart={x:pt.x,y:pt.y}; camStart={x:cam.x,y:cam.y}; }
+});
+window.addEventListener('pointercancel', (e)=>{ activePointers.delete(e.pointerId); if(activePointers.size===0){ dragging=false; canvas.classList.remove('grabbing'); } });
+canvas.addEventListener('wheel', (e)=>{ e.preventDefault(); cam.zoom=clamp(cam.zoom+(e.deltaY>0?-0.1:0.1),0.5,2.2); clampCam(); }, {passive:false});
+document.getElementById('zoom-in').addEventListener('click', ()=>{ cam.zoom=clamp(cam.zoom+0.2,0.5,2.2); clampCam(); });
+document.getElementById('zoom-out').addEventListener('click', ()=>{ cam.zoom=clamp(cam.zoom-0.2,0.5,2.2); clampCam(); });
+let downPos=null;
+canvas.addEventListener('pointerdown', (e)=>{ downPos={x:e.clientX,y:e.clientY,t:Date.now()}; });
+canvas.addEventListener('pointerup', (e)=>{ if(!downPos) return; const moved=Math.hypot(e.clientX-downPos.x,e.clientY-downPos.y); if(moved<6 && Date.now()-downPos.t<400){ handleWorldTap(e.clientX,e.clientY); } downPos=null; });
+function handleWorldTap(sx,sy){
+  const w=screenToWorld(sx,sy);
+  for(const n of state.ninjas){ if(n.status==='mission') continue; if(Math.hypot(n.pos.x-w.x,n.pos.y-w.y)<20){ openPanel('roster'); return; } }
+  for(const z of ZONES){ if(Math.hypot(z.x-w.x,z.y-w.y)<z.r){ openBuildingPopup(z.id); return; } }
+}
+state.ninjas.forEach(n=>{ const home=ZONES.find(z=>z.id==='huts'); n.pos.x=home.x+randRange(-30,30); n.pos.y=home.y+randRange(-30,30); pickNewWanderTarget(n); });
+function pickNewWanderTarget(n){
+  if(n.status==='training'){ const z=ZONES.find(zz=>zz.id==='training'); n.target={x:z.x+randRange(-18,18),y:z.y+randRange(-18,18),wait:randInt(80,180)}; return; }
+  if(n.status==='injured'){ const z=ZONES.find(zz=>zz.id==='infirmary'); n.target={x:z.x+randRange(-14,14),y:z.y+randRange(-14,14),wait:randInt(100,200)}; return; }
+  if(n.status==='mission'){ n.target=null; return; }
+  if(Math.random()<0.5){ const z=pickFrom(ZONES.filter(zz=>zz.id!=='gate')); n.target={x:z.x+randRange(-22,22),y:z.y+randRange(-22,22),wait:randInt(60,180)}; }
+  else { n.target={x:randRange(200,800),y:randRange(150,600),wait:randInt(30,100)}; }
+}
+function updateNinjas(dt){
+  state.ninjas.forEach(n=>{
+    if(n.status==='mission') return;
+    if(!n.target){ pickNewWanderTarget(n); return; }
+    if(n.target.wait>0){ n.target.wait-=dt*60; return; }
+    const dx=n.target.x-n.pos.x, dy=n.target.y-n.pos.y; const dist=Math.hypot(dx,dy);
+    if(dist<4){ pickNewWanderTarget(n); return; }
+    const speed=28; n.pos.x+=(dx/dist)*speed*dt; n.pos.y+=(dy/dist)*speed*dt;
+  });
+}
+function drawPine(x,y,scale){ ctx.save(); ctx.translate(x,y); ctx.scale(scale,scale); ctx.fillStyle='#3a2c1f'; ctx.fillRect(-2,4,4,9);
+  const shades=['#2a4028','#33502e','#3d5f37']; for(let i=0;i<3;i++){ ctx.fillStyle=shades[i]; ctx.beginPath(); const w=15-i*3.5,yy=4-i*8.5; ctx.moveTo(0,yy-13); ctx.lineTo(-w,yy); ctx.lineTo(w,yy); ctx.closePath(); ctx.fill(); } ctx.restore(); }
+function drawBush(x,y,scale){ ctx.save(); ctx.translate(x,y); ctx.scale(scale,scale); ctx.fillStyle='#2e4a2c'; ctx.beginPath(); ctx.ellipse(0,0,10,7,0,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#3a5c38'; ctx.beginPath(); ctx.ellipse(-3,-2,5,3,0,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+function drawRock(x,y,scale){ ctx.save(); ctx.translate(x,y); ctx.scale(scale,scale); ctx.fillStyle='#3a352e'; ctx.beginPath(); ctx.ellipse(0,0,9,6,0.3,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.07)'; ctx.beginPath(); ctx.ellipse(-2,-2,4,2,0.3,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+function drawHutBuilding(z){ ctx.save(); ctx.translate(z.x,z.y); ctx.fillStyle='rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(2,z.r*0.55,z.r*0.85,z.r*0.35,0,0,Math.PI*2); ctx.fill();
+  const bw=z.r*1.5, bh=z.r*0.9; ctx.fillStyle='#332a20'; ctx.fillRect(-bw/2,-bh*0.1,bw,bh*0.75);
+  ctx.fillStyle=z.color; ctx.beginPath(); ctx.moveTo(-bw*0.65,-bh*0.15); ctx.lineTo(0,-bh*1.15); ctx.lineTo(bw*0.65,-bh*0.15); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=1.5; ctx.stroke(); ctx.fillStyle='#141210'; ctx.fillRect(-bw*0.12,bh*0.2,bw*0.24,bh*0.42); ctx.restore(); }
+function drawElderHouse(z){ ctx.save(); ctx.translate(z.x,z.y); ctx.fillStyle='rgba(0,0,0,.32)'; ctx.beginPath(); ctx.ellipse(3,z.r*0.62,z.r*1.05,z.r*0.4,0,0,Math.PI*2); ctx.fill();
+  const bw=z.r*1.9, bh=z.r*1.05;
+  ctx.fillStyle='#3a352c'; ctx.fillRect(-bw*0.55,bh*0.28,bw*1.1,bh*0.16);
+  ctx.fillStyle='#332a20'; ctx.fillRect(-bw*0.5,-bh*0.05,bw,bh*0.35);
+  ctx.fillStyle='#241d15'; ctx.fillRect(-bw*0.4,bh*0.26,bw*0.8,bh*0.08);
+  ctx.fillStyle='#1c1710'; for(let i=-1;i<=1;i+=2){ ctx.fillRect(i*bw*0.42-2,-bh*0.05,4,bh*0.35); }
+  ctx.fillStyle=z.color; ctx.beginPath(); ctx.moveTo(-bw*0.62,-bh*0.02); ctx.lineTo(0,-bh*0.42); ctx.lineTo(bw*0.62,-bh*0.02); ctx.lineTo(bw*0.5,-bh*0.02); ctx.lineTo(0,-bh*0.34); ctx.lineTo(-bw*0.5,-bh*0.02); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.4)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle=z.color2||'#8a3530'; ctx.beginPath(); ctx.moveTo(-bw*0.4,-bh*0.32); ctx.lineTo(0,-bh*0.85); ctx.lineTo(bw*0.4,-bh*0.32); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.strokeStyle='#161310'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(-bw*0.06,-bh*0.83); ctx.lineTo(bw*0.06,-bh*0.83); ctx.stroke();
+  ctx.fillStyle='#141210'; ctx.fillRect(-bw*0.1,bh*0.02,bw*0.2,bh*0.3);
+  ctx.strokeStyle=z.color; ctx.lineWidth=2; ctx.strokeRect(-bw*0.1,bh*0.02,bw*0.2,bh*0.3);
+  ctx.fillStyle='rgba(255,220,150,.4)'; ctx.fillRect(-bw*0.35,bh*0.06,bw*0.14,bh*0.16); ctx.fillRect(bw*0.21,bh*0.06,bw*0.14,bh*0.16);
+  ctx.fillStyle=z.color; ctx.beginPath(); ctx.arc(0,-bh*0.15,z.r*0.13,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#e8e2d5'; ctx.font=`bold ${z.r*0.16}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('影',0,-bh*0.15);
+  ctx.restore(); }
+function drawTrainingYard(z){ ctx.save(); ctx.translate(z.x,z.y); ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(0,0,z.r*0.9,0,Math.PI*2); ctx.stroke();
+  for(let i=0;i<3;i++){ const a=(i/3)*Math.PI*2; const px=Math.cos(a)*z.r*0.55, py=Math.sin(a)*z.r*0.4; ctx.fillStyle='#4a3e2a'; ctx.fillRect(px-2,py-14,4,14);
+    ctx.fillStyle=z.color; ctx.beginPath(); ctx.arc(px,py-16,6,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#e8e2d5'; ctx.beginPath(); ctx.arc(px,py-16,3,0,Math.PI*2); ctx.fill(); }
+  ctx.restore(); }
+function drawWorkshop(z){ ctx.save(); ctx.translate(z.x,z.y); ctx.fillStyle='rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(2,z.r*0.55,z.r*0.8,z.r*0.32,0,0,Math.PI*2); ctx.fill();
+  const bw=z.r*1.4, bh=z.r*0.8; ctx.fillStyle='#332c22'; ctx.fillRect(-bw/2,-bh*0.1,bw,bh*0.7);
+  ctx.fillStyle=z.color; ctx.beginPath(); ctx.moveTo(-bw*0.6,-bh*0.15); ctx.lineTo(0,-bh*0.95); ctx.lineTo(bw*0.6,-bh*0.15); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#241f18'; ctx.fillRect(bw*0.25,-bh*0.95,6,bh*0.5); ctx.restore(); }
+function drawInfirmary(z){ ctx.save(); ctx.translate(z.x,z.y); ctx.fillStyle='rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(2,z.r*0.55,z.r*0.8,z.r*0.32,0,0,Math.PI*2); ctx.fill();
+  const bw=z.r*1.3, bh=z.r*0.8; ctx.fillStyle='#e8e2d5'; ctx.fillRect(-bw/2,-bh*0.1,bw,bh*0.7);
+  ctx.fillStyle=z.color; ctx.beginPath(); ctx.moveTo(-bw*0.6,-bh*0.15); ctx.lineTo(0,-bh*1.0); ctx.lineTo(bw*0.6,-bh*0.15); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#a8352e'; ctx.fillRect(-4,-bh*0.35,8,16); ctx.fillRect(-8,-bh*0.28,16,8); ctx.restore(); }
+function drawGate(z){ ctx.save(); ctx.translate(z.x,z.y); ctx.strokeStyle='#332a20'; ctx.lineWidth=8; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(-z.r*0.7,-z.r*0.6); ctx.lineTo(-z.r*0.7,z.r*0.5); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(z.r*0.7,-z.r*0.6); ctx.lineTo(z.r*0.7,z.r*0.5); ctx.stroke();
+  ctx.lineWidth=10; ctx.beginPath(); ctx.moveTo(-z.r*0.8,-z.r*0.6); ctx.lineTo(z.r*0.8,-z.r*0.6); ctx.stroke(); ctx.restore(); }
+function drawFence(){
+  const margin=46; const left=margin,right=WORLD_W-margin,top=margin,bottom=WORLD_H-margin;
+  const gateZone=ZONES.find(z=>z.id==='gate'); const postSpacing=22;
+  function drawPost(px,py,tall){ ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(px-2,py+2,5,4);
+    ctx.fillStyle='#332a20'; ctx.fillRect(px-3,py-(tall?20:15),6,(tall?20:15)); ctx.fillStyle='#3a2e20'; ctx.fillRect(px-3,py-(tall?20:15),2,(tall?20:15));
+    ctx.beginPath(); ctx.moveTo(px-3,py-(tall?20:15)); ctx.lineTo(px,py-(tall?26:20)); ctx.lineTo(px+3,py-(tall?20:15)); ctx.closePath(); ctx.fillStyle='#241d15'; ctx.fill(); }
+  function segmentPosts(x1,y1,x2,y2){ const dist=Math.hypot(x2-x1,y2-y1); const count=Math.max(2,Math.round(dist/postSpacing));
+    for(let i=0;i<=count;i++){ const t=i/count; const px=x1+(x2-x1)*t, py=y1+(y2-y1)*t;
+      if(gateZone && Math.hypot(px-gateZone.x,py-gateZone.y)<gateZone.r*1.4) continue; drawPost(px,py,false); } }
+  ctx.strokeStyle='#332a20'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(left,top); ctx.lineTo(right,top); ctx.lineTo(right,bottom); ctx.lineTo(left,bottom); ctx.closePath(); ctx.stroke();
+  segmentPosts(left,top,right,top); segmentPosts(right,top,right,bottom); segmentPosts(right,bottom,left,bottom); segmentPosts(left,bottom,left,top);
+  if(gateZone){ drawPost(gateZone.x-gateZone.r*1.3,bottom,true); drawPost(gateZone.x+gateZone.r*1.3,bottom,true); }
+}
+function drawWorld(){
+  const rect=canvas.getBoundingClientRect(); ctx.save(); ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); ctx.clearRect(0,0,rect.width,rect.height);
+  ctx.fillStyle='#0e1410'; ctx.fillRect(0,0,rect.width,rect.height);
+  ctx.translate(rect.width/2,rect.height/2); ctx.scale(cam.zoom,cam.zoom); ctx.translate(-cam.x,-cam.y);
+  const grad=ctx.createRadialGradient(500,380,80,500,380,600); grad.addColorStop(0,'#22301f'); grad.addColorStop(1,'#141d12'); ctx.fillStyle=grad; ctx.fillRect(-150,-150,WORLD_W+300,WORLD_H+300);
+  ctx.fillStyle='#171f16'; ctx.beginPath(); ctx.moveTo(-150,140); ctx.lineTo(50,-60); ctx.lineTo(220,90); ctx.lineTo(420,-100); ctx.lineTo(650,60); ctx.lineTo(880,-70); ctx.lineTo(1150,110); ctx.lineTo(1150,-150); ctx.lineTo(-150,-150); ctx.closePath(); ctx.fill();
+  const hq=ZONES.find(z=>z.id==='hq');
+  ctx.strokeStyle='rgba(130,112,80,.5)'; ctx.lineWidth=16; ctx.lineCap='round';
+  ZONES.forEach(z=>{ if(z.id==='hq') return; ctx.beginPath(); ctx.moveTo(hq.x,hq.y); const midx=(hq.x+z.x)/2+(z.y-hq.y)*0.08, midy=(hq.y+z.y)/2-(z.x-hq.x)*0.08; ctx.quadraticCurveTo(midx,midy,z.x,z.y); ctx.stroke(); });
+  ctx.fillStyle='rgba(140,118,80,.35)'; ctx.beginPath(); ctx.ellipse(hq.x,hq.y,150,120,0,0,Math.PI*2); ctx.fill();
+  const drawables=[];
+  TREES.forEach(t=>drawables.push({y:t.y, draw:()=>{ if(t.type==='pine') drawPine(t.x,t.y,t.s); else if(t.type==='rock') drawRock(t.x,t.y,t.s); else drawBush(t.x,t.y,t.s); }}));
+  ZONES.forEach(z=>{ drawables.push({y:z.y, draw:()=>{
+    if(z.id==='hq') drawElderHouse(z); else if(z.id==='training') drawTrainingYard(z); else if(z.id==='huts') drawHutBuilding(z);
+    else if(z.id==='workshop') drawWorkshop(z); else if(z.id==='infirmary') drawInfirmary(z); else if(z.id==='gate') drawGate(z);
+    ctx.font='bold 11px -apple-system,sans-serif'; ctx.fillStyle='#e8e2d5'; ctx.textAlign='center'; ctx.fillText(z.name, z.x, z.y+z.r+16);
+  }}); });
+  state.ninjas.forEach(n=>{ if(n.status==='mission') return; drawables.push({y:n.pos.y, draw:()=>{
+    ctx.beginPath(); ctx.ellipse(n.pos.x,n.pos.y+9,8,3,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fill();
+    drawNinjaSilhouette(ctx, n.pos.x, n.pos.y, 12, n);
+    ctx.font='bold 9px -apple-system,sans-serif'; ctx.fillStyle='#e8e2d5'; ctx.textAlign='center'; ctx.fillText(n.name, n.pos.x, n.pos.y-17);
+  }}); });
+  drawables.sort((a,b)=>a.y-b.y); drawables.forEach(d=>d.draw());
+  drawFence();
+  ctx.restore();
+}
+let lastT=performance.now();
+function loop(t){
+  const dt=Math.min(0.05,(t-lastT)/1000); lastT=t;
+  if(!state.gameOver){ updateNinjas(dt); tickClock(dt); }
+  drawWorld();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+function tickClock(dt){
+  if(!state.autoTimeEnabled) return;
+  if(document.getElementById('modal-backdrop').classList.contains('show')) return;
+  if(document.getElementById('resolution-modal-backdrop').classList.contains('show')) return;
+  state.phaseProgress += dt/DAY_DURATION_SEC;
+  if(state.phaseProgress>=1){ state.phaseProgress=0; goToNextDay(); }
+  updateClockWidget();
+}
+
+/* ============================================================
+   MAIN MENU / INTRO / NEW GAME
+   ============================================================ */
+function startFreshGame(){
+  document.getElementById('main-menu').style.display='none';
+  document.getElementById('intro-screen').classList.add('show');
+}
+function beginGameplay(){
+  document.getElementById('intro-screen').classList.remove('show');
+  advanceStory(0);
+  renderAll();
+  saveGame();
+}
+function continueGame(){
+  const saved=loadGame();
+  if(saved){
+    Object.assign(state, saved);
+    // rebuild ninja references since arrays were replaced
+    state.ninjas.forEach(n=>{ if(!n.pos) n.pos={x:0,y:0}; });
+  }
+  document.getElementById('main-menu').style.display='none';
+  ensureMissionSupply();
+  renderAll();
+  updateBellBadge();
+}
+document.getElementById('menu-new').addEventListener('click', ()=>{ Audio_.unlock(); clearSave(); startFreshGame(); });
+document.getElementById('menu-continue').addEventListener('click', ()=>{ Audio_.unlock(); continueGame(); });
+document.getElementById('menu-howto').addEventListener('click', ()=>{
+  const modal=document.getElementById('modal');
+  modal.innerHTML=`<h2>How to Play</h2>
+    <div class="modal-sub" style="margin-bottom:2px;">The short version.</div>
+    <div style="font-size:12.5px;color:var(--text-dim);line-height:1.7;">
+    <b style="color:var(--text)">Missions</b> come from three factions in the valley. Tap the Mission Board, pick a job, choose who goes and what tools to bring.<br><br>
+    <b style="color:var(--text)">Travel takes real days</b> — check the map to see how far a job is. Your ninjas are unavailable the whole trip.<br><br>
+    <b style="color:var(--text)">Anyone home and rested defends the village automatically</b> — no need to assign guards.<br><br>
+    <b style="color:var(--text)">Training</b> happens at the Training Yard building on the map. <b style="color:var(--text)">Crafting</b> happens at the Workshop.<br><br>
+    <b style="color:var(--text)">Keep the clan fed.</b> No food means everyone weakens over time, and weak ninjas fail more missions.<br><br>
+    Time advances on its own — tap the small clock top-right to pause it or check the day.
+    </div>
+    <button class="btn gold block" id="howto-close" style="margin-top:14px;">Got it</button>`;
+  document.getElementById('howto-close').addEventListener('click', closeModal);
+  showModal();
+});
+document.getElementById('intro-start').addEventListener('click', ()=>{ Audio_.unlock(); beginGameplay(); });
+
+// show Continue button if a save exists
+if(hasSave()){ document.getElementById('menu-continue').style.display='block'; }
+
+})();
+</script>
 </body>
 </html>
