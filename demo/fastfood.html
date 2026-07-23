@@ -3,1570 +3,1476 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Graveyard — Where Unfinished Games Live On</title>
+<title>GoodWorks — The Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-
   :root{
-    --bg: #1B1233; --bg-deep: #140C26; --panel: #251A45; --panel-2: #2E2056; --line: #4A3A7A;
-    --ink: #FFFFFF; --ink-dim: #C4B8E8;
-    --pink: #FF4D8D; --pink-dk: #C22A63;
-    --cyan: #34E4E0; --cyan-dk: #159C99;
-    --lime: #B4F03C; --lime-dk: #7CA818;
-    --orange: #FF9F3E; --orange-dk: #D4700E;
-    --yellow: #FFD93E;
-    --purple: #9B6BFF; --purple-dk: #6B3FD4;
-    --red: #FF5A52; --red-dk: #C7362F;
-    --glow1: rgba(155,107,255,0.25); --glow2: rgba(52,228,224,0.15); --glow3: rgba(255,77,141,0.12);
-    --title-shadow: rgba(0,0,0,0.55); --hero-emoji-opacity: 0.12;
-    --header-tint: rgba(20,12,38,0.88); --hover-tint: rgba(255,255,255,0.06);
-    --title-main: #FFFFFF; --title-accent: #FFD93E;
-  }
-
-  html[data-theme="day"]{
-    --bg: #FFF3E2; --bg-deep: #FFFFFF; --panel: #FFFFFF; --panel-2: #FFF9F0; --line: #F0D9BC;
-    --ink: #3A2A1A; --ink-dim: #8A6A50;
-    --pink: #E85D2C; --pink-dk: #B8431A;
-    --cyan: #4EC5C1; --cyan-dk: #2C8E8A;
-    --lime: #8FDD5A; --lime-dk: #4FA82E;
-    --orange: #FF8A3D; --orange-dk: #C4611A;
-    --yellow: #FFD23E;
-    --purple: #B07FE0; --purple-dk: #8058B0;
-    --red: #E0473A; --red-dk: #B02E24;
-    --glow1: rgba(232,93,44,0.10); --glow2: rgba(78,197,193,0.10); --glow3: rgba(255,210,62,0.14);
-    --title-shadow: rgba(0,0,0,0.12); --hero-emoji-opacity: 0.08;
-    --header-tint: rgba(255,255,255,0.85); --hover-tint: rgba(232,93,44,0.08);
-    --title-main: #E85D2C; --title-accent: #2C8E8A;
+    --paper: #F7F4EC;
+    --paper-dim: #EFEADB;
+    --ink: #1F2A24;
+    --ink-soft: #45524A;
+    --moss: #3D6355;
+    --moss-deep: #294138;
+    --brass: #7A6A4F;
+    --brass-soft: #C9BB9C;
+    --oxblood: #A33B2E;
+    --line: rgba(31,42,36,0.16);
+    --card: #FCFAF3;
+    --shadow: 0 1px 0 rgba(31,42,36,0.06), 0 8px 20px -12px rgba(31,42,36,0.25);
   }
 
   *{ box-sizing: border-box; }
+
   html{ scroll-behavior: smooth; }
+
   body{
     margin:0;
-    background:
-      radial-gradient(ellipse at 15% 0%, var(--glow1) 0%, transparent 45%),
-      radial-gradient(ellipse at 85% 20%, var(--glow2) 0%, transparent 40%),
-      radial-gradient(ellipse at 50% 100%, var(--glow3) 0%, transparent 50%),
-      var(--bg);
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px);
+    background-size: 100% 32px;
     color: var(--ink);
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
     line-height: 1.5;
-    min-height: 100vh;
-    transition: background-color .3s ease, color .3s ease;
   }
-  h1,h2,h3,h4, .display{ font-family: 'Baloo 2', sans-serif; font-weight: 800; color: var(--ink); margin: 0; }
-  .mono{ font-family: 'Space Mono', monospace; }
+
+  h1,h2,h3, .display{
+    font-family: 'Fraunces', serif;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .mono{ font-family: 'JetBrains Mono', monospace; }
+
   a{ color: inherit; }
-  ::selection{ background: var(--pink); color: white; }
 
-  .game-title{
-    font-family: 'Fredoka', sans-serif;
+  button{
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* ---------- App shell ---------- */
+  .app{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ---------- Top masthead ---------- */
+  .masthead{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 26px 0 18px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap: 10px;
+  }
+  .brand .mark{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+  }
+  .brand .sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass);
+  }
+  .user-chip{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12.5px;
+  }
+  .avatar{
+    width:34px;height:34px;border-radius:3px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:14px;
+    color:#fff;
+    flex-shrink:0;
+  }
+
+  /* ---------- Binder tab navigation ---------- */
+  .tabs{
+    display:flex;
+    gap: 4px;
+    margin-top: 0;
+    overflow-x:auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{
+    position:relative;
+    padding: 10px 18px 12px;
+    background: var(--paper-dim);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    top: 1px;
+  }
+  .tab.active{
+    background: var(--paper);
+    color: var(--ink);
     font-weight: 700;
-    letter-spacing: 0.01em;
-    text-shadow: 3px 3px 0 var(--title-shadow);
+    border-color: var(--ink);
+    border-bottom: 1px solid var(--paper);
+    margin-bottom: -1px;
+  }
+  .tab:hover:not(.active){ color: var(--ink); }
+  .tab .count{
+    display:inline-block;
+    margin-left:6px;
+    background: var(--oxblood);
+    color:#fff;
+    border-radius: 20px;
+    padding: 0 6px;
+    font-size: 10px;
   }
 
-  .wrap{ max-width: 1220px; margin: 0 auto; padding: 0 28px; }
-
-  /* ---------- header ---------- */
-  header.site{ position: sticky; top: 0; z-index: 50; background: var(--header-tint); backdrop-filter: blur(10px); border-bottom: 3px solid var(--purple); }
-  header.site .bar{ display:flex; align-items:center; justify-content:space-between; padding: 14px 0; gap: 16px; }
-  .wordmark{ display:flex; align-items:center; gap:10px; cursor:pointer; flex-shrink:0; }
-  .wordmark .skull{ font-size: 28px; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.4)); transform: rotate(-8deg); display:inline-block; }
-  .wordmark .game-title{ font-size: 24px; color: var(--title-main); }
-
-  nav.main{ display:flex; gap: 6px; align-items:center; }
-  nav.main button{
-    background: transparent; border: 2px solid transparent; font-family:'Baloo 2', sans-serif; font-weight: 600;
-    font-size: 15px; color: var(--ink-dim); cursor:pointer; padding: 8px 16px; border-radius: 10px; transition: all .15s ease;
+  .page{
+    border-top: 3px solid var(--ink);
+    padding-top: 34px;
+    display:none;
+    animation: settle 0.35s ease;
   }
-  nav.main button:hover{ color: var(--ink); background: var(--hover-tint); }
-  nav.main button.active{ color: var(--bg-deep); background: var(--yellow); box-shadow: 0 3px 0 var(--orange-dk); }
-
-  .header-right{ display:flex; align-items:center; gap: 10px; flex-shrink:0; }
-  .account-chip{
-    display:flex; align-items:center; gap:8px; background: var(--panel); border: 2px solid var(--line);
-    border-radius: 999px; padding: 5px 14px 5px 6px; cursor:pointer; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px;
-  }
-  .account-chip .avatar-mini{
-    width: 26px; height:26px; border-radius:50%; background: linear-gradient(135deg, var(--purple), var(--pink));
-    color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
+  .page.active{ display:block; }
+  @keyframes settle{
+    from{ opacity:0; transform: translateY(6px); }
+    to{ opacity:1; transform: translateY(0); }
   }
 
+  /* ---------- Typography helpers ---------- */
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 10px;
+    display:block;
+  }
+  .lede{
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 640px;
+  }
+
+  /* ---------- Home / hero ---------- */
+  .hero{
+    display:grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 48px;
+    align-items: start;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 860px){ .hero{ grid-template-columns: 1fr; } }
+  .hero h1{
+    font-size: clamp(36px, 5vw, 58px);
+    line-height: 1.02;
+    font-weight: 700;
+  }
+  .hero h1 em{
+    font-style: italic;
+    color: var(--moss);
+  }
+  .hero-actions{
+    display:flex;
+    gap: 12px;
+    margin-top: 26px;
+    flex-wrap: wrap;
+  }
   .btn{
-    font-family:'Baloo 2', sans-serif; font-weight: 700; font-size: 15px; padding: 11px 22px; border: none; border-radius: 12px;
-    cursor: pointer; color: var(--bg-deep); background: var(--yellow); box-shadow: 0 4px 0 var(--orange-dk);
-    transition: transform .1s ease, box-shadow .1s ease;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 22px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14.5px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  .btn:hover{ transform: translateY(-2px); box-shadow: 0 6px 0 var(--orange-dk); }
-  .btn:active{ transform: translateY(2px); box-shadow: 0 2px 0 var(--orange-dk); }
-  .btn.pink{ background: var(--pink); box-shadow: 0 4px 0 var(--pink-dk); color: white; }
-  .btn.pink:hover{ box-shadow: 0 6px 0 var(--pink-dk); }
-  .btn.cyan{ background: var(--cyan); box-shadow: 0 4px 0 var(--cyan-dk); color: var(--bg-deep); }
-  .btn.cyan:hover{ box-shadow: 0 6px 0 var(--cyan-dk); }
-  .btn.ghost{ background: transparent; color: var(--ink); border: 2.5px solid var(--purple); box-shadow: none; }
-  .btn.ghost:hover{ background: var(--hover-tint); transform: translateY(-2px); }
-  .btn.small{ padding: 8px 14px; font-size: 13px; border-radius: 9px; }
-  .btn.tiny{ padding: 6px 11px; font-size: 12px; border-radius: 8px; box-shadow: 0 3px 0 var(--orange-dk); }
-  .btn.tiny.pink{ box-shadow: 0 3px 0 var(--pink-dk); }
-  .btn.tiny:hover{ box-shadow: 0 4px 0 var(--orange-dk); }
-  .btn.tiny.pink:hover{ box-shadow: 0 4px 0 var(--pink-dk); }
-  .btn:disabled{ opacity: .5; cursor: not-allowed; transform:none !important; }
-  .btn.danger{ background: var(--red); box-shadow: 0 4px 0 var(--red-dk); color:white; }
-  .btn.danger:hover{ box-shadow: 0 6px 0 var(--red-dk); }
+  .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn.ghost{
+    background: transparent;
+    color: var(--ink);
+  }
+  .btn.moss{
+    background: var(--moss);
+    border-color: var(--moss);
+    color:#fff;
+  }
+  .btn.oxblood{
+    background: transparent;
+    border-color: var(--oxblood);
+    color: var(--oxblood);
+  }
+  .btn.small{ padding: 8px 14px; font-size: 13px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
 
-  /* ---------- reaction buttons (RIP / Revive) ---------- */
-  .reaction-row{ display:flex; gap: 10px; align-items:center; flex-wrap:wrap; }
-  .react-btn{
-    font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 14px;
-    padding: 10px 18px; border-radius: 12px; border: 2.5px solid var(--line);
-    background: var(--panel); color: var(--ink); cursor:pointer; transition: all .15s;
-    display:flex; align-items:center; gap:7px;
-  }
-  .react-btn:hover{ transform: translateY(-2px); }
-  .react-btn.rip.active{ background: var(--panel-2); border-color: var(--ink-dim); color: var(--ink); box-shadow: 0 3px 0 var(--line); }
-  .react-btn.revive.active{ background: var(--pink); border-color: var(--pink-dk); color: white; box-shadow: 0 3px 0 var(--pink-dk); }
-  .react-count{ font-family:'Space Mono',monospace; font-size: 12px; color: var(--ink-dim); }
-  .react-btn-sm{
-    font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 11.5px;
-    padding: 6px 10px; border-radius: 9px; border: 2px solid var(--line);
-    background: var(--panel); color: var(--ink); cursor:pointer; display:flex; align-items:center; gap:4px;
-  }
-  .react-btn-sm.rip.active{ background: var(--panel-2); border-color: var(--ink-dim); }
-  .react-btn-sm.revive.active{ background: var(--pink); border-color: var(--pink-dk); color:white; }
-
-  /* ---------- hero ---------- */
-  .hero{ padding: 60px 0 40px; position: relative; overflow:hidden; }
-  .hero::before{
-    content:'👻 🕹 💀 ✨ 🎮 🦴'; position:absolute; top: 10px; left:0; right:0; font-size: 22px;
-    opacity: var(--hero-emoji-opacity); letter-spacing: 60px; white-space: nowrap; pointer-events:none;
-  }
-  .hero-inner{ position:relative; text-align:center; }
-  .eyebrow-badge{
-    display:inline-flex; align-items:center; gap:8px; background: var(--panel); border: 2px solid var(--purple);
-    border-radius: 999px; padding: 7px 16px; font-family:'Space Mono',monospace; font-size: 12px; color: var(--cyan-dk); margin-bottom: 22px;
-  }
-  html[data-theme="day"] .eyebrow-badge{ color: var(--cyan-dk); }
-  .eyebrow-badge .dot{ width:7px; height:7px; border-radius:50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); }
-  .hero h1.game-title{ font-size: clamp(38px, 6vw, 66px); line-height: 1.05; color: var(--title-main); }
-  .hero h1.game-title .accent{ color: var(--title-accent); text-shadow: 3px 3px 0 var(--title-shadow); }
-  .hero p.lede{ font-size: 17px; color: var(--ink-dim); max-width: 52ch; margin: 20px auto 0; }
-  .hero-actions{ margin-top: 28px; display:flex; gap: 14px; justify-content:center; flex-wrap:wrap; }
-
-  /* ---------- section scaffolding ---------- */
-  section{ padding: 46px 0; }
-  .section-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 26px; gap: 20px; flex-wrap: wrap; }
-  .section-head h2{ font-size: 28px; display:flex; align-items:center; gap:10px; }
-  .section-head p{ color: var(--ink-dim); font-size: 14px; max-width: 44ch; }
-  .refresh-link{
-    font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 13px; color: var(--cyan-dk);
-    background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:5px;
+  .ledger-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 22px;
   }
 
-  /* ---------- game card grid ---------- */
-  .card-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px; }
-  .gcard{
-    background: var(--panel); border: 3px solid var(--line); border-radius: 18px; cursor:pointer; overflow:hidden;
-    display:flex; flex-direction:column; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; position:relative;
+  .todays-entry .stamp-row{
+    display:flex;
+    justify-content: space-between;
+    align-items:flex-start;
+    margin-bottom: 14px;
   }
-  .gcard:hover{ transform: translateY(-6px) rotate(-0.6deg); border-color: var(--yellow); box-shadow: 0 12px 0 -4px rgba(0,0,0,0.3), 0 14px 24px rgba(0,0,0,0.4); }
-  .gcard:focus-visible{ outline: 3px solid var(--cyan); outline-offset:2px; }
-  .cover{ height: 140px; position: relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-  .cover .icon{ font-size: 46px; filter: drop-shadow(2px 3px 0 rgba(0,0,0,0.3)); position:relative; z-index:2; }
-  .cover .shape{ position:absolute; border-radius:50%; opacity:.5; }
-  .cover .shape.s1{ width:90px;height:90px; top:-30px; left:-20px; }
-  .cover .shape.s2{ width:60px;height:60px; bottom:-20px; right:-10px; }
-  .cover .shape.s3{ width:40px;height:40px; top:20px; right:20px; }
-  .status-chip{
-    position:absolute; top: 10px; right: 10px; z-index:3; font-family:'Space Mono',monospace; font-size: 9.5px; font-weight:700;
-    letter-spacing:.05em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; color: var(--bg-deep);
+  .stat-strip{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 30px;
   }
-  .status-chip.abandoned{ background: var(--red); color:white; }
-  .status-chip.onhold{ background: var(--orange); }
-  .status-chip.prototype{ background: var(--cyan); }
-  .status-chip.idea{ background: #D8CCFF; }
-  .status-chip.canceled{ background: #8A8098; color:white; }
-  .status-chip.revived{ background: var(--lime); }
-  .status-chip.dev{ background: var(--yellow); }
-  .badge-corner{
-    position:absolute; top:10px; left:10px; z-index:3; font-family:'Space Mono',monospace; font-size:9px; font-weight:700;
-    padding: 4px 8px; border-radius: 999px; background: rgba(0,0,0,0.35); color:white; letter-spacing:.04em; text-transform:uppercase;
+  .stat{
+    border-left: 2px solid var(--brass);
+    padding-left: 14px;
   }
-  .gcard .body{ padding: 14px 15px 16px; display:flex; flex-direction:column; gap:7px; flex:1; }
-  .gcard h4{ font-size: 17px; font-weight:700; line-height:1.2; }
-  .genre-line{ font-family:'Space Mono',monospace; font-size: 10px; text-transform:uppercase; letter-spacing:.05em; color: var(--ink-dim); }
-  .gcard p.snippet{ font-size: 12.5px; color: var(--ink-dim); flex:1; line-height:1.4; }
-  .gcard .foot{
-    display:flex; justify-content:space-between; align-items:center; margin-top: 4px; padding-top: 10px;
-    border-top: 2px dashed var(--line); font-family:'Space Mono',monospace; font-size: 11px; color: var(--ink-dim);
+  .stat .num{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size: 26px;
+    color: var(--moss-deep);
   }
-  .foot .reactions{ display:flex; gap:8px; }
-  .foot .rip-mini{ color: var(--ink-dim); }
-  .foot .revive-mini{ color: var(--pink); font-weight:700; }
+  .stat .lbl{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
 
-  .filters{ display:flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; align-items:center; }
-  .filters select, .filters input[type=text]{
-    font-family:'Fredoka', sans-serif; font-size: 13.5px; font-weight:500; padding: 10px 14px; border-radius: 10px;
-    border: 2px solid var(--line); background: var(--panel); color: var(--ink);
+  /* ---------- Section headers ---------- */
+  .section-head{
+    display:flex;
+    justify-content: space-between;
+    align-items:flex-end;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  .filters input[type=text]{ min-width: 220px; flex:1; }
-  .filters select:focus, .filters input:focus{ outline: none; border-color: var(--cyan); }
 
-  .empty-state{ text-align:center; padding: 60px 20px; color: var(--ink-dim); font-family:'Space Mono',monospace; font-size: 13px; border: 2px dashed var(--line); border-radius: 18px; }
-
-  .genre-band{ display:flex; flex-wrap:wrap; gap: 10px; }
-  .genre-pill{
-    font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 13.5px; padding: 10px 18px; border-radius: 999px; cursor:pointer;
-    border: 2.5px solid var(--line); background: var(--panel); color: var(--ink); transition: all .15s;
+  /* ---------- Cards grid (tasks) ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
   }
-  .genre-pill:hover{ transform: translateY(-2px); border-color: var(--yellow); }
-
-  /* ---------- login gate banner ---------- */
-  .login-gate{
-    background: var(--panel); border: 2.5px dashed var(--purple); border-radius: 16px;
-    padding: 18px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  .task-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+    display:flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    position: relative;
   }
-  .login-gate p{ font-size: 14px; color: var(--ink-dim); margin:0; }
-  .login-gate p b{ color: var(--ink); }
-
-  /* ---------- detail page ---------- */
-  .back-link{
-    font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 14px; color: var(--ink-dim); cursor:pointer;
-    display:inline-flex; align-items:center; gap:6px; margin-bottom: 22px; transition: color .15s;
+  .task-card .cat{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--moss-deep);
+    background: rgba(61,99,85,0.12);
+    display:inline-block;
+    padding: 3px 9px;
+    border-radius: 20px;
+    width: fit-content;
   }
-  .back-link:hover{ color: var(--yellow); }
-  .detail-head{ display:grid; grid-template-columns: 1fr 1.3fr; gap: 36px; margin-bottom: 10px; }
-  .detail-cover{ height: 280px; border-radius: 20px; border: 3px solid var(--line); position: relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-  .detail-cover .icon{ font-size: 78px; filter: drop-shadow(3px 4px 0 rgba(0,0,0,0.3)); position:relative; z-index:2; }
-  .detail-info .case{ font-family:'Space Mono',monospace; font-size:12px; color: var(--cyan-dk); margin-bottom:8px; }
-  .detail-info h2{ font-size: 34px; }
-  .fields{ margin-top: 18px; display:grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
-  .field .k{ font-family:'Space Mono',monospace; font-size: 10px; text-transform:uppercase; letter-spacing:.06em; color: var(--ink-dim); }
-  .field .v{ font-size: 15px; margin-top: 3px; font-weight:600; }
-  .detail-actions{ margin-top: 22px; display:flex; gap: 14px; align-items:center; flex-wrap:wrap; }
-  .revive-count{ font-family:'Space Mono',monospace; font-size: 13px; color: var(--ink-dim); }
-  .report-link{ font-family:'Space Mono',monospace; font-size: 11.5px; color: var(--ink-dim); text-decoration: underline; cursor:pointer; background:none; border:none; }
-
-  .prose-block{ margin-top: 36px; max-width: 76ch; }
-  .prose-block h3{ font-size: 20px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 3px solid var(--purple); display:inline-block; }
-  .prose-block .story{ white-space: pre-wrap; font-size: 16px; color: var(--ink-dim); line-height:1.65; }
-
-  .media-links{ margin-top: 32px; }
-  .media-links h3{ font-size: 20px; padding-bottom:10px; border-bottom: 3px solid var(--cyan); display:inline-block; margin-bottom:14px; }
-  .media-links ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
-  .media-links li a{
-    display:inline-block; font-family:'Space Mono',monospace; font-size: 13px; background: var(--panel); border: 2px solid var(--line);
-    border-radius: 10px; padding: 10px 16px; text-decoration:none; transition: border-color .15s;
+  .task-card h3{ font-size: 20px; }
+  .task-card p{ color: var(--ink-soft); font-size: 14.5px; margin:0; flex-grow:1; }
+  .task-meta{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-soft);
   }
-  .media-links li a:hover{ border-color: var(--cyan); }
+  .task-meta .pts{ color: var(--brass); font-weight: 700; }
 
-  .comments-block{ margin-top: 32px; }
-  .comments-block h3{ font-size: 20px; padding-bottom:10px; border-bottom: 3px solid var(--pink); display:inline-block; margin-bottom:14px; }
-  .beta-tag{ font-family:'Space Mono',monospace; font-size: 9.5px; font-weight:700; background: var(--yellow); color: var(--bg-deep); padding: 3px 8px; border-radius: 999px; vertical-align: middle; margin-left: 8px; }
-  .placeholder-note{ font-family:'Space Mono',monospace; font-size: 12px; color: var(--ink-dim); background: var(--panel); border: 2px dashed var(--line); border-radius: 14px; padding: 16px 18px; }
-
-  .comment{ display:flex; gap: 12px; padding: 16px 0; border-bottom: 2px dashed var(--line); }
-  .comment:first-child{ padding-top: 0; }
-  .comment-avatar{
-    width: 38px; height:38px; border-radius: 50%; flex-shrink:0; background: var(--purple); color: white;
-    display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 15px;
+  /* ---------- Groups ---------- */
+  .group-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display:flex;
+    gap: 16px;
+    align-items:flex-start;
   }
-  .comment-body{ flex:1; }
-  .comment-head{ display:flex; gap:10px; align-items:baseline; }
-  .comment-name{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 14px; }
-  .comment-time{ font-family:'Space Mono',monospace; font-size: 11px; color: var(--ink-dim); }
-  .comment-text{ margin: 4px 0 0; font-size: 14px; color: var(--ink-dim); line-height:1.5; }
-  .comment-form{ margin-top: 20px; background: var(--panel); border: 2px solid var(--line); border-radius: 14px; padding: 16px; }
-  .comment-form textarea{
-    width:100%; min-height: 80px; font-family:'Fredoka', sans-serif; font-size: 14px; padding: 11px 13px; border-radius: 10px;
-    border: 2px solid var(--line); background: var(--bg-deep); color: var(--ink); resize: vertical; margin-bottom: 10px;
+  .group-icon{
+    width: 52px; height:52px; border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; font-size:20px;
+    color:#fff; flex-shrink:0;
   }
-  .comment-form textarea:focus{ outline:none; border-color: var(--cyan); }
-  .comment-form-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .group-card .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+  }
+  .privacy-badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+  }
+  .privacy-badge.public{ color: var(--moss-deep); border-color: var(--moss); }
+  .privacy-badge.private{ color: var(--brass); border-color: var(--brass); }
 
-  /* ---------- profile page ---------- */
-  .profile-head{ display:flex; gap: 28px; align-items:flex-start; flex-wrap:wrap; }
+  form.panel{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    max-width: 560px;
+    display:flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    display:block;
+    margin-bottom: 6px;
+  }
+  input[type=text], input[type=number], input[type=url], textarea, select{
+    width:100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 5px;
+    background: var(--paper);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  input:focus, textarea:focus, select:focus, button:focus-visible, .tab:focus-visible{
+    outline: 2px solid var(--moss);
+    outline-offset: 2px;
+  }
+  textarea{ resize: vertical; min-height: 70px; }
+  .field-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width:560px){ .field-row{ grid-template-columns: 1fr; } }
+  .radio-row{ display:flex; gap: 18px; }
+  .radio-opt{ display:flex; align-items:center; gap:6px; font-size: 14px; }
+  .radio-opt input{ width:auto; }
+
+  /* ---------- Approval queue ---------- */
+  .approval-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 20px;
+    display:grid;
+    grid-template-columns: 260px 1fr;
+    gap: 22px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  @media (max-width:700px){ .approval-card{ grid-template-columns: 1fr; } }
+  .proof-frame{
+    background: #0F1512;
+    border-radius: 6px;
+    aspect-ratio: 16/10;
+    display:flex;align-items:center;justify-content:center;
+    color: #B8C9BE;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-align:center;
+    padding: 10px;
+    overflow:hidden;
+  }
+  .proof-frame img, .proof-frame iframe{
+    width:100%; height:100%; object-fit:cover; border:none;
+  }
+  .progress-track{
+    height: 8px;
+    background: var(--paper-dim);
+    border-radius: 20px;
+    overflow:hidden;
+    margin: 10px 0;
+    border: 1px solid var(--line);
+  }
+  .progress-fill{
+    height:100%;
+    background: var(--moss);
+    transition: width 0.4s ease;
+  }
+  .progress-fill.flag{ background: var(--oxblood); }
+  .approve-actions{ display:flex; gap:10px; margin-top: 14px; flex-wrap:wrap; }
+
+  /* wax seal stamp - signature element */
+  .stamp{
+    position:absolute;
+    top: 14px; right: 14px;
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #B9503F, var(--oxblood) 70%);
+    color: #F7E9DE;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    font-family:'Fraunces', serif;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align:center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.35), inset 0 0 0 3px rgba(247,233,222,0.25);
+    transform: rotate(-11deg) scale(0);
+    animation: stamp-in 0.5s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  .stamp.moss-stamp{
+    background: radial-gradient(circle at 35% 30%, #4d7d6c, var(--moss-deep) 70%);
+  }
+  @keyframes stamp-in{
+    0%{ transform: rotate(-30deg) scale(0); opacity: 0;}
+    60%{ transform: rotate(-8deg) scale(1.15); opacity:1;}
+    100%{ transform: rotate(-11deg) scale(1); opacity:1;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .stamp{ animation: none; transform: rotate(-11deg) scale(1); }
+    .page{ animation: none; }
+  }
+
+  /* ---------- Leaderboard ---------- */
+  .lead-row{
+    display:grid;
+    grid-template-columns: 44px 1fr auto auto;
+    align-items:center;
+    gap: 16px;
+    padding: 14px 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  .lead-row .rank-num{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    color: var(--brass);
+    font-size: 15px;
+  }
+  .rank-badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    color: #fff;
+  }
+
+  /* ---------- Profile ---------- */
+  .profile-head{
+    display:flex;
+    gap: 26px;
+    align-items:center;
+    padding-bottom: 26px;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
   .profile-avatar{
-    width: 96px; height: 96px; border-radius: 26px; flex-shrink:0; background: linear-gradient(135deg, var(--purple), var(--pink));
-    color:white; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size: 40px; border: 3px solid var(--line);
+    width: 88px; height: 88px; border-radius: 8px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces', serif; font-weight:700; font-size: 34px;
+    color:#fff;
+    flex-shrink:0;
   }
-  .profile-info{ flex:1; min-width: 240px; }
-  .profile-info h2{ font-size: 30px; }
-  .profile-bio{ margin-top: 14px; font-size: 15px; color: var(--ink-dim); max-width: 62ch; line-height:1.55; }
-
-  /* ---------- submit form ---------- */
-  .form-wrap{ max-width: 760px; }
-  .form-section{ margin-bottom: 34px; background: var(--panel); border: 2.5px solid var(--line); border-radius: 18px; padding: 22px 24px; }
-  .fs-title{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size: 15px; color: var(--orange-dk); margin-bottom: 18px; display:flex; align-items:center; gap:8px; }
-  html[data-theme="day"] .fs-title{ color: var(--pink-dk); }
-  .form-row{ margin-bottom: 18px; }
-  .form-row label{ display:block; font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 13.5px; margin-bottom: 7px; color: var(--ink); }
-  .form-row .hint{ font-size: 12px; color: var(--ink-dim); margin-top: 5px; }
-  .form-row input[type=text], .form-row input[type=url], .form-row input[type=email], .form-row input[type=password],
-  .form-row select, .form-row textarea{
-    width:100%; font-family:'Fredoka', sans-serif; font-size: 14.5px; padding: 11px 13px; border-radius: 10px;
-    border: 2px solid var(--line); background: var(--bg-deep); color: var(--ink);
+  .progress-to-next{
+    margin-top: 10px;
+    max-width: 360px;
   }
-  .form-row textarea{ min-height: 150px; resize: vertical; line-height:1.55; }
-  .form-row input:focus, .form-row select:focus, .form-row textarea:focus{ outline:none; border-color: var(--cyan); }
-  .two-col{ display:grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .multi-url-row{ display:flex; gap:8px; margin-bottom:8px; }
-  .multi-url-row input{ flex:1; }
-  .add-link{ font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 12.5px; background:none; border:none; color: var(--cyan-dk); cursor:pointer; padding:4px 0; }
-  .remove-link{ background: var(--bg-deep); border:2px solid var(--line); color:var(--ink-dim); cursor:pointer; border-radius: 8px; font-size:14px; width: 42px; }
-
-  .confirm-box{
-    background: var(--bg-deep); border: 2.5px solid var(--purple); border-radius: 14px; padding: 18px; display:flex; gap: 12px;
-    align-items:flex-start; transition: border-color .2s, box-shadow .2s;
+  .completed-list{ margin-top: 26px; }
+  .completed-row{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 14.5px;
   }
-  .confirm-box.error{ border-color: var(--red); box-shadow: 0 0 0 4px rgba(255,90,82,0.2); animation: shake .4s ease; }
-  @keyframes shake{ 0%,100%{ transform: translateX(0); } 20%{ transform: translateX(-6px); } 40%{ transform: translateX(6px); } 60%{ transform: translateX(-4px); } 80%{ transform: translateX(4px); } }
-  .confirm-error-msg{ display:none; color: var(--red); font-family:'Baloo 2', sans-serif; font-weight: 700; font-size: 13.5px; margin-top: 10px; align-items:center; gap:6px; }
-  .confirm-error-msg.show{ display:flex; }
-  .confirm-box input[type=checkbox]{ margin-top: 4px; width: 18px; height:18px; accent-color: var(--pink); flex-shrink:0; }
-  .confirm-box .ctext{ font-size: 13.5px; }
-  .confirm-box .ctext b{ display:block; margin-bottom:4px; color: var(--orange-dk); }
-  html[data-theme="day"] .confirm-box .ctext b{ color: var(--pink-dk); }
-  .confirm-box .ctext .fine{ display:block; margin-top: 6px; font-size: 11.5px; color: var(--ink-dim); }
-  .confirm-box .ctext a{ color: var(--cyan-dk); text-decoration: underline; }
+  .completed-row .pts{ font-family:'JetBrains Mono', monospace; color: var(--moss-deep); font-weight:700; }
 
-  .submit-bar{ margin-top: 26px; display:flex; justify-content: space-between; align-items:center; gap: 16px; flex-wrap: wrap; }
+  /* ---------- About ---------- */
+  .about-block{ max-width: 680px; }
+  .about-block p{ color: var(--ink-soft); font-size: 16.5px; }
+  .rank-ladder{
+    display:flex;
+    flex-direction: column;
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow:hidden;
+  }
+  .rank-step{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    padding: 12px 18px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+  .rank-step:last-child{ border-bottom:none; }
+  .rank-step .name{ font-family:'Fraunces', serif; font-weight:600; font-size: 16px; }
+  .rank-step .pts-req{ font-family:'JetBrains Mono', monospace; font-size: 12.5px; color: var(--ink-soft); }
 
+  /* ---------- Admin ---------- */
+  .flag-item{
+    display:flex; justify-content:space-between; align-items:center;
+    background: rgba(163,59,46,0.06);
+    border: 1px solid rgba(163,59,46,0.3);
+    padding: 12px 16px; border-radius: 6px; margin-bottom:10px;
+    font-size: 14px;
+  }
+  .empty-state{
+    text-align:center;
+    padding: 50px 20px;
+    color: var(--ink-soft);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+  }
   .toast{
-    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--purple); color: white;
-    font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 14px; padding: 14px 24px; border-radius: 14px;
-    box-shadow: 0 6px 0 var(--purple-dk); opacity: 0; pointer-events:none; transition: opacity .25s ease, transform .25s ease; z-index: 100;
+    position: fixed;
+    bottom: 26px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    opacity: 0;
+    pointer-events:none;
+    transition: all 0.3s ease;
+    z-index: 999;
   }
-  .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
 
-  /* ---------- about / policy pages ---------- */
-  .about-lede{ font-family:'Baloo 2',sans-serif; font-size: 24px; line-height: 1.4; max-width: 62ch; margin-bottom: 30px; color: var(--ink-dim); font-weight:600; }
-  .about-lede .accent{ color: var(--orange-dk); }
-  html[data-theme="day"] .about-lede .accent{ color: var(--pink-dk); }
-  .about-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 34px; }
-  .about-card{ border: 2.5px solid var(--line); background: var(--panel); border-radius: 16px; padding: 22px; }
-  .about-card .emoji{ font-size: 26px; margin-bottom: 10px; }
-  .about-card h4{ font-size:17px; margin-bottom:8px; }
-  .about-card p{ font-size: 13.5px; color: var(--ink-dim); }
-  .policy-box{ margin-top: 44px; border-top: 3px solid var(--purple); padding-top: 28px; }
-  .policy-box h3{ font-size: 19px; margin-bottom: 10px; color: var(--orange-dk); }
-  html[data-theme="day"] .policy-box h3{ color: var(--pink-dk); }
-  .policy-box p{ color: var(--ink-dim); font-size: 14.5px; max-width: 70ch; margin-bottom: 10px; }
-
-  .policy-page h2{ font-size: 30px; margin-bottom: 8px; }
-  .policy-updated{ font-family:'Space Mono',monospace; font-size: 12px; color: var(--ink-dim); margin-bottom: 30px; }
-  .policy-toc{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 40px; }
-  .policy-toc a{
-    font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; background: var(--panel); border:2px solid var(--line);
-    border-radius: 999px; padding: 7px 14px; text-decoration:none; cursor:pointer;
-  }
-  .policy-section{ margin-bottom: 38px; max-width: 76ch; }
-  .policy-section h3{ font-size: 20px; margin-bottom:12px; padding-bottom:8px; border-bottom: 3px solid var(--purple); display:inline-block; }
-  .policy-section p, .policy-section li{ color: var(--ink-dim); font-size: 14.5px; line-height:1.65; margin-bottom: 10px; }
-  .policy-section ul{ padding-left: 22px; }
-  .policy-section strong{ color: var(--ink); }
-
-  /* ---------- auth modal ---------- */
   .modal-overlay{
-    position: fixed; inset:0; background: rgba(0,0,0,0.55); z-index: 200; display:none;
-    align-items:center; justify-content:center; padding: 20px;
+    position:fixed; inset:0; background: rgba(31,42,36,0.5);
+    display:none; align-items:center; justify-content:center;
+    z-index: 1000; padding: 20px;
   }
   .modal-overlay.show{ display:flex; }
   .modal-box{
-    background: var(--panel); border: 3px solid var(--line); border-radius: 20px; padding: 30px; max-width: 420px; width:100%;
-    position:relative;
+    background: var(--paper);
+    border-radius: 8px;
+    max-width: 480px; width:100%;
+    padding: 26px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
   }
-  .modal-close{
-    position:absolute; top:14px; right:14px; background:none; border:none; color: var(--ink-dim); font-size: 20px; cursor:pointer;
-  }
-  .modal-box h3{ font-size: 24px; margin-bottom: 6px; }
-  .modal-box .modal-sub{ font-size: 13.5px; color: var(--ink-dim); margin-bottom: 22px; }
-  .modal-tabs{ display:flex; gap:8px; margin-bottom: 22px; }
-  .modal-tab{
-    flex:1; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; padding: 10px; border-radius: 10px;
-    border: 2px solid var(--line); background: var(--bg-deep); color: var(--ink-dim); cursor:pointer;
-  }
-  .modal-tab.active{ background: var(--pink); border-color: var(--pink-dk); color: white; }
-  .modal-note{ font-family:'Space Mono',monospace; font-size: 11px; color: var(--ink-dim); background: var(--bg-deep); border: 2px dashed var(--line); border-radius: 10px; padding: 12px 14px; margin-top: 16px; }
+  .modal-box h3{ margin-bottom: 12px; }
+  .modal-box p{ color: var(--ink-soft); margin-bottom: 20px; }
+  .modal-actions{ display:flex; gap:10px; justify-content:flex-end; }
 
-  /* ---------- dashboard ---------- */
-  .dash-stats{ display:flex; gap: 14px; flex-wrap:wrap; margin-bottom: 30px; }
-  .dash-stat{ background: var(--panel); border: 2.5px solid var(--line); border-radius: 14px; padding: 14px 22px; }
-  .dash-stat .num{ font-family:'Baloo 2',sans-serif; font-size: 24px; font-weight:800; color: var(--orange-dk); }
-  html[data-theme="day"] .dash-stat .num{ color: var(--pink-dk); }
-  .dash-stat .lab{ font-family:'Space Mono',monospace; font-size: 10px; text-transform:uppercase; color: var(--ink-dim); letter-spacing:.06em; }
-  .dash-row{
-    display:flex; align-items:center; gap: 16px; background: var(--panel); border: 2.5px solid var(--line); border-radius: 16px;
-    padding: 14px 18px; margin-bottom: 14px; flex-wrap:wrap;
+  .pill-select{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pill-opt{
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--line);
+    font-size: 13px;
+    background: var(--paper);
   }
-  .dash-row .dash-cover{
-    width: 60px; height: 60px; border-radius: 12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size: 24px;
+  .pill-opt.selected{ border-color: var(--moss); background: rgba(61,99,85,0.12); color: var(--moss-deep); font-weight:600; }
+
+  footer{
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
   }
-  .dash-row .dash-info{ flex:1; min-width: 180px; }
-  .dash-row .dash-info h5{ font-family:'Baloo 2',sans-serif; font-size:16px; margin-bottom:3px; }
-  .dash-row .dash-info .meta{ font-family:'Space Mono',monospace; font-size:11px; color: var(--ink-dim); }
-  .dash-row .dash-actions{ display:flex; gap:8px; flex-wrap:wrap; }
-
-  footer{ padding: 34px 0 50px; border-top: 3px solid var(--purple); margin-top: 20px; }
-  footer .foot-grid{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap: 20px; }
-  footer .f-mark{ font-family:'Baloo 2',sans-serif; font-size: 17px; font-weight:700; }
-  footer p.tag{ font-family:'Space Mono',monospace; font-size: 11px; color: var(--ink-dim); margin-top: 6px; max-width: 40ch; }
-  footer .f-links{ display:flex; gap: 22px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size: 13px; color: var(--ink-dim); flex-wrap:wrap; }
-  footer .f-links a{ cursor:pointer; }
-  footer .f-links a:hover{ color: var(--orange-dk); }
-  html[data-theme="day"] footer .f-links a:hover{ color: var(--pink-dk); }
-
-  .page{ display:none; }
-  .page.active{ display:block; }
-
-  @media (max-width: 860px){
-    .detail-head{ grid-template-columns: 1fr; }
-    .fields{ grid-template-columns: 1fr; }
-    .two-col{ grid-template-columns: 1fr; }
-    .about-grid{ grid-template-columns: 1fr; }
-    nav.main{ display:none; }
-    .hero::before{ display:none; }
-    .profile-head{ flex-direction:column; }
-  }
-  :focus-visible{ outline: 3px solid var(--cyan); outline-offset: 2px; }
-  @media (prefers-reduced-motion: reduce){ *{ transition: none !important; scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
 
-<header class="site">
-  <div class="wrap bar">
-    <div class="wordmark" data-nav="home">
-      <span class="skull">💀</span>
-      <span class="game-title">Game Graveyard</span>
+<div class="app">
+
+  <div class="masthead">
+    <div class="brand">
+      <span class="mark">GoodWorks</span>
+      <span class="sub">— The Ledger</span>
     </div>
-    <nav class="main">
-      <button data-nav="home" class="active">Home</button>
-      <button data-nav="browse">Browse</button>
-      <button data-nav="submit">Submit</button>
-      <button data-nav="about">About</button>
-    </nav>
-    <div class="header-right">
-      <button class="btn small ghost" id="theme-toggle" aria-label="Switch theme" style="padding:8px 12px; font-size:16px; line-height:1;">🌙</button>
-      <div id="logged-out-actions" style="display:flex; gap:8px;">
-        <button class="btn small ghost" id="open-login">Log In</button>
-        <button class="btn small" id="open-signup">Sign Up</button>
-      </div>
-      <div id="logged-in-actions" style="display:none;">
-        <div class="account-chip" id="account-chip">
-          <span class="avatar-mini" id="chip-avatar">?</span>
-          <span id="chip-name">User</span>
-        </div>
-      </div>
+    <div class="user-chip">
+      <div class="avatar" id="currentAvatar" style="background:#3D6355;">M</div>
+      <span id="currentUserName">Micah</span>
+      <span class="mono" style="color:var(--brass)" id="currentUserPts">· 140 pts</span>
     </div>
   </div>
-</header>
 
-<!-- ============ HOME ============ -->
-<main class="page active" id="page-home">
+  <div class="tabs" id="tabBar">
+    <div class="tab active" data-page="home">Home</div>
+    <div class="tab" data-page="groups">Groups</div>
+    <div class="tab" data-page="tasks">Tasks</div>
+    <div class="tab" data-page="approval">Needs Approval <span class="count" id="approvalCount">2</span></div>
+    <div class="tab" data-page="leaderboard">Leaderboard</div>
+    <div class="tab" data-page="profile">Profile</div>
+    <div class="tab" data-page="about">About</div>
+    <div class="tab" data-page="admin">Admin</div>
+  </div>
 
-  <section class="hero">
-    <div class="wrap hero-inner">
-      <div class="eyebrow-badge"><span class="dot"></span> Archive is live · new games added daily</div>
-      <h1 class="game-title">Games die too.<br>We keep them <span class="accent">playable in memory.</span></h1>
-      <p class="lede">Browse hundreds of canceled, abandoned, and unfinished games. Mark them RIP or vote to revive. Discover what could've been.</p>
-      <div class="hero-actions">
-        <button class="btn pink" data-nav="browse">🎮 Browse the Graveyard</button>
-        <button class="btn ghost" data-nav="submit">⚰️ Submit Your Game</button>
+  <!-- ===================== HOME ===================== -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div>
+        <span class="eyebrow">A ledger of things worth doing</span>
+        <h1>Do the <em>good</em> you already meant to do.</h1>
+        <p class="lede">Create or join a group — your family, your team, your church — add tasks worth doing, and let the people who know you best confirm you did them.</p>
+        <div class="hero-actions">
+          <button class="btn moss" data-goto="groups">Create a group</button>
+          <button class="btn ghost" data-goto="groups">Join a group</button>
+        </div>
+        <div class="stat-strip">
+          <div class="stat"><div class="num mono">3</div><div class="lbl">Groups you're in</div></div>
+          <div class="stat"><div class="num mono">12</div><div class="lbl">Deeds completed</div></div>
+          <div class="stat"><div class="num mono">Disciple</div><div class="lbl">Current rank</div></div>
+        </div>
+      </div>
+      <div class="ledger-card todays-entry">
+        <span class="eyebrow">From the ledger</span>
+        <h3 style="font-size:22px; margin-bottom:10px;">Recently entered into record</h3>
+        <div id="recentEntries"></div>
       </div>
     </div>
-  </section>
 
-  <section id="following-section" style="display:none;">
-    <div class="wrap">
+    <div style="margin-top:44px;">
       <div class="section-head">
-        <div><h2>🔔 From Developers You Follow</h2><p>New and notable from the people you're following.</p></div>
+        <h2 style="font-size:24px;">Your groups, at a glance</h2>
+        <button class="btn ghost small" data-goto="groups">See all groups</button>
       </div>
-      <div class="card-grid" id="grid-following"></div>
+      <div class="grid" id="homeGroupsGrid"></div>
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <div class="section-head">
-        <div><h2>🎲 Discover Something Random</h2><p>A fresh shuffle of the archive — refresh for more.</p></div>
-        <button class="refresh-link" id="reshuffle-random">🔄 Shuffle again</button>
+  <!-- ===================== GROUPS ===================== -->
+  <section class="page" id="page-groups">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Groups</span>
+        <h2 style="font-size:28px;">Your circles</h2>
       </div>
-      <div class="card-grid" id="grid-random"></div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn ghost small" id="btnShowJoin">Join with a code</button>
+        <button class="btn moss small" id="btnShowCreate">Create a group</button>
+      </div>
+    </div>
+
+    <div id="createGroupPanel" style="display:none; margin-bottom:30px;">
+      <form class="panel" id="createGroupForm">
+        <h3 style="font-size:19px;">New group</h3>
+        <div>
+          <label>Group name</label>
+          <input type="text" id="ngName" placeholder="e.g. The Smiths, Grace Youth Group" required>
+        </div>
+        <div>
+          <label>Description</label>
+          <textarea id="ngDesc" placeholder="What's this group about?"></textarea>
+        </div>
+        <div class="field-row">
+          <div>
+            <label>Category</label>
+            <select id="ngCategory">
+              <option>Family</option>
+              <option>School</option>
+              <option>Church</option>
+              <option>Work</option>
+              <option>Friends</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label>Privacy</label>
+            <div class="radio-row" style="margin-top:10px;">
+              <label class="radio-opt"><input type="radio" name="ngPrivacy" value="public" checked> Public</label>
+              <label class="radio-opt"><input type="radio" name="ngPrivacy" value="private"> Private</label>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button type="submit" class="btn moss">Create group</button>
+          <button type="button" class="btn ghost" id="btnCancelCreate">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="joinGroupPanel" style="display:none; margin-bottom:30px;">
+      <form class="panel" id="joinGroupForm">
+        <h3 style="font-size:19px;">Join a private group</h3>
+        <div>
+          <label>Invite code</label>
+          <input type="text" id="joinCode" placeholder="e.g. SMITH-2026" required>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button type="submit" class="btn moss">Join</button>
+          <button type="button" class="btn ghost" id="btnCancelJoin">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <h3 style="font-size:16px; color:var(--ink-soft); margin-bottom:14px;">Public groups you can browse</h3>
+    <div class="grid" id="publicGroupsGrid"></div>
+  </section>
+
+  <!-- ===================== TASKS ===================== -->
+  <section class="page" id="page-tasks">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Task list</span>
+        <h2 style="font-size:28px;">Available deeds</h2>
+      </div>
+      <select id="taskGroupFilter" style="max-width:220px;"></select>
+    </div>
+    <div class="grid" id="tasksGrid"></div>
+  </section>
+
+  <!-- ===================== SUBMIT (hidden until a task is taken) ===================== -->
+  <section class="page" id="page-submit">
+    <span class="eyebrow">Submit proof</span>
+    <h2 style="font-size:28px; margin-bottom:20px;">Show your work</h2>
+    <form class="panel" id="submitForm">
+      <div id="submitTaskSummary" class="ledger-card" style="box-shadow:none; padding:16px;"></div>
+      <div>
+        <label>Link to photo or video (YouTube, Drive, Imgur, etc.)</label>
+        <input type="url" id="proofUrl" placeholder="https://..." required>
+      </div>
+      <div>
+        <label>Note (optional)</label>
+        <textarea id="proofNote" placeholder="Anything the approvers should know"></textarea>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button type="submit" class="btn moss">Submit for approval</button>
+        <button type="button" class="btn ghost" data-goto="tasks">Cancel</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===================== NEEDS APPROVAL ===================== -->
+  <section class="page" id="page-approval">
+    <span class="eyebrow">Community review</span>
+    <h2 style="font-size:28px; margin-bottom:22px;">Needs approval</h2>
+    <div id="approvalList"></div>
+  </section>
+
+  <!-- ===================== LEADERBOARD ===================== -->
+  <section class="page" id="page-leaderboard">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Standings</span>
+        <h2 style="font-size:28px;">Leaderboard</h2>
+      </div>
+      <select id="leaderGroupFilter" style="max-width:220px;"></select>
+    </div>
+    <div id="leaderboardList"></div>
+  </section>
+
+  <!-- ===================== PROFILE ===================== -->
+  <section class="page" id="page-profile">
+    <div class="profile-head">
+      <div class="profile-avatar" style="background:#3D6355;">M</div>
+      <div>
+        <h2 style="font-size:26px;">Micah Owens</h2>
+        <span class="rank-badge" style="background:var(--moss-deep);">Disciple</span>
+        <span class="mono" style="margin-left:10px; color:var(--brass); font-weight:700;">140 pts</span>
+        <div class="progress-to-next">
+          <div class="mono" style="font-size:12px; color:var(--ink-soft);">60 pts to Steward</div>
+          <div class="progress-track"><div class="progress-fill" style="width:70%;"></div></div>
+        </div>
+        <div style="margin-top:10px; font-size:13.5px; color:var(--ink-soft);">Member of: <strong>The Owens Family</strong>, <strong>Grace Youth Group</strong></div>
+      </div>
+    </div>
+    <div class="completed-list">
+      <h3 style="font-size:18px; margin-bottom:6px;">Completed deeds</h3>
+      <div id="completedList"></div>
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <div class="section-head">
-        <div><h2>🌱 Needs Some Love</h2><p>Lower-traffic projects that deserve a look — everyone gets a chance to be seen.</p></div>
-      </div>
-      <div class="card-grid" id="grid-underdog"></div>
+  <!-- ===================== ABOUT ===================== -->
+  <section class="page" id="page-about">
+    <span class="eyebrow">About</span>
+    <h2 style="font-size:30px; margin-bottom:16px;">What this ledger is for</h2>
+    <div class="about-block">
+      <p>GoodWorks is a place for groups — families, classrooms, churches, teams, friends — to keep a shared record of good done. An admin adds a task. Someone takes it, does it, and shows the proof. The group confirms it happened. It goes in the book.</p>
+      <p>Points only ever build a rank inside your own group. There's no global chase, no public score to perform for — just a quiet, growing record of who showed up.</p>
+      <h3 style="font-size:19px; margin-top:30px; margin-bottom:6px;">How rank is earned</h3>
+      <div class="rank-ladder" id="rankLadder"></div>
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <div class="section-head">
-        <div><h2>🆕 Latest Submissions</h2><p>Fresh off the hard drive — newest additions to the archive.</p></div>
+  <!-- ===================== ADMIN ===================== -->
+  <section class="page" id="page-admin">
+    <span class="eyebrow">Group admin</span>
+    <h2 style="font-size:28px; margin-bottom:22px;">Manage tasks</h2>
+
+    <form class="panel" id="newTaskForm" style="margin-bottom:36px;">
+      <h3 style="font-size:19px;">Add a task</h3>
+      <div>
+        <label>Group</label>
+        <select id="taskAdminGroup"></select>
       </div>
-      <div class="card-grid" id="grid-latest"></div>
-    </div>
+      <div>
+        <label>Task name</label>
+        <input type="text" id="taskName" placeholder="e.g. Bring a meal to someone sick" required>
+      </div>
+      <div>
+        <label>Description</label>
+        <textarea id="taskDesc" placeholder="What should the person actually do?"></textarea>
+      </div>
+      <div class="field-row">
+        <div>
+          <label>Points</label>
+          <input type="number" id="taskPoints" min="1" value="20" required>
+        </div>
+        <div>
+          <label>Category</label>
+          <select id="taskCat">
+            <option>Community</option>
+            <option>Family</option>
+            <option>Kindness</option>
+            <option>Faith</option>
+            <option>Service</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div>
+          <label>Approvals needed (min 3, max 6)</label>
+          <input type="number" id="taskApprovals" min="3" max="6" value="3" required>
+        </div>
+        <div>
+          <label>Expires after (days, optional)</label>
+          <input type="number" id="taskExpiry" min="1" placeholder="e.g. 7">
+        </div>
+      </div>
+      <button type="submit" class="btn moss">Add task to list</button>
+    </form>
+
+    <h3 style="font-size:18px; margin-bottom:12px;">Flagged submissions</h3>
+    <div id="flagList"></div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <div class="section-head">
-        <div><h2>❤️‍🔥 Most Wanted for Revival</h2><p>The games the community most wants to see finished.</p></div>
-      </div>
-      <div class="card-grid" id="grid-wanted"></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <div class="section-head"><div><h2>🎯 Browse by Genre</h2></div></div>
-      <div class="genre-band" id="genre-band"></div>
-    </div>
-  </section>
-
-</main>
-
-<!-- ============ BROWSE ============ -->
-<main class="page" id="page-browse">
-  <section>
-    <div class="wrap">
-      <div class="section-head">
-        <div><h2>🗂 Browse All Games</h2><p id="browse-count-label"></p></div>
-      </div>
-      <div class="filters">
-        <input type="text" id="f-search" placeholder="🔍 Search by title...">
-        <select id="f-status"><option value="">Any status</option></select>
-        <select id="f-genre"><option value="">Any genre</option></select>
-        <select id="f-engine"><option value="">Any engine</option></select>
-        <select id="f-sort">
-          <option value="latest">Sort: Latest</option>
-          <option value="viewed">Sort: Most viewed</option>
-          <option value="voted">Sort: Most Revive votes</option>
-          <option value="az">Sort: A–Z</option>
-        </select>
-      </div>
-      <div class="card-grid" id="grid-browse"></div>
-    </div>
-  </section>
-</main>
-
-<!-- ============ PROJECT DETAIL ============ -->
-<main class="page" id="page-detail">
-  <section><div class="wrap" id="detail-content"></div></section>
-</main>
-
-<!-- ============ SUBMIT ============ -->
-<main class="page" id="page-submit">
-  <section>
-    <div class="wrap" id="submit-wrap">
-      <!-- content injected by JS depending on login state -->
-    </div>
-  </section>
-</main>
-
-<!-- ============ DASHBOARD ============ -->
-<main class="page" id="page-dashboard">
-  <section>
-    <div class="wrap" id="dashboard-wrap">
-      <!-- content injected by JS -->
-    </div>
-  </section>
-</main>
-
-<!-- ============ ABOUT ============ -->
-<main class="page" id="page-about">
-  <section>
-    <div class="wrap">
-      <h2 style="font-size:32px; margin-bottom:22px;">💀 About the Archive</h2>
-      <p class="about-lede">Game Graveyard exists to preserve the stories of games that were <span class="accent">never finished</span>. Every abandoned project contains creativity, effort, and lessons worth remembering — this is where they're kept instead of lost.</p>
-
-      <div class="about-grid">
-        <div class="about-card"><div class="emoji">🛠</div><h4>For developers</h4><p>Give your unfinished work a permanent home, explain the journey, and find people who still want to see it exist.</p></div>
-        <div class="about-card"><div class="emoji">🎮</div><h4>For players</h4><p>Explore canceled and unfinished games, mark them RIP or vote to revive, and dig into the stories behind them.</p></div>
-        <div class="about-card"><div class="emoji">🗃</div><h4>For everyone</h4><p>A place where unfinished games don't vanish — the record stays, even if development doesn't continue.</p></div>
-      </div>
-
-      <div class="policy-box">
-        <h3>Legal & Policies</h3>
-        <p>Ownership confirmation, our takedown process, terms of use, and privacy details all live on one page so it's easy to find everything in one place.</p>
-        <button class="btn small ghost" data-nav="policy">📜 Read Full Policies</button>
-      </div>
-    </div>
-  </section>
-</main>
-
-<!-- ============ POLICY ============ -->
-<main class="page" id="page-policy">
-  <section>
-    <div class="wrap policy-page">
-      <span class="back-link" data-nav="about">← Back to About</span>
-      <h2>📜 Terms, Privacy & Takedown Policy</h2>
-      <div class="policy-updated">Last updated: a placeholder draft — not yet legally reviewed. Treat as a starting point, not a finished policy.</div>
-
-      <div class="policy-toc">
-        <a data-scroll="pol-terms">Terms of Use</a>
-        <a data-scroll="pol-content">Content Ownership</a>
-        <a data-scroll="pol-takedown">Takedown Policy</a>
-        <a data-scroll="pol-conduct">Community Conduct</a>
-        <a data-scroll="pol-privacy">Privacy</a>
-        <a data-scroll="pol-disclaimer">Disclaimer</a>
-      </div>
-
-      <div class="policy-section" id="pol-terms">
-        <h3>1. Terms of Use</h3>
-        <p>Game Graveyard is a free, community-run archive for unfinished, abandoned, canceled, and revived game projects. By creating an account or submitting content, you agree to these terms. The service is provided as-is, free of charge, with no guarantee of uptime, permanence, or accuracy of user-submitted content.</p>
-        <p>You must be old enough to legally agree to these terms in your country to create an account. We reserve the right to suspend or remove accounts that violate these terms.</p>
-      </div>
-
-      <div class="policy-section" id="pol-content">
-        <h3>2. Content Ownership & Your Submissions</h3>
-        <p>You retain ownership of anything you submit — text, images, links, or descriptions. By submitting, you grant Game Graveyard a non-exclusive license to display that content on the site.</p>
-        <p><strong>Every submission requires you to confirm, via checkbox, that the project is your own or that you have permission to share it.</strong> This confirmation is logged with a timestamp at the time of submission. Misrepresenting ownership is a violation of these terms and may result in account suspension.</p>
-        <p>Logged-in users can edit or permanently delete their own submissions at any time from their Dashboard.</p>
-      </div>
-
-      <div class="policy-section" id="pol-takedown">
-        <h3>3. Takedown Policy</h3>
-        <p>If you believe content on this archive infringes your rights — including a project submitted by someone other than its rightful owner — you can request its removal.</p>
-        <ul>
-          <li>Contact us using the report link on any project page, or via the contact method listed at the bottom of this page.</li>
-          <li>Include the project name/URL and a brief explanation of your claim.</li>
-          <li>We aim to review valid requests within a few business days and will remove content found to be in violation.</li>
-          <li>Repeat or clearly bad-faith submissions from the same account may result in permanent suspension.</li>
-        </ul>
-        <p>This is a good-faith moderation process, not a substitute for formal legal action where that's required.</p>
-      </div>
-
-      <div class="policy-section" id="pol-conduct">
-        <h3>4. Community Conduct</h3>
-        <p>Comments, reactions (RIP / Revive), and follows require a logged-in account so that community activity stays accountable. We ask that comments stay respectful — critique the project, not the person. Harassment, hate speech, spam, or coordinated vote manipulation may result in comment removal or account suspension.</p>
-      </div>
-
-      <div class="policy-section" id="pol-privacy">
-        <h3>5. Privacy</h3>
-        <p>Once real accounts are implemented, we intend to collect only what's needed to operate the site: an email address and password (securely hashed, never stored in plain text) for login, and whatever profile details you choose to add. We will not sell user data to third parties or use it for advertising.</p>
-        <p>This current version of the site is a prototype — no real accounts, emails, or passwords are being stored anywhere yet.</p>
-      </div>
-
-      <div class="policy-section" id="pol-disclaimer">
-        <h3>6. Disclaimer</h3>
-        <p>Game Graveyard is an independent, fan/community-run archive and is not affiliated with, endorsed by, or sponsored by any game studio, publisher, or platform mentioned in user submissions. Project descriptions reflect the submitting user's own account of events and may not be independently verified.</p>
-        <p style="margin-top:20px;">Questions about these policies? This is placeholder contact info for now: <strong>hello@gamegraveyard.example</strong></p>
-      </div>
-    </div>
-  </section>
-</main>
+  <footer>GoodWorks — placeholder build · local demo data only · no accounts stored</footer>
+</div>
 
 <div class="toast" id="toast"></div>
 
-<footer>
-  <div class="wrap foot-grid">
-    <div>
-      <div class="f-mark">💀 Game Graveyard</div>
-      <p class="tag">An archive of unfinished games — preserved, not deleted.</p>
-    </div>
-    <div class="f-links">
-      <a data-nav="browse">Browse</a>
-      <a data-nav="submit">Submit</a>
-      <a data-nav="about">About</a>
-      <a data-nav="policy">Policies</a>
-    </div>
-  </div>
-</footer>
-
-<!-- ============ AUTH MODAL ============ -->
-<div class="modal-overlay" id="auth-modal">
+<div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
-    <button class="modal-close" id="modal-close">✕</button>
-    <h3 id="modal-title">Welcome Back</h3>
-    <p class="modal-sub" id="modal-sub">Log in to vote, comment, follow, and submit games.</p>
-    <div class="modal-tabs">
-      <button class="modal-tab active" id="tab-login">Log In</button>
-      <button class="modal-tab" id="tab-signup">Sign Up</button>
+    <h3 id="modalTitle">Are you sure?</h3>
+    <p id="modalBody">This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="modalCancel">Cancel</button>
+      <button class="btn oxblood" id="modalConfirm">Confirm</button>
     </div>
-    <form id="auth-form">
-      <div class="form-row" id="signup-name-row" style="display:none;">
-        <label for="auth-name">Display Name</label>
-        <input type="text" id="auth-name" placeholder="How you'll appear to others">
-      </div>
-      <div class="form-row">
-        <label for="auth-email">Email</label>
-        <input type="email" id="auth-email" placeholder="you@example.com" required>
-      </div>
-      <div class="form-row">
-        <label for="auth-password">Password</label>
-        <input type="password" id="auth-password" placeholder="••••••••" required>
-      </div>
-      <button type="submit" class="btn pink" style="width:100%;" id="auth-submit-btn">Log In</button>
-    </form>
-    <div class="modal-note">🔧 Placeholder auth — no real account is created, no password is stored anywhere. This just simulates being logged in for demo purposes.</div>
   </div>
 </div>
 
 <script>
-(function(){
+/* ============================================================
+   GOODWORKS — placeholder / local-data prototype
+   Single file. All data in memory (resets on reload).
+   ============================================================ */
 
-  // ================= THEME =================
-  const themeBtn = document.getElementById('theme-toggle');
-  function applyTheme(theme){
-    if(theme === 'day'){ document.documentElement.setAttribute('data-theme', 'day'); themeBtn.textContent = '☀️'; }
-    else { document.documentElement.removeAttribute('data-theme'); themeBtn.textContent = '🌙'; }
-  }
-  let currentTheme = 'day';
-  applyTheme(currentTheme);
-  themeBtn.addEventListener('click', () => { currentTheme = currentTheme === 'night' ? 'day' : 'night'; applyTheme(currentTheme); });
+const RANKS = [
+  { name: "Seeker",   min: 0 },
+  { name: "Servant",  min: 60 },
+  { name: "Disciple", min: 120 },
+  { name: "Steward",  min: 200 },
+  { name: "Shepherd", min: 350 },
+  { name: "Faithful", min: 550 },
+  { name: "Apostle",  min: 800 },
+];
 
-  // ================= FAKE AUTH STATE =================
-  let currentUser = null; // { name, email }
+const RANK_COLORS = {
+  Seeker: "#7A6A4F", Servant: "#5C7A66", Disciple: "#3D6355",
+  Steward: "#2F5A4C", Shepherd: "#294138", Faithful: "#7A6A4F", Apostle: "#A33B2E"
+};
 
-  function isLoggedIn(){ return !!currentUser; }
+function rankForPoints(pts){
+  let current = RANKS[0];
+  for (const r of RANKS){ if (pts >= r.min) current = r; }
+  return current;
+}
+function nextRank(pts){
+  for (const r of RANKS){ if (pts < r.min) return r; }
+  return null;
+}
 
-  function requireLogin(actionLabel){
-    if(isLoggedIn()) return true;
-    showToast(`🔒 Log in to ${actionLabel}`);
-    openAuthModal('login');
-    return false;
-  }
+let state = {
+  currentUserId: "u1",
+  users: {
+    u1: { id:"u1", name:"Micah Owens", initial:"M", color:"#3D6355", points:{ g1: 140, g2: 90 } },
+    u2: { id:"u2", name:"Ava Torres", initial:"A", color:"#7A6A4F", points:{ g1: 210 } },
+    u3: { id:"u3", name:"Jordan Lee", initial:"J", color:"#A33B2E", points:{ g1: 60, g2: 300 } },
+    u4: { id:"u4", name:"Priya Nair", initial:"P", color:"#294138", points:{ g2: 40 } },
+  },
+  groups: {
+    g1: { id:"g1", name:"The Owens Family", desc:"Our home, keeping each other kind and accountable.", category:"Family", privacy:"public", code:"OWENS-142", memberIds:["u1","u2","u3"] },
+    g2: { id:"g2", name:"Grace Youth Group", desc:"Weekly service tasks for our youth group.", category:"Church", privacy:"private", code:"GRACE-YG9", memberIds:["u1","u3","u4"] },
+    g3: { id:"g3", name:"Lincoln Elementary Rm 4B", desc:"Classroom kindness challenge.", category:"School", privacy:"public", code:"RM4B-001", memberIds:["u4"] },
+  },
+  tasks: [
+    { id:"t1", groupId:"g1", name:"Call grandma and actually talk for 10 minutes", desc:"No texting — a real phone call.", points:25, category:"Family", approvalsNeeded:3, expiryDays:null, active:true },
+    { id:"t2", groupId:"g1", name:"Clean the garage without being asked twice", desc:"Full clean, not just a quick tidy.", points:30, category:"Family", approvalsNeeded:3, expiryDays:7, active:true },
+    { id:"t3", groupId:"g2", name:"Bring a meal to someone who's sick or grieving", desc:"Deliver in person if possible.", points:50, category:"Service", approvalsNeeded:4, expiryDays:14, active:true },
+    { id:"t4", groupId:"g2", name:"Write an encouraging note to someone struggling", desc:"Hand-written, dropped off or mailed.", points:20, category:"Kindness", approvalsNeeded:3, expiryDays:null, active:true },
+    { id:"t5", groupId:"g3", name:"Include the kid who's sitting alone at lunch", desc:"Sit with them, talk to them.", points:15, category:"Kindness", approvalsNeeded:3, expiryDays:5, active:true },
+  ],
+  submissions: [
+    { id:"s1", taskId:"t3", groupId:"g2", userId:"u3", proofUrl:"https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600", note:"Dropped off dinner for the Hendersons.", approvals:["u1","u4"], flags:[], status:"pending" },
+    { id:"s2", taskId:"t1", groupId:"g1", userId:"u2", proofUrl:"https://images.unsplash.com/photo-1516307365426-bea591f05011?w=600", note:"45 min call, she loved it.", approvals:["u3"], flags:[], status:"pending" },
+  ],
+  completed: [
+    { userId:"u1", groupId:"g1", taskName:"Fed someone at the shelter downtown", points:35, date:"2026-07-10" },
+    { userId:"u1", groupId:"g1", taskName:"Mowed a neighbor's lawn, no charge", points:20, date:"2026-07-14" },
+    { userId:"u1", groupId:"g2", taskName:"Led small group discussion", points:30, date:"2026-07-18" },
+  ],
+};
 
-  function updateHeaderForAuth(){
-    const outEl = document.getElementById('logged-out-actions');
-    const inEl = document.getElementById('logged-in-actions');
-    if(isLoggedIn()){
-      outEl.style.display = 'none';
-      inEl.style.display = 'block';
-      document.getElementById('chip-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
-      document.getElementById('chip-name').textContent = currentUser.name;
-    } else {
-      outEl.style.display = 'flex';
-      inEl.style.display = 'none';
-    }
-  }
+let selectedTaskForSubmit = null;
 
-  document.getElementById('account-chip').addEventListener('click', () => {
-    showPage('dashboard');
-    renderDashboard();
-  });
+/* ---------------- Navigation ---------------- */
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.addEventListener("click", ()=> gotoPage(tab.dataset.page));
+});
+document.querySelectorAll("[data-goto]").forEach(el=>{
+  el.addEventListener("click", ()=> gotoPage(el.dataset.goto));
+});
 
-  // ---------- auth modal ----------
-  const authModal = document.getElementById('auth-modal');
-  const tabLogin = document.getElementById('tab-login');
-  const tabSignup = document.getElementById('tab-signup');
-  const signupNameRow = document.getElementById('signup-name-row');
-  const modalTitle = document.getElementById('modal-title');
-  const modalSub = document.getElementById('modal-sub');
-  const authSubmitBtn = document.getElementById('auth-submit-btn');
-  let authMode = 'login';
+function gotoPage(name){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  const page = document.getElementById("page-"+name);
+  const tab = document.querySelector(`.tab[data-page="${name}"]`);
+  if (page) page.classList.add("active");
+  if (tab) tab.classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
 
-  function setAuthMode(mode){
-    authMode = mode;
-    tabLogin.classList.toggle('active', mode === 'login');
-    tabSignup.classList.toggle('active', mode === 'signup');
-    signupNameRow.style.display = mode === 'signup' ? 'block' : 'none';
-    modalTitle.textContent = mode === 'signup' ? 'Create Your Account' : 'Welcome Back';
-    modalSub.textContent = mode === 'signup' ? 'Sign up to vote, comment, follow, and submit games.' : 'Log in to vote, comment, follow, and submit games.';
-    authSubmitBtn.textContent = mode === 'signup' ? 'Sign Up' : 'Log In';
-  }
-  tabLogin.addEventListener('click', () => setAuthMode('login'));
-  tabSignup.addEventListener('click', () => setAuthMode('signup'));
+/* ---------------- Toast ---------------- */
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=> t.classList.remove("show"), 2600);
+}
 
-  function openAuthModal(mode){
-    setAuthMode(mode || 'login');
-    authModal.classList.add('show');
-    document.getElementById('auth-email').focus();
-  }
-  function closeAuthModal(){ authModal.classList.remove('show'); document.getElementById('auth-form').reset(); }
+/* ---------------- Confirm modal ---------------- */
+function confirmAction(title, body, onConfirm){
+  const modal = document.getElementById("confirmModal");
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalBody").textContent = body;
+  modal.classList.add("show");
+  const confirmBtn = document.getElementById("modalConfirm");
+  const cancelBtn = document.getElementById("modalCancel");
+  const cleanup = ()=>{ modal.classList.remove("show"); confirmBtn.onclick=null; cancelBtn.onclick=null; };
+  confirmBtn.onclick = ()=>{ cleanup(); onConfirm(); };
+  cancelBtn.onclick = cleanup;
+}
 
-  document.getElementById('open-login').addEventListener('click', () => openAuthModal('login'));
-  document.getElementById('open-signup').addEventListener('click', () => openAuthModal('signup'));
-  document.getElementById('modal-close').addEventListener('click', closeAuthModal);
-  authModal.addEventListener('click', (e) => { if(e.target === authModal) closeAuthModal(); });
+/* ---------------- Helpers ---------------- */
+function currentUser(){ return state.users[state.currentUserId]; }
+function userGroups(userId){
+  return Object.values(state.groups).filter(g => g.memberIds.includes(userId));
+}
+function userPointsInGroup(userId, groupId){
+  return (state.users[userId].points[groupId]) || 0;
+}
+function userTotalPoints(userId){
+  return Object.values(state.users[userId].points).reduce((a,b)=>a+b,0);
+}
+function isProofImage(url){
+  return /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url) || url.includes("images.unsplash.com");
+}
+function isYouTube(url){ return /youtube\.com|youtu\.be/.test(url); }
+function youTubeEmbed(url){
+  let id = "";
+  const m1 = url.match(/[?&]v=([^&]+)/);
+  const m2 = url.match(/youtu\.be\/([^?&]+)/);
+  if (m1) id = m1[1]; else if (m2) id = m2[1];
+  return `https://www.youtube.com/embed/${id}`;
+}
+function renderProof(url){
+  if (!url) return `<div>No proof link</div>`;
+  if (isYouTube(url)) return `<iframe src="${youTubeEmbed(url)}" allowfullscreen loading="lazy"></iframe>`;
+  if (isProofImage(url)) return `<img src="${url}" alt="submitted proof" loading="lazy">`;
+  return `<div>Link submitted:<br><span class="mono" style="word-break:break-all; font-size:11px;">${url}</span></div>`;
+}
 
-  document.getElementById('auth-form').addEventListener('submit', function(e){
-    e.preventDefault();
-    const email = document.getElementById('auth-email').value.trim();
-    const nameInput = document.getElementById('auth-name').value.trim();
-    const name = authMode === 'signup' ? (nameInput || email.split('@')[0]) : (email.split('@')[0] || 'Player');
-    currentUser = { name: name.charAt(0).toUpperCase() + name.slice(1), email };
-    updateHeaderForAuth();
-    closeAuthModal();
-    showToast(authMode === 'signup' ? `Welcome, ${currentUser.name}! 🎉` : `Welcome back, ${currentUser.name}!`);
-    renderHome();
-    if(document.getElementById('page-submit').classList.contains('active')) renderSubmitPage();
-  });
+/* ---------------- RENDER: Home ---------------- */
+function renderHome(){
+  const u = currentUser();
+  document.getElementById("recentEntries").innerHTML = state.completed
+    .filter(c=>c.userId===u.id)
+    .slice(-3).reverse()
+    .map(c=>`<div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14px;">
+        <span>${c.taskName}</span><span class="mono" style="color:var(--brass); font-weight:700;">+${c.points}</span>
+      </div>`).join("") || `<p style="color:var(--ink-soft); font-size:14px;">Nothing yet — take a task to begin your record.</p>`;
 
-  // simple logout, reachable from dashboard
-  function logout(){
-    currentUser = null;
-    updateHeaderForAuth();
-    showPage('home');
-    renderHome();
-    showToast('Logged out.');
-  }
+  const grid = document.getElementById("homeGroupsGrid");
+  const groups = userGroups(u.id);
+  grid.innerHTML = groups.map(g => groupCardHTML(g)).join("");
+}
 
-  // ================= NAV =================
-  function showPage(name){
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('active');
-    document.querySelectorAll('nav.main button').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
-    window.scrollTo(0,0);
-  }
-  document.querySelectorAll('[data-nav]').forEach(el => {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = el.dataset.nav;
-      showPage(target);
-      if(target === 'browse') renderBrowse();
-      if(target === 'submit') renderSubmitPage();
-      if(target === 'dashboard') renderDashboard();
-    });
-  });
-  document.querySelectorAll('.policy-toc a').forEach(a => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById(a.dataset.scroll).scrollIntoView({ behavior:'smooth', block:'start' });
-    });
-  });
+function initialColorFor(str){
+  const colors = ["#3D6355","#7A6A4F","#294138","#A33B2E","#5C7A66"];
+  let hash = 0;
+  for (const c of str) hash += c.charCodeAt(0);
+  return colors[hash % colors.length];
+}
 
-  function openProject(id){
-    const p = projects.find(x => x.id === id);
-    if(!p) return;
-    p.views += 1;
-    renderDetail(p);
-    showPage('detail');
-  }
+function groupCardHTML(g){
+  const rank = rankForPoints(userPointsInGroup(currentUser().id, g.id));
+  return `<div class="group-card">
+    <div class="group-icon" style="background:${initialColorFor(g.name)}">${g.name.split(" ").map(w=>w[0]).slice(0,2).join("")}</div>
+    <div style="flex-grow:1;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+        <h3 style="font-size:17px;">${g.name}</h3>
+        <span class="privacy-badge ${g.privacy}">${g.privacy}</span>
+      </div>
+      <div class="tag">${g.category} · ${g.memberIds.length} members</div>
+      <p style="font-size:13.5px; color:var(--ink-soft); margin:8px 0 10px;">${g.desc}</p>
+      <span class="rank-badge" style="background:${RANK_COLORS[rank.name]}">${rank.name}</span>
+      <span class="mono" style="margin-left:8px; font-size:12.5px; color:var(--brass);">${userPointsInGroup(currentUser().id,g.id)} pts here</span>
+    </div>
+  </div>`;
+}
 
-  function escapeHTML(str){
-    const d = document.createElement('div');
-    d.textContent = str || '';
-    return d.innerHTML;
-  }
-
-  // ================= DATA =================
-  const GENRE_STYLE = {
-    Action:      { g1:"#FF4D8D", g2:"#C22A63", icon:"⚔️" },
-    Adventure:   { g1:"#34E4E0", g2:"#159C99", icon:"🗺️" },
-    RPG:         { g1:"#9B6BFF", g2:"#6B3FD4", icon:"📜" },
-    Horror:      { g1:"#FF5A52", g2:"#7A1F1A", icon:"👁️" },
-    Racing:      { g1:"#FF9F3E", g2:"#D4700E", icon:"🏁" },
-    Strategy:    { g1:"#B4F03C", g2:"#5C8A10", icon:"♟️" },
-    Puzzle:      { g1:"#FFD93E", g2:"#D4A50E", icon:"🧩" },
-    Platformer:  { g1:"#34E4E0", g2:"#9B6BFF", icon:"🕹️" },
-    Simulation:  { g1:"#B4F03C", g2:"#159C99", icon:"⚙️" },
-    Other:       { g1:"#9B6BFF", g2:"#FF4D8D", icon:"✨" }
-  };
-
-  const DEV_BIOS = {
-    "K. Reyes": "Solo developer who likes stealth games and quiet corners of half-finished cities. Currently freelancing while thinking about a Shadow of Kage comeback.",
-    "Nightbloom Games": "Two-person horror studio focused on atmosphere over jump scares. Currently working on an audio-drama side project.",
-    "Mara Voss": "Physics nerd and part-time student. Makes small, weird puzzle toys between semesters.",
-    "Combustion Collective": "A rotating cast of friends who've been making arcade racers together since college.",
-    "T. Okonkwo": "Design-first hobbyist. Prefers paper prototypes to code — figures out if it's fun before it's ever built.",
-    "Lantern & Wire": "A narrative-focused two-person team. Big fans of radio dramas and unreliable narrators.",
-    "Deer Path Studio": "Small indie studio building slow, atmospheric RPGs about places changing over time.",
-    "Bent Nail Games": "Scrappy arcade-fighter studio. Believes every cancelled game deserves a second look.",
-    "Iris Fenn": "Platformer specialist obsessed with movement feel over everything else.",
-    "Overcast Studio": "Systems-heavy simulation team, currently on hiatus but not done."
-  };
-  const DEV_JOINED = {
-    "K. Reyes": "2022", "Nightbloom Games": "2023", "Mara Voss": "2024",
-    "Combustion Collective": "2021", "T. Okonkwo": "2025", "Lantern & Wire": "2020",
-    "Deer Path Studio": "2023", "Bent Nail Games": "2019", "Iris Fenn": "2024", "Overcast Studio": "2022"
-  };
-
-  const seed = [
-    { id:1, title:"Shadow of Kage", genre:"Action", status:"Abandoned", engine:"Unity", dev:"K. Reyes", devtime:"12 months", year:"2022", views:1840, ripCount:64, reviveCount:312,
-      story:"Shadow of Kage started as a two-week prototype for a game jam and quietly grew into something much bigger. The idea was simple: a ninja stealth game where light and shadow weren't just aesthetic, but the entire mechanic — enemies could only see you if you crossed a lit tile.\n\nThe first six months were the best development experience I've ever had. The core mechanic worked, it felt good, and a small community started following devlogs. But scope crept. I kept adding systems — a crafting layer, branching missions, a whole second city district — without finishing the first one properly.\n\nAt month ten I was solo, out of savings, and the stealth AI still had game-breaking bugs I couldn't figure out alone. I stopped updating the devlog in month twelve. I still think about finishing it.",
-      video:"", demo:"https://itch.io",
-      comments:[
-        { name:"PixelHermit", text:"This one hurts. The demo footage looked so good — genuinely thought this would be the next big stealth indie.", time:"3 days ago" },
-        { name:"Kayla R.", text:"Voted revive immediately. Please come back to this someday!", time:"1 day ago" }
-      ] },
-    { id:2, title:"Hollow Orbit", genre:"Horror", status:"Canceled", engine:"Godot", dev:"Nightbloom Games", devtime:"5 months", year:"2023", views:940, ripCount:41, reviveCount:188,
-      story:"A survival horror game set on an abandoned space station, told almost entirely through audio logs. We wanted something closer to a haunted house than a shooter — no weapons, just a flashlight and your own paranoia.\n\nThe publisher we were talking to passed after a demo build, and without funding the two-person team couldn't keep going while also paying rent. It's fully canceled, not on hold — we've both moved to other projects. But the atmosphere we built still holds up, and we'd love for someone to see it.",
-      video:"", demo:"" },
-    { id:3, title:"Tideglass", genre:"Puzzle", status:"Prototype", engine:"Unreal Engine", dev:"Mara Voss", devtime:"3 months", year:"2024", views:512, ripCount:9, reviveCount:96,
-      story:"A physics puzzle game about bending light through glass sculptures underwater. Started as a shader experiment and turned into an actual playable prototype with about 15 puzzle rooms.\n\nCurrently paused while I finish my degree — this one isn't dead, just sleeping. Posting it here mostly to see if anyone's interested before I pick it back up.",
-      video:"", demo:"" },
-    { id:4, title:"Rustbelt Racer", genre:"Racing", status:"On Hold", engine:"Unity", dev:"Combustion Collective", devtime:"9 months", year:"2021", views:1210, ripCount:22, reviveCount:401,
-      story:"An arcade racer set in a decaying industrial city, built around destructible scenery and a rubber-band AI that actually felt fair. We had a working vertical slice with three tracks and eight cars.\n\nOur lead artist had to step away for personal reasons and the project stalled without anyone to keep the visual pipeline moving. Everyone involved still wants to finish it — 'on hold' is accurate, not a euphemism.",
-      video:"", demo:"" },
-    { id:5, title:"Paper Kingdoms", genre:"Strategy", status:"Idea", engine:"Other", dev:"T. Okonkwo", devtime:"", year:"2025", views:88, ripCount:2, reviveCount:14,
-      story:"A turn-based strategy game where the entire map is literally made of folded paper, and terrain changes as you fold and unfold sections of the board. Right now this exists as about 40 pages of design notes and one very rough paper prototype played with index cards.\n\nPosting early because I want feedback on the core folding mechanic before committing engine time to it.",
-      video:"", demo:"" },
-    { id:6, title:"Static Choir", genre:"Adventure", status:"Abandoned", engine:"Godot", dev:"Lantern & Wire", devtime:"14 months", year:"2020", views:2230, ripCount:88, reviveCount:560,
-      story:"A narrative adventure about a radio operator in a town where the signal occasionally lets you hear the future. We had full voice acting for two of six chapters and a nearly complete script.\n\nThe team split up amicably after 14 months — different life circumstances pulled everyone in different directions. This is the project I'm proudest of that never saw daylight. All assets are just sitting on a drive.",
-      video:"", demo:"",
-      comments:[
-        { name:"radiodaze", text:"The two chapters that exist are on YouTube somewhere, right? This premise is incredible.", time:"6 days ago" },
-        { name:"Tomás", text:"'Told through audio logs' + radio operator + hearing the future is such a good hook. Devastated this stopped.", time:"2 days ago" },
-        { name:"GhostFrequency", text:"Following in case any of the team wants to pick this back up with a new collaborator.", time:"yesterday" }
-      ] },
-    { id:7, title:"Ferrowood", genre:"RPG", status:"In Development", engine:"Unreal Engine", dev:"Deer Path Studio", devtime:"20 months", year:"2023", views:1670, ripCount:5, reviveCount:275,
-      story:"A low-fantasy RPG about a logging town slowly being reclaimed by an unexplainable forest. Still actively in development, but slower than announced — posting here for transparency and to log the journey honestly rather than go quiet like most devlogs do when things get hard.",
-      video:"", demo:"" },
-    { id:8, title:"Glassjaw Arena", genre:"Other", status:"Revived", engine:"Unity", dev:"Bent Nail Games", devtime:"6 months (original) + 4 months (revival)", year:"2019", views:3040, ripCount:12, reviveCount:812,
-      story:"A brutal one-hit-kill arena fighter that was shelved in 2019 after our publisher deal fell through. Filed it here in year one of this site mostly as a memorial. The revival vote count convinced a small studio to pick up the concept under license — new build launches next year.",
-      video:"", demo:"" },
-    { id:9, title:"Marrow Deep", genre:"Platformer", status:"Prototype", engine:"Godot", dev:"Iris Fenn", devtime:"4 months", year:"2024", views:340, ripCount:6, reviveCount:52,
-      story:"A grapple-hook platformer where you play as a creature made of bone, hooking onto the environment with your own ribs. Twelve levels blocked out, movement feels great. Shelved because I couldn't crack the art style — everything I tried looked wrong next to the mechanics.",
-      video:"", demo:"" },
-    { id:10, title:"Silo 7", genre:"Simulation", status:"On Hold", engine:"Unity", dev:"Overcast Studio", devtime:"11 months", year:"2022", views:780, ripCount:18, reviveCount:140,
-      story:"A colony management sim set entirely underground, where oxygen and light are the resources you're really managing. Deep systems, mostly working economy, no real bugs — just ran out of runway. Team's still together, just working day jobs now.",
-      video:"", demo:"" },
-    { id:11, title:"Nine Lives Casino", genre:"Simulation", status:"Idea", engine:"Other", dev:"T. Okonkwo", devtime:"", year:"2025", views:41, ripCount:1, reviveCount:6,
-      story:"A tiny management sim about running a casino for cats. Still just a design doc and a spreadsheet of card game rules. Posting super early to gauge interest before investing real time.",
-      video:"", demo:"" },
-    { id:12, title:"Undertow Signal", genre:"Horror", status:"Canceled", engine:"Godot", dev:"Nightbloom Games", devtime:"2 months", year:"2024", views:63, ripCount:3, reviveCount:11,
-      story:"A short experimental horror piece about a lighthouse keeper who starts hearing voices in the foghorn. Only ever a vertical slice — about 20 minutes of content. Canceled quickly when we realized the concept worked better as a short film than a game.",
-      video:"", demo:"" }
-  ];
-
-  const STATUS_KEYS = { "Idea":"idea","Prototype":"prototype","In Development":"dev","On Hold":"onhold","Abandoned":"abandoned","Canceled":"canceled","Revived":"revived" };
-  const GENRES = ["Action","Adventure","RPG","Horror","Racing","Strategy","Puzzle","Platformer","Simulation","Other"];
-  const ENGINES = ["Unity","Unreal Engine","Godot","Custom Engine","Other"];
-  const STATUSES = ["Idea","Prototype","In Development","On Hold","Abandoned","Canceled","Revived"];
-
-  let projects = JSON.parse(JSON.stringify(seed));
-  let userReactions = {};   // { projectId: 'rip' | 'revive' }
-  let followedDevs = new Set();
-  let mySubmissions = [];   // ids of projects submitted by currentUser this session
-
-  // ================= CARD RENDERING =================
-  function coverStyle(genre){
-    const s = GENRE_STYLE[genre] || GENRE_STYLE.Other;
-    return `background: linear-gradient(135deg, ${s.g1}, ${s.g2});`;
-  }
-  function coverHTML(genre, big){
-    const s = GENRE_STYLE[genre] || GENRE_STYLE.Other;
-    return `
-      <div class="shape s1" style="background:rgba(255,255,255,0.18);"></div>
-      <div class="shape s2" style="background:rgba(0,0,0,0.15);"></div>
-      <div class="shape s3" style="background:rgba(255,255,255,0.12);"></div>
-      <span class="icon" style="${big?'font-size:78px;':''}">${s.icon}</span>
-    `;
-  }
-
-  function cardHTML(p, opts){
-    opts = opts || {};
-    const key = STATUS_KEYS[p.status] || 'idea';
-    const snippet = p.story.split('\n')[0].slice(0, 100) + (p.story.length > 100 ? '…' : '');
-    const badge = opts.badge ? `<span class="badge-corner">${opts.badge}</span>` : '';
-    return `
-      <article class="gcard" data-id="${p.id}" tabindex="0" role="button" aria-label="View ${escapeHTML(p.title)}">
-        <div class="cover" style="${coverStyle(p.genre)}">
-          ${coverHTML(p.genre)}
-          ${badge}
-          <span class="status-chip ${key}">${p.status}</span>
+/* ---------------- RENDER: Groups page ---------------- */
+function renderGroups(){
+  const grid = document.getElementById("publicGroupsGrid");
+  const publicGroups = Object.values(state.groups).filter(g=>g.privacy==="public");
+  grid.innerHTML = publicGroups.map(g=>{
+    const joined = g.memberIds.includes(currentUser().id);
+    return `<div class="group-card">
+      <div class="group-icon" style="background:${initialColorFor(g.name)}">${g.name.split(" ").map(w=>w[0]).slice(0,2).join("")}</div>
+      <div style="flex-grow:1;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+          <h3 style="font-size:17px;">${g.name}</h3>
+          <span class="privacy-badge public">public</span>
         </div>
-        <div class="body">
-          <h4>${escapeHTML(p.title)}</h4>
-          <div class="genre-line">${p.genre}${p.engine ? ' · ' + p.engine : ''}</div>
-          <p class="snippet">${escapeHTML(snippet)}</p>
-          <div class="foot">
-            <span>👁 ${p.views.toLocaleString()}</span>
-            <span class="reactions"><span class="rip-mini">🕊 ${p.ripCount}</span><span class="revive-mini">❤️‍🔥 ${p.reviveCount}</span></span>
+        <div class="tag">${g.category} · ${g.memberIds.length} members</div>
+        <p style="font-size:13.5px; color:var(--ink-soft); margin:8px 0 12px;">${g.desc}</p>
+        <button class="btn ${joined?'ghost':'moss'} small" ${joined?'disabled':''} data-join-group="${g.id}">${joined? "Already a member" : "Join group"}</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  grid.querySelectorAll("[data-join-group]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const gid = btn.dataset.joinGroup;
+      state.groups[gid].memberIds.push(currentUser().id);
+      currentUser().points[gid] = 0;
+      showToast("Joined " + state.groups[gid].name);
+      renderAll();
+    });
+  });
+}
+
+document.getElementById("btnShowCreate").addEventListener("click", ()=>{
+  document.getElementById("createGroupPanel").style.display = "block";
+  document.getElementById("joinGroupPanel").style.display = "none";
+});
+document.getElementById("btnCancelCreate").addEventListener("click", ()=>{
+  document.getElementById("createGroupPanel").style.display = "none";
+});
+document.getElementById("btnShowJoin").addEventListener("click", ()=>{
+  document.getElementById("joinGroupPanel").style.display = "block";
+  document.getElementById("createGroupPanel").style.display = "none";
+});
+document.getElementById("btnCancelJoin").addEventListener("click", ()=>{
+  document.getElementById("joinGroupPanel").style.display = "none";
+});
+
+document.getElementById("createGroupForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  const id = "g" + (Object.keys(state.groups).length + 1);
+  const privacy = document.querySelector('input[name="ngPrivacy"]:checked').value;
+  state.groups[id] = {
+    id, name: document.getElementById("ngName").value,
+    desc: document.getElementById("ngDesc").value || "No description yet.",
+    category: document.getElementById("ngCategory").value,
+    privacy, code: id.toUpperCase()+"-"+Math.floor(Math.random()*900+100),
+    memberIds: [currentUser().id]
+  };
+  currentUser().points[id] = 0;
+  document.getElementById("createGroupForm").reset();
+  document.getElementById("createGroupPanel").style.display = "none";
+  showToast("Group created. Invite code: " + state.groups[id].code);
+  renderAll();
+});
+
+document.getElementById("joinGroupForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  const code = document.getElementById("joinCode").value.trim().toUpperCase();
+  const match = Object.values(state.groups).find(g=>g.code === code);
+  if (match){
+    if (!match.memberIds.includes(currentUser().id)) match.memberIds.push(currentUser().id);
+    currentUser().points[match.id] = currentUser().points[match.id] || 0;
+    showToast("Joined " + match.name);
+  } else {
+    showToast("No group found with that code");
+  }
+  document.getElementById("joinGroupForm").reset();
+  document.getElementById("joinGroupPanel").style.display = "none";
+  renderAll();
+});
+
+/* ---------------- RENDER: Tasks ---------------- */
+function populateGroupFilter(selectEl, includeAll=true){
+  const groups = userGroups(currentUser().id);
+  selectEl.innerHTML = (includeAll ? `<option value="all">All my groups</option>` : "") +
+    groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join("");
+}
+
+function renderTasks(){
+  const filterSel = document.getElementById("taskGroupFilter");
+  if (!filterSel.dataset.bound){
+    populateGroupFilter(filterSel);
+    filterSel.addEventListener("change", renderTasks);
+    filterSel.dataset.bound = "1";
+  }
+  const filterVal = filterSel.value || "all";
+  const myGroupIds = userGroups(currentUser().id).map(g=>g.id);
+  const tasks = state.tasks.filter(t => t.active && myGroupIds.includes(t.groupId) && (filterVal==="all" || t.groupId===filterVal));
+
+  const grid = document.getElementById("tasksGrid");
+  if (tasks.length===0){
+    grid.innerHTML = `<div class="empty-state">No tasks here yet. Join a group or ask its admin to add one.</div>`;
+    return;
+  }
+  grid.innerHTML = tasks.map(t=>{
+    const g = state.groups[t.groupId];
+    return `<div class="task-card">
+      <span class="cat">${t.category} · ${g.name}</span>
+      <h3>${t.name}</h3>
+      <p>${t.desc}</p>
+      <div class="task-meta">
+        <span>${t.approvalsNeeded} approvals needed${t.expiryDays ? " · expires in "+t.expiryDays+"d" : ""}</span>
+        <span class="pts">+${t.points} pts</span>
+      </div>
+      <button class="btn moss small" data-take-task="${t.id}">Take this task</button>
+    </div>`;
+  }).join("");
+
+  grid.querySelectorAll("[data-take-task]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const task = state.tasks.find(t=>t.id===btn.dataset.takeTask);
+      openSubmitForm(task);
+    });
+  });
+}
+
+function openSubmitForm(task){
+  selectedTaskForSubmit = task;
+  const g = state.groups[task.groupId];
+  document.getElementById("submitTaskSummary").innerHTML = `
+    <div class="cat">${task.category} · ${g.name}</div>
+    <h3 style="font-size:18px; margin:8px 0 4px;">${task.name}</h3>
+    <p style="color:var(--ink-soft); font-size:14px; margin:0;">${task.desc}</p>
+    <div class="mono" style="margin-top:10px; font-size:12.5px; color:var(--brass);">+${task.points} pts · ${task.approvalsNeeded} approvals needed</div>
+  `;
+  gotoPage("submit");
+}
+
+document.getElementById("submitForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  const url = document.getElementById("proofUrl").value;
+  const note = document.getElementById("proofNote").value;
+  const id = "s" + (state.submissions.length + Date.now()%1000);
+  state.submissions.push({
+    id, taskId: selectedTaskForSubmit.id, groupId: selectedTaskForSubmit.groupId,
+    userId: currentUser().id, proofUrl: url, note, approvals: [], flags: [], status:"pending"
+  });
+  document.getElementById("submitForm").reset();
+  showToast("Submitted — waiting on group approval");
+  gotoPage("approval");
+  renderAll();
+});
+
+/* ---------------- RENDER: Approval queue ---------------- */
+function renderApproval(){
+  const myGroupIds = userGroups(currentUser().id).map(g=>g.id);
+  const pending = state.submissions.filter(s => s.status==="pending" && myGroupIds.includes(s.groupId));
+  document.getElementById("approvalCount").textContent = pending.length;
+
+  const list = document.getElementById("approvalList");
+  if (pending.length===0){
+    list.innerHTML = `<div class="empty-state">Nothing waiting on review right now.</div>`;
+    return;
+  }
+  list.innerHTML = pending.map(s=>{
+    const task = state.tasks.find(t=>t.id===s.taskId);
+    const submitter = state.users[s.userId];
+    const need = task.approvalsNeeded;
+    const approvedPct = Math.min(100, (s.approvals.length/need)*100);
+    const flaggedPct = Math.min(100, (s.flags.length/need)*100);
+    const iAlreadyApproved = s.approvals.includes(currentUser().id);
+    const iAlreadyFlagged = s.flags.includes(currentUser().id);
+    const isMine = s.userId === currentUser().id;
+    return `<div class="approval-card" data-sub="${s.id}">
+      <div class="proof-frame">${renderProof(s.proofUrl)}</div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <span class="cat">${task.category}</span>
+            <h3 style="font-size:18px; margin:6px 0 2px;">${task.name}</h3>
+            <div style="font-size:13.5px; color:var(--ink-soft);">Submitted by <strong>${submitter.name}</strong>${isMine ? " (you)" : ""}</div>
           </div>
+          <span class="mono" style="color:var(--brass); font-weight:700;">+${task.points} pts</span>
         </div>
-      </article>
-    `;
+        ${s.note ? `<p style="font-size:14px; margin:10px 0 0; color:var(--ink-soft);">"${s.note}"</p>` : ""}
+        <div class="mono" style="font-size:12px; margin-top:14px; color:var(--ink-soft);">Approvals: ${s.approvals.length} / ${need}</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${approvedPct}%"></div></div>
+        <div class="mono" style="font-size:12px; color:var(--ink-soft);">Flags: ${s.flags.length} / ${need}</div>
+        <div class="progress-track"><div class="progress-fill flag" style="width:${flaggedPct}%"></div></div>
+        <div class="approve-actions">
+          <button class="btn moss small" data-approve="${s.id}" ${isMine || iAlreadyApproved ? "disabled":""}>${iAlreadyApproved ? "Approved ✓" : "Approve"}</button>
+          <button class="btn oxblood small" data-flag="${s.id}" ${isMine || iAlreadyFlagged ? "disabled":""}>${iAlreadyFlagged ? "Flagged" : "Flag"}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  list.querySelectorAll("[data-approve]").forEach(btn=>{
+    btn.addEventListener("click", ()=> handleApprove(btn.dataset.approve));
+  });
+  list.querySelectorAll("[data-flag]").forEach(btn=>{
+    btn.addEventListener("click", ()=> handleFlag(btn.dataset.flag));
+  });
+}
+
+function handleApprove(subId){
+  const s = state.submissions.find(s=>s.id===subId);
+  if (!s || s.approvals.includes(currentUser().id)) return;
+  s.approvals.push(currentUser().id);
+  const task = state.tasks.find(t=>t.id===s.taskId);
+
+  if (s.approvals.length >= task.approvalsNeeded){
+    s.status = "approved";
+    const owner = state.users[s.userId];
+    owner.points[s.groupId] = (owner.points[s.groupId]||0) + task.points;
+    state.completed.push({ userId: s.userId, groupId: s.groupId, taskName: task.name, points: task.points, date: new Date().toISOString().slice(0,10) });
+    showToast("Sealed and approved — points awarded to " + owner.name);
+    animateStamp(subId, "moss");
+  } else {
+    showToast("Approval recorded (" + s.approvals.length + "/" + task.approvalsNeeded + ")");
+  }
+  renderAll();
+}
+
+function handleFlag(subId){
+  const s = state.submissions.find(s=>s.id===subId);
+  if (!s || s.flags.includes(currentUser().id)) return;
+  s.flags.push(currentUser().id);
+  const task = state.tasks.find(t=>t.id===s.taskId);
+
+  if (s.flags.length >= task.approvalsNeeded){
+    s.status = "removed";
+    showToast("Submission removed after enough flags");
+    animateStamp(subId, "oxblood");
+  } else {
+    showToast("Flag recorded (" + s.flags.length + "/" + task.approvalsNeeded + ")");
+  }
+  renderAll();
+}
+
+function animateStamp(subId, kind){
+  // purely cosmetic — the card is about to re-render/disappear, so this is a no-op placeholder
+  // kept for future enhancement where we delay removal to show the stamp seal animation.
+}
+
+/* ---------------- RENDER: Leaderboard ---------------- */
+function renderLeaderboard(){
+  const sel = document.getElementById("leaderGroupFilter");
+  if (!sel.dataset.bound){
+    populateGroupFilter(sel, false);
+    sel.addEventListener("change", renderLeaderboard);
+    sel.dataset.bound = "1";
+  }
+  const groups = userGroups(currentUser().id);
+  if (groups.length===0){
+    document.getElementById("leaderboardList").innerHTML = `<div class="empty-state">Join a group to see its leaderboard.</div>`;
+    return;
+  }
+  const groupId = sel.value || groups[0].id;
+  const group = state.groups[groupId];
+  const rows = group.memberIds
+    .map(uid => ({ user: state.users[uid], pts: userPointsInGroup(uid, groupId) }))
+    .sort((a,b)=> b.pts - a.pts);
+
+  document.getElementById("leaderboardList").innerHTML = rows.map((r, i)=>{
+    const rank = rankForPoints(r.pts);
+    return `<div class="lead-row">
+      <span class="rank-num">#${i+1}</span>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="avatar" style="background:${r.user.color}; width:30px; height:30px; font-size:12px;">${r.user.initial}</div>
+        <span>${r.user.name}${r.user.id===currentUser().id ? " (you)" : ""}</span>
+      </div>
+      <span class="rank-badge" style="background:${RANK_COLORS[rank.name]}">${rank.name}</span>
+      <span class="mono" style="font-weight:700; color:var(--brass);">${r.pts} pts</span>
+    </div>`;
+  }).join("");
+}
+
+/* ---------------- RENDER: Profile ---------------- */
+function renderProfile(){
+  const u = currentUser();
+  const total = userTotalPoints(u.id);
+  const rank = rankForPoints(total);
+  const next = nextRank(total);
+
+  document.querySelector("#page-profile .profile-avatar").style.background = u.color;
+  document.querySelector("#page-profile .profile-avatar").textContent = u.initial;
+  document.querySelector("#page-profile h2").textContent = u.name;
+  document.querySelector("#page-profile .rank-badge").textContent = rank.name;
+  document.querySelector("#page-profile .rank-badge").style.background = RANK_COLORS[rank.name];
+  document.querySelector("#page-profile .mono").textContent = total + " pts";
+
+  const progWrap = document.querySelector("#page-profile .progress-to-next");
+  if (next){
+    const span = next.min - rank.min;
+    const into = total - rank.min;
+    const pct = Math.min(100, Math.round((into/span)*100));
+    progWrap.innerHTML = `<div class="mono" style="font-size:12px; color:var(--ink-soft);">${next.min - total} pts to ${next.name}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+  } else {
+    progWrap.innerHTML = `<div class="mono" style="font-size:12px; color:var(--brass); font-weight:700;">Highest rank reached</div>`;
   }
 
-  function attachCardHandlers(container){
-    container.querySelectorAll('.gcard').forEach(el => {
-      const id = Number(el.dataset.id);
-      el.addEventListener('click', () => openProject(id));
-      el.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openProject(id); } });
-    });
-  }
+  document.querySelector("#page-profile .profile-head div div:last-child").innerHTML =
+    "Member of: " + userGroups(u.id).map(g=>`<strong>${g.name}</strong>`).join(", ");
 
-  function shuffledSample(arr, n){
-    const copy = [...arr];
-    for(let i = copy.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i+1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy.slice(0, n);
-  }
+  const completed = state.completed.filter(c=>c.userId===u.id).slice().reverse();
+  document.getElementById("completedList").innerHTML = completed.length ? completed.map(c=>`
+    <div class="completed-row">
+      <span>${c.taskName} <span class="mono" style="color:var(--ink-soft); font-size:12px;">· ${state.groups[c.groupId].name}</span></span>
+      <span class="pts">+${c.points}</span>
+    </div>`).join("") : `<div class="empty-state">No completed deeds yet.</div>`;
+}
 
-  // ================= HOME =================
-  function renderHome(){
-    // following section
-    const followingSec = document.getElementById('following-section');
-    if(isLoggedIn() && followedDevs.size > 0){
-      const followingProjects = projects.filter(p => followedDevs.has(p.dev)).sort((a,b)=>b.id-a.id);
-      if(followingProjects.length){
-        followingSec.style.display = 'block';
-        const grid = document.getElementById('grid-following');
-        grid.innerHTML = followingProjects.slice(0,4).map(p => cardHTML(p, { badge: '🔔 Followed dev' })).join('');
-        attachCardHandlers(grid);
-      } else { followingSec.style.display = 'none'; }
-    } else {
-      followingSec.style.display = 'none';
-    }
+/* ---------------- RENDER: About ---------------- */
+function renderAbout(){
+  document.getElementById("rankLadder").innerHTML = RANKS.map(r=>`
+    <div class="rank-step">
+      <span class="name">${r.name}</span>
+      <span class="pts-req mono">${r.min}+ pts</span>
+    </div>`).join("");
+}
 
-    renderRandom();
+/* ---------------- RENDER: Admin ---------------- */
+function renderAdmin(){
+  const sel = document.getElementById("taskAdminGroup");
+  const groups = userGroups(currentUser().id);
+  sel.innerHTML = groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join("");
 
-    // underdog: lowest-viewed 40%, random pick of 4
-    const sortedByViews = [...projects].sort((a,b)=>a.views-b.views);
-    const bottomPool = sortedByViews.slice(0, Math.max(4, Math.ceil(projects.length * 0.4)));
-    const underdogPicks = shuffledSample(bottomPool, 4);
-    const gridUnderdog = document.getElementById('grid-underdog');
-    gridUnderdog.innerHTML = underdogPicks.map(p => cardHTML(p, { badge: '🌱 Underseen' })).join('');
-    attachCardHandlers(gridUnderdog);
+  const flagged = state.submissions.filter(s => s.flags.length > 0 && s.status !== "removed");
+  const flagList = document.getElementById("flagList");
+  flagList.innerHTML = flagged.length ? flagged.map(s=>{
+    const task = state.tasks.find(t=>t.id===s.taskId);
+    const submitter = state.users[s.userId];
+    return `<div class="flag-item">
+      <span>${submitter.name} — "${task.name}" — ${s.flags.length} flag(s)</span>
+      <button class="btn oxblood small" data-remove-sub="${s.id}">Remove submission</button>
+    </div>`;
+  }).join("") : `<div class="empty-state">No flagged submissions.</div>`;
 
-    const latest = [...projects].sort((a,b)=>b.id-a.id).slice(0,4);
-    const gridLatest = document.getElementById('grid-latest');
-    gridLatest.innerHTML = latest.map(p => cardHTML(p)).join('');
-    attachCardHandlers(gridLatest);
-
-    const wanted = [...projects].sort((a,b)=>b.reviveCount-a.reviveCount).slice(0,4);
-    const gridWanted = document.getElementById('grid-wanted');
-    gridWanted.innerHTML = wanted.map(p => cardHTML(p)).join('');
-    attachCardHandlers(gridWanted);
-
-    const band = document.getElementById('genre-band');
-    band.innerHTML = GENRES.map(g => `<button class="genre-pill" data-genre="${g}">${GENRE_STYLE[g].icon} ${g}</button>`).join('');
-    band.querySelectorAll('.genre-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        showPage('browse');
-        document.getElementById('f-genre').value = btn.dataset.genre;
-        renderBrowse();
+  flagList.querySelectorAll("[data-remove-sub]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      confirmAction("Remove this submission?", "This will delete the submission permanently. This cannot be undone.", ()=>{
+        const s = state.submissions.find(s=>s.id===btn.dataset.removeSub);
+        s.status = "removed";
+        showToast("Submission removed by admin");
+        renderAll();
       });
     });
-  }
-
-  function renderRandom(){
-    const picks = shuffledSample(projects, 4);
-    const grid = document.getElementById('grid-random');
-    grid.innerHTML = picks.map(p => cardHTML(p)).join('');
-    attachCardHandlers(grid);
-  }
-  document.getElementById('reshuffle-random').addEventListener('click', renderRandom);
-
-  // ================= BROWSE =================
-  function populateFilterOptions(){
-    const statusSel = document.getElementById('f-status');
-    STATUSES.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; statusSel.appendChild(o); });
-    const genreSel = document.getElementById('f-genre');
-    GENRES.forEach(g => { const o=document.createElement('option'); o.value=g; o.textContent=g; genreSel.appendChild(o); });
-    const engineSel = document.getElementById('f-engine');
-    ENGINES.forEach(e => { const o=document.createElement('option'); o.value=e; o.textContent=e; engineSel.appendChild(o); });
-  }
-
-  function renderBrowse(){
-    const search = document.getElementById('f-search').value.trim().toLowerCase();
-    const status = document.getElementById('f-status').value;
-    const genre = document.getElementById('f-genre').value;
-    const engine = document.getElementById('f-engine').value;
-    const sort = document.getElementById('f-sort').value;
-
-    let list = projects.filter(p => {
-      if(search && !p.title.toLowerCase().includes(search)) return false;
-      if(status && p.status !== status) return false;
-      if(genre && p.genre !== genre) return false;
-      if(engine && p.engine !== engine) return false;
-      return true;
-    });
-
-    if(sort === 'latest') list.sort((a,b)=>b.id-a.id);
-    else if(sort === 'viewed') list.sort((a,b)=>b.views-a.views);
-    else if(sort === 'voted') list.sort((a,b)=>b.reviveCount-a.reviveCount);
-    else if(sort === 'az') list.sort((a,b)=>a.title.localeCompare(b.title));
-
-    document.getElementById('browse-count-label').textContent = `${list.length} game${list.length===1?'':'s'} found.`;
-
-    const grid = document.getElementById('grid-browse');
-    document.querySelector('#page-browse .empty-state')?.remove();
-    if(list.length === 0){
-      grid.innerHTML = '';
-      const empty = document.createElement('div');
-      empty.className = 'empty-state';
-      empty.textContent = '👻 Nothing matches those filters. Try widening the search.';
-      grid.after(empty);
-    } else {
-      grid.innerHTML = list.map(p => cardHTML(p)).join('');
-      attachCardHandlers(grid);
-    }
-  }
-  ['f-search','f-status','f-genre','f-engine','f-sort'].forEach(id => {
-    document.getElementById(id).addEventListener('input', renderBrowse);
   });
+}
 
-  // ================= DETAIL =================
-  function renderDetail(p){
-    const key = STATUS_KEYS[p.status] || 'idea';
-    const myReaction = userReactions[p.id];
-    const links = [];
-    if(p.demo) links.push(['🎮 Demo / Download', p.demo]);
-    if(p.video) links.push(['📺 Gameplay Video', p.video]);
-    const isFollowed = followedDevs.has(p.dev);
+document.getElementById("newTaskForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  const approvals = Math.min(6, Math.max(3, parseInt(document.getElementById("taskApprovals").value || 3)));
+  const id = "t" + (state.tasks.length + 1 + Date.now()%1000);
+  state.tasks.push({
+    id,
+    groupId: document.getElementById("taskAdminGroup").value,
+    name: document.getElementById("taskName").value,
+    desc: document.getElementById("taskDesc").value,
+    points: parseInt(document.getElementById("taskPoints").value || 10),
+    category: document.getElementById("taskCat").value,
+    approvalsNeeded: approvals,
+    expiryDays: document.getElementById("taskExpiry").value ? parseInt(document.getElementById("taskExpiry").value) : null,
+    active: true
+  });
+  document.getElementById("newTaskForm").reset();
+  document.getElementById("taskApprovals").value = 3;
+  document.getElementById("taskPoints").value = 20;
+  showToast("Task added to the list");
+  renderAll();
+});
 
-    document.getElementById('detail-content').innerHTML = `
-      <span class="back-link" id="detail-back">← Back to browse</span>
-      <div class="detail-head">
-        <div class="detail-cover" style="${coverStyle(p.genre)}">${coverHTML(p.genre, true)}</div>
-        <div class="detail-info">
-          <div class="case mono">CASE FILE #${String(p.id).padStart(4,'0')}</div>
-          <h2>${escapeHTML(p.title)}</h2>
-          <div class="genre-line">${p.genre}${p.engine ? ' · ' + p.engine : ''}</div>
-          <div class="fields">
-            <div class="field"><div class="k">Status</div><div class="v"><span class="status-chip ${key}" style="position:static; display:inline-block;">${p.status}</span></div></div>
-            <div class="field"><div class="k">Year Started</div><div class="v">${p.year || '—'}</div></div>
-            <div class="field"><div class="k">Developer</div><div class="v">${p.dev ? `<a href="#" class="dev-link" data-dev="${escapeHTML(p.dev)}">${escapeHTML(p.dev)} ↗</a>` : 'Unlisted'}</div></div>
-            <div class="field"><div class="k">Dev Time</div><div class="v">${p.devtime || '—'}</div></div>
-          </div>
-          <div class="detail-actions">
-            <div class="reaction-row">
-              <button class="react-btn rip ${myReaction==='rip'?'active':''}" id="rip-btn">🕊 RIP</button>
-              <button class="react-btn revive ${myReaction==='revive'?'active':''}" id="revive-btn">❤️‍🔥 Revive</button>
-            </div>
-          </div>
-          <div class="revive-count" style="margin-top:10px;">🕊 ${p.ripCount} · ❤️‍🔥 ${p.reviveCount}</div>
-          <div class="detail-actions" style="margin-top:6px;">
-            <button class="btn ${isFollowed ? 'ghost' : 'small'} small" id="detail-follow-btn">${isFollowed ? '✓ Following ' + escapeHTML(p.dev) : '+ Follow ' + escapeHTML(p.dev)}</button>
-            <button class="report-link" id="report-btn">🚩 Report this project</button>
-          </div>
-        </div>
-      </div>
+/* ---------------- Master render ---------------- */
+function renderAll(){
+  const u = currentUser();
+  document.getElementById("currentAvatar").textContent = u.initial;
+  document.getElementById("currentAvatar").style.background = u.color;
+  document.getElementById("currentUserName").textContent = u.name.split(" ")[0];
+  document.getElementById("currentUserPts").textContent = "· " + userTotalPoints(u.id) + " pts";
 
-      <div class="prose-block">
-        <h3>📖 About This Project</h3>
-        <p class="story">${escapeHTML(p.story)}</p>
-      </div>
-
-      ${links.length ? `
-      <div class="media-links">
-        <h3>🔗 Media & Links</h3>
-        <ul>${links.map(([label,url]) => `<li><a href="${escapeHTML(url)}" target="_blank" rel="noopener">${label} ↗</a></li>`).join('')}</ul>
-      </div>` : ''}
-
-      <div class="comments-block">
-        <h3>💬 Discussion <span class="beta-tag">BETA</span></h3>
-        <div class="placeholder-note" style="margin-bottom:18px;">This discussion feature is an early placeholder — comments here are for demo purposes and aren't saved permanently yet.</div>
-        <div id="comments-list"></div>
-        ${isLoggedIn() ? `
-        <form id="comment-form" class="comment-form">
-          <textarea id="comment-input" placeholder="Share your thoughts on this project..." required></textarea>
-          <div class="comment-form-bar">
-            <span class="genre-line">Posting as ${escapeHTML(currentUser.name)}</span>
-            <button type="submit" class="btn cyan small">Post Comment</button>
-          </div>
-        </form>` : `
-        <div class="login-gate" style="margin-top:16px;">
-          <p><b>Log in</b> to join the discussion.</p>
-          <button class="btn small pink" id="comment-login-btn">Log In</button>
-        </div>`}
-      </div>
-    `;
-
-    renderComments(p);
-
-    document.getElementById('detail-back').addEventListener('click', () => { showPage('browse'); renderBrowse(); });
-
-    document.querySelectorAll('.dev-link').forEach(el => {
-      el.addEventListener('click', (e) => { e.preventDefault(); openProfile(el.dataset.dev, p); });
-    });
-
-    document.getElementById('rip-btn').addEventListener('click', () => setReaction(p, 'rip'));
-    document.getElementById('revive-btn').addEventListener('click', () => setReaction(p, 'revive'));
-
-    document.getElementById('detail-follow-btn').addEventListener('click', function(){
-      if(!requireLogin('follow developers')) return;
-      toggleFollow(p.dev);
-      renderDetail(p);
-    });
-
-    document.getElementById('report-btn').addEventListener('click', () => {
-      showToast('🚩 Report received — thanks for flagging this (placeholder, not sent anywhere yet).');
-    });
-
-    const commentLoginBtn = document.getElementById('comment-login-btn');
-    if(commentLoginBtn) commentLoginBtn.addEventListener('click', () => openAuthModal('login'));
-
-    const commentForm = document.getElementById('comment-form');
-    if(commentForm){
-      commentForm.addEventListener('submit', function(e){
-        e.preventDefault();
-        const textEl = document.getElementById('comment-input');
-        const text = textEl.value.trim();
-        if(!text) return;
-        if(!p.comments) p.comments = [];
-        p.comments.push({ name: currentUser.name, text, time: 'just now' });
-        textEl.value = '';
-        renderComments(p);
-        showToast('Comment posted 💬');
-      });
-    }
-  }
-
-  function setReaction(p, type){
-    if(!requireLogin('mark RIP or Revive')) return;
-    const prev = userReactions[p.id];
-    if(prev === type){
-      // toggle off
-      if(type === 'rip') p.ripCount--; else p.reviveCount--;
-      delete userReactions[p.id];
-    } else {
-      if(prev === 'rip') p.ripCount--;
-      if(prev === 'revive') p.reviveCount--;
-      if(type === 'rip') p.ripCount++; else p.reviveCount++;
-      userReactions[p.id] = type;
-    }
-    renderDetail(p);
-    if(userReactions[p.id] === 'revive') showToast('Marked ❤️‍🔥 Revive — thanks for weighing in!');
-    else if(userReactions[p.id] === 'rip') showToast('Marked 🕊 RIP — rest easy.');
-  }
-
-  function toggleFollow(devName){
-    if(followedDevs.has(devName)){ followedDevs.delete(devName); showToast(`Unfollowed ${devName}`); }
-    else { followedDevs.add(devName); showToast(`Following ${devName} 🔔`); }
-  }
-
-  function renderComments(p){
-    const list = document.getElementById('comments-list');
-    if(!list) return;
-    const comments = p.comments || [];
-    if(comments.length === 0){
-      list.innerHTML = `<div class="empty-state" style="padding:26px;">No comments yet — be the first to say something.</div>`;
-      return;
-    }
-    list.innerHTML = comments.map(c => `
-      <div class="comment">
-        <div class="comment-avatar">${(c.name || 'A').trim().charAt(0).toUpperCase()}</div>
-        <div class="comment-body">
-          <div class="comment-head"><span class="comment-name">${escapeHTML(c.name)}</span><span class="comment-time">${escapeHTML(c.time)}</span></div>
-          <p class="comment-text">${escapeHTML(c.text)}</p>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  // ================= DEVELOPER PROFILE =================
-  function openProfile(devName, fromProject){
-    const devProjects = projects.filter(pr => pr.dev === devName);
-    const totalRevive = devProjects.reduce((sum, pr) => sum + pr.reviveCount, 0);
-    const isFollowed = followedDevs.has(devName);
-    const bio = DEV_BIOS[devName] || "This developer hasn't added a bio yet. They're out there somewhere, probably debugging something.";
-    const joined = DEV_JOINED[devName] || "2023";
-
-    document.getElementById('detail-content').innerHTML = `
-      <span class="back-link" id="profile-back">← Back to ${escapeHTML(fromProject.title)}</span>
-      <div class="profile-head">
-        <div class="profile-avatar">${devName.trim().charAt(0).toUpperCase()}</div>
-        <div class="profile-info">
-          <h2>${escapeHTML(devName)}</h2>
-          <div class="genre-line">Member since ${joined} · ${devProjects.length} project${devProjects.length===1?'':'s'} filed</div>
-          <p class="profile-bio">${escapeHTML(bio)}</p>
-          <div class="detail-actions">
-            <button class="btn ${isFollowed ? 'ghost' : 'pink'}" id="follow-btn">${isFollowed ? '✓ Following' : '+ Follow'}</button>
-            <span class="revive-count">❤️‍🔥 ${totalRevive} total revive votes across their projects</span>
-          </div>
-        </div>
-      </div>
-      <div class="prose-block" style="margin-top:38px;">
-        <h3>🗃 Their Projects</h3>
-        <div class="card-grid" id="profile-projects" style="margin-top:16px;"></div>
-      </div>
-      <div class="placeholder-note" style="margin-top:30px;">👤 Developer profiles are an early placeholder — bios, real avatars, and account-linked social feeds are coming soon.</div>
-    `;
-
-    const grid = document.getElementById('profile-projects');
-    grid.innerHTML = devProjects.map(p => cardHTML(p)).join('');
-    attachCardHandlers(grid);
-
-    document.getElementById('profile-back').addEventListener('click', () => openProject(fromProject.id));
-    document.getElementById('follow-btn').addEventListener('click', function(){
-      if(!requireLogin('follow developers')) return;
-      toggleFollow(devName);
-      openProfile(devName, fromProject);
-    });
-  }
-
-  // ================= SUBMIT PAGE (gated) =================
-  function renderSubmitPage(){
-    const wrap = document.getElementById('submit-wrap');
-    if(!isLoggedIn()){
-      wrap.innerHTML = `
-        <span class="back-link" data-nav="home">← Back</span>
-        <div class="section-head">
-          <div><h2>⚰️ Submit a Game</h2><p>You'll need an account to submit — it lets you edit or remove your project later from your dashboard.</p></div>
-        </div>
-        <div class="login-gate">
-          <p><b>Log in or sign up</b> to submit a project to the archive.</p>
-          <div style="display:flex; gap:10px;">
-            <button class="btn ghost small" id="submit-login-btn">Log In</button>
-            <button class="btn small" id="submit-signup-btn">Sign Up</button>
-          </div>
-        </div>
-      `;
-      wrap.querySelector('[data-nav="home"]').addEventListener('click', (e)=>{ e.preventDefault(); showPage('home'); });
-      document.getElementById('submit-login-btn').addEventListener('click', () => openAuthModal('login'));
-      document.getElementById('submit-signup-btn').addEventListener('click', () => openAuthModal('signup'));
-      return;
-    }
-
-    wrap.innerHTML = `
-      <span class="back-link" data-nav="home">← Back</span>
-      <div class="section-head">
-        <div><h2>⚰️ Submit a Game</h2><p>Tell us what it was, what happened, and why it mattered. Takes about five minutes.</p></div>
-      </div>
-      <form class="form-wrap" id="submit-form">
-        <div class="form-section">
-          <div class="fs-title">🎮 The Basics</div>
-          <div class="form-row"><label for="in-title">Game Title *</label><input type="text" id="in-title" placeholder="Shadow of Kage" required></div>
-          <div class="form-row"><label for="in-cover">Cover Image URL</label><input type="url" id="in-cover" placeholder="https://i.imgur.com/..."><div class="hint">No image yet? No problem — we'll generate a colorful placeholder cover.</div></div>
-          <div class="form-row"><label for="in-desc">Description / Story *</label><textarea id="in-desc" placeholder="Tell us about your game, its history, what happened, and anything you want players to know." required></textarea></div>
-          <div class="two-col">
-            <div class="form-row"><label for="in-genre">Genre *</label>
-              <select id="in-genre" required><option value="">Choose one</option>${GENRES.map(g=>`<option>${g}</option>`).join('')}</select>
-            </div>
-            <div class="form-row"><label for="in-status">Project Status *</label>
-              <select id="in-status" required><option value="">Choose one</option>${STATUSES.map(s=>`<option>${s}</option>`).join('')}</select>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="fs-title">🖼 Media (optional)</div>
-          <div class="form-row"><label>Screenshot URLs</label><div id="screenshot-list"></div><button type="button" class="add-link" id="add-screenshot">+ Add another screenshot link</button></div>
-          <div class="form-row"><label for="in-video">Gameplay Video URL</label><input type="url" id="in-video" placeholder="https://youtube.com/..."></div>
-          <div class="form-row"><label for="in-demo">Demo Download URL</label><input type="url" id="in-demo" placeholder="itch.io, GitHub, Google Drive..."></div>
-        </div>
-
-        <div class="form-section">
-          <div class="fs-title">👥 Credits & Details (optional)</div>
-          <div class="two-col">
-            <div class="form-row"><label for="in-dev">Developer Name</label><input type="text" id="in-dev" placeholder="Your name or handle" value="${escapeHTML(currentUser.name)}"></div>
-            <div class="form-row"><label for="in-team">Team Name</label><input type="text" id="in-team" placeholder="Studio or team name"></div>
-          </div>
-          <div class="two-col">
-            <div class="form-row"><label for="in-engine">Engine Used</label>
-              <select id="in-engine"><option value="">Not specified</option>${ENGINES.map(e=>`<option>${e}</option>`).join('')}</select>
-            </div>
-            <div class="form-row"><label for="in-devtime">Development Time</label><input type="text" id="in-devtime" placeholder="e.g. 8 months"></div>
-          </div>
-          <div class="form-row"><label for="in-year">Year Started</label><input type="text" id="in-year" placeholder="e.g. 2023" style="max-width:160px;"></div>
-        </div>
-
-        <div class="form-section">
-          <div class="fs-title">🔗 Social Links (optional)</div>
-          <div class="two-col">
-            <div class="form-row"><label for="in-website">Website</label><input type="url" id="in-website" placeholder="https://..."></div>
-            <div class="form-row"><label for="in-twitter">Twitter / X</label><input type="url" id="in-twitter" placeholder="https://x.com/..."></div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="fs-title">✅ Rights Confirmation</div>
-          <div class="confirm-box" id="confirm-box">
-            <input type="checkbox" id="in-confirm" required>
-            <div class="ctext">
-              <b>I confirm this is my own project, or I have permission to share it.</b>
-              By checking this box you take responsibility for the accuracy of that claim. If a rights holder later disputes this submission, we will remove it upon a valid request.
-              <span class="fine">See our <a href="#" data-nav="policy">Terms & Takedown Policy</a> for details. This confirmation is logged with your submission.</span>
-            </div>
-          </div>
-          <div class="confirm-error-msg" id="confirm-error-msg">⚠️ You must check this box before submitting.</div>
-        </div>
-
-        <div class="submit-bar">
-          <span class="mono" style="font-size:12px; color:var(--ink-dim);">* Required fields</span>
-          <button type="submit" class="btn pink">⚰️ Bury This Game</button>
-        </div>
-      </form>
-    `;
-
-    wrap.querySelector('[data-nav="home"]').addEventListener('click', (e)=>{ e.preventDefault(); showPage('home'); });
-    wrap.querySelectorAll('[data-nav="policy"]').forEach(el => el.addEventListener('click', (e)=>{ e.preventDefault(); showPage('policy'); }));
-
-    function addScreenshotRow(){
-      const row = document.createElement('div');
-      row.className = 'multi-url-row';
-      row.innerHTML = `<input type="url" placeholder="https://imgur.com/..."> <button type="button" class="remove-link" aria-label="Remove">✕</button>`;
-      row.querySelector('.remove-link').addEventListener('click', () => row.remove());
-      document.getElementById('screenshot-list').appendChild(row);
-    }
-    document.getElementById('add-screenshot').addEventListener('click', addScreenshotRow);
-    addScreenshotRow();
-
-    document.getElementById('in-confirm').addEventListener('change', function(){
-      if(this.checked){
-        document.getElementById('confirm-box').classList.remove('error');
-        document.getElementById('confirm-error-msg').classList.remove('show');
-      }
-    });
-
-    document.getElementById('submit-form').addEventListener('submit', function(e){
-      e.preventDefault();
-      const confirmBox = document.getElementById('in-confirm');
-      const confirmWrap = document.getElementById('confirm-box');
-      const confirmError = document.getElementById('confirm-error-msg');
-      if(!confirmBox.checked){
-        confirmWrap.classList.remove('error'); void confirmWrap.offsetWidth; confirmWrap.classList.add('error');
-        confirmError.classList.add('show');
-        confirmWrap.scrollIntoView({ behavior:'smooth', block:'center' });
-        showToast('⚠️ Please confirm ownership before submitting.');
-        return;
-      }
-      const title = document.getElementById('in-title').value.trim();
-      const desc = document.getElementById('in-desc').value.trim();
-      const genre = document.getElementById('in-genre').value;
-      const status = document.getElementById('in-status').value;
-      if(!title || !desc || !genre || !status){ showToast('Please fill in all required fields.'); return; }
-
-      const newProject = {
-        id: Math.max(...projects.map(p=>p.id)) + 1,
-        title, genre, status,
-        engine: document.getElementById('in-engine').value,
-        dev: document.getElementById('in-dev').value.trim() || currentUser.name,
-        devtime: document.getElementById('in-devtime').value.trim(),
-        year: document.getElementById('in-year').value.trim(),
-        views: 0, ripCount: 0, reviveCount: 0,
-        story: desc,
-        video: document.getElementById('in-video').value.trim(),
-        demo: document.getElementById('in-demo').value.trim(),
-        ownerEmail: currentUser.email,
-        confirmedAt: new Date().toISOString()
-      };
-      projects.unshift(newProject);
-      mySubmissions.unshift(newProject.id);
-      showToast('Filed! Your game has joined the archive. 🪦');
-      renderHome();
-      openProject(newProject.id);
-    });
-  }
-
-  // ================= DASHBOARD =================
-  function renderDashboard(){
-    const wrap = document.getElementById('dashboard-wrap');
-    if(!isLoggedIn()){
-      wrap.innerHTML = `
-        <div class="login-gate">
-          <p><b>Log in</b> to view your dashboard.</p>
-          <button class="btn small pink" id="dash-login-btn">Log In</button>
-        </div>
-      `;
-      document.getElementById('dash-login-btn').addEventListener('click', () => openAuthModal('login'));
-      return;
-    }
-
-    const myProjects = projects.filter(p => mySubmissions.includes(p.id));
-    const totalRevive = myProjects.reduce((s,p)=>s+p.reviveCount, 0);
-
-    wrap.innerHTML = `
-      <div class="section-head">
-        <div><h2>👤 Your Dashboard</h2><p>Welcome, ${escapeHTML(currentUser.name)}. Manage your submissions and following.</p></div>
-        <button class="btn ghost small" id="dash-logout">Log Out</button>
-      </div>
-      <div class="dash-stats">
-        <div class="dash-stat"><div class="num">${myProjects.length}</div><div class="lab">Projects Filed</div></div>
-        <div class="dash-stat"><div class="num">${totalRevive}</div><div class="lab">Revive Votes Received</div></div>
-        <div class="dash-stat"><div class="num">${followedDevs.size}</div><div class="lab">Developers Followed</div></div>
-      </div>
-
-      <h3 style="font-size:20px; margin-bottom:16px;">🗂 Your Submissions</h3>
-      <div id="dash-my-projects"></div>
-
-      <h3 style="font-size:20px; margin:34px 0 16px;">🔔 Following</h3>
-      <div id="dash-following-list"></div>
-    `;
-
-    document.getElementById('dash-logout').addEventListener('click', logout);
-
-    const myProjectsWrap = document.getElementById('dash-my-projects');
-    if(myProjects.length === 0){
-      myProjectsWrap.innerHTML = `<div class="empty-state">You haven't submitted anything yet. <span style="display:block; margin-top:8px;"><button class="btn small pink" id="dash-submit-btn">⚰️ Submit a Game</button></span></div>`;
-      document.getElementById('dash-submit-btn').addEventListener('click', () => { showPage('submit'); renderSubmitPage(); });
-    } else {
-      myProjectsWrap.innerHTML = myProjects.map(p => `
-        <div class="dash-row">
-          <div class="dash-cover" style="${coverStyle(p.genre)}">${(GENRE_STYLE[p.genre]||GENRE_STYLE.Other).icon}</div>
-          <div class="dash-info">
-            <h5>${escapeHTML(p.title)}</h5>
-            <div class="meta">${p.status} · 👁 ${p.views} · 🕊 ${p.ripCount} · ❤️‍🔥 ${p.reviveCount}</div>
-          </div>
-          <div class="dash-actions">
-            <button class="btn tiny ghost" data-view="${p.id}">View</button>
-            <button class="btn tiny" data-edit="${p.id}">Edit</button>
-            <button class="btn tiny danger" data-delete="${p.id}">Delete</button>
-          </div>
-        </div>
-      `).join('');
-      myProjectsWrap.querySelectorAll('[data-view]').forEach(btn => btn.addEventListener('click', () => { showPage('detail'); openProject(Number(btn.dataset.view)); }));
-      myProjectsWrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => openEditModal(Number(btn.dataset.edit))));
-      myProjectsWrap.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', () => {
-        const id = Number(btn.dataset.delete);
-        const proj = projects.find(p=>p.id===id);
-        if(confirm(`Delete "${proj.title}" permanently? This can't be undone.`)){
-          projects = projects.filter(p => p.id !== id);
-          mySubmissions = mySubmissions.filter(pid => pid !== id);
-          showToast('Project deleted.');
-          renderDashboard();
-          renderHome();
-        }
-      }));
-    }
-
-    const followWrap = document.getElementById('dash-following-list');
-    if(followedDevs.size === 0){
-      followWrap.innerHTML = `<div class="empty-state">You're not following any developers yet. Visit a project page and hit Follow.</div>`;
-    } else {
-      followWrap.innerHTML = [...followedDevs].map(dev => {
-        const count = projects.filter(p => p.dev === dev).length;
-        return `
-          <div class="dash-row">
-            <div class="dash-cover" style="background:linear-gradient(135deg, var(--purple), var(--pink)); color:white; font-family:'Baloo 2',sans-serif; font-weight:800;">${dev.charAt(0).toUpperCase()}</div>
-            <div class="dash-info"><h5>${escapeHTML(dev)}</h5><div class="meta">${count} project${count===1?'':'s'} filed</div></div>
-            <div class="dash-actions"><button class="btn tiny danger" data-unfollow="${escapeHTML(dev)}">Unfollow</button></div>
-          </div>
-        `;
-      }).join('');
-      followWrap.querySelectorAll('[data-unfollow]').forEach(btn => btn.addEventListener('click', () => {
-        followedDevs.delete(btn.dataset.unfollow);
-        showToast(`Unfollowed ${btn.dataset.unfollow}`);
-        renderDashboard();
-      }));
-    }
-  }
-
-  // simple inline edit via prompt-based modal reuse (keeps this placeholder lightweight)
-  function openEditModal(id){
-    const p = projects.find(x => x.id === id);
-    if(!p) return;
-    const newTitle = prompt('Edit title:', p.title);
-    if(newTitle === null) return;
-    const newStory = prompt('Edit description/story:', p.story);
-    if(newStory === null) return;
-    p.title = newTitle.trim() || p.title;
-    p.story = newStory.trim() || p.story;
-    showToast('Project updated.');
-    renderDashboard();
-  }
-
-  // ================= TOAST =================
-  let toastTimer;
-  function showToast(msg){
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=> t.classList.remove('show'), 2800);
-  }
-
-  // ================= INIT =================
-  populateFilterOptions();
-  updateHeaderForAuth();
   renderHome();
-  renderBrowse();
+  renderGroups();
+  renderTasks();
+  renderApproval();
+  renderLeaderboard();
+  renderProfile();
+  renderAbout();
+  renderAdmin();
+}
 
-})();
+renderAll();
 </script>
-
 </body>
 </html>
